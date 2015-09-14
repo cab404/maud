@@ -17,4 +17,5 @@
     <string name="title_activity_topic">TopicActivity</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_splash">SplashActivity</string>
 </resources>

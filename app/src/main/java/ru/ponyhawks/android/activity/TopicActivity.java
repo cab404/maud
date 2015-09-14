@@ -6,13 +6,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.fragments.TopicFragment;
 
 public class TopicActivity extends AppCompatActivity {
+
+    public static final String KEY_TOPIC_ID = "topicId";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_topic);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, TopicFragment.getInstance(getIntent().getIntExtra(KEY_TOPIC_ID, -1)))
+                .commit();
     }
 
     @Override

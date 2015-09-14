@@ -1,5 +1,6 @@
 package ru.ponyhawks.android.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -8,15 +9,14 @@ import android.view.View;
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Topic;
 import com.cab404.libph.modules.TopicModule;
-import com.cab404.libph.pages.BasePage;
 import com.cab404.libph.pages.MainPage;
-import com.cab404.libph.pages.TopicPage;
-import com.cab404.libph.requests.LoginRequest;
 import com.cab404.libph.util.PonyhawksProfile;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
+import ru.ponyhawks.android.activity.TopicActivity;
 import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.TopicPart;
+import ru.ponyhawks.android.statics.ProfileStore;
 import ru.ponyhawks.android.utils.BatchedInsertHandler;
 
 /**
@@ -48,9 +48,7 @@ public class TopicListFragment extends ListFragment {
         new Thread() {
             @Override
             public void run() {
-                Log.v("This", "Started cycle");
-                PonyhawksProfile profile = new PonyhawksProfile();
-                Log.v("This", "Login finished");
+                PonyhawksProfile profile = ProfileStore.get();
                 final MainPage page = new MainPage() {
                     @Override
                     protected void bindParsers(ModularBlockParser base) {
@@ -66,6 +64,9 @@ public class TopicListFragment extends ListFragment {
     }
 
     private void switchToPage(Topic data) {
+        Intent startTopicActivity = new Intent(getActivity(), TopicActivity.class);
+        startTopicActivity.putExtra(TopicActivity.KEY_TOPIC_ID, data.id);
+        startActivity(startTopicActivity);
     }
 
 //    @Override

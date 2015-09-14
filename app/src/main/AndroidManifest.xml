@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru.ponyhawks.android" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="ru.ponyhawks.android">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -9,24 +10,37 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="keyboard|orientation|screenSize"
-            android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:label="@string/app_name">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
+
         <activity
             android:name=".activity.TopicActivity"
+            android:configChanges="keyboard|orientation|screenSize"
             android:label="@string/title_activity_topic"
-            android:parentActivityName=".activity.MainActivity" >
+            android:parentActivityName=".activity.MainActivity"
+            tools:ignore="UnusedAttribute">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.ponyhawks.android.activity.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".activity.SplashActivity"
+            android:configChanges="keyboard|orientation|screenSize"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

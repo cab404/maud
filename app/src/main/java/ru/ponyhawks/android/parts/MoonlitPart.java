@@ -17,7 +17,7 @@ import com.cab404.chumroll.ViewConverter;
 public class MoonlitPart<A> implements ViewConverter<A> {
 
     public interface OnDataClickListener<A>{
-        public void onClick(A data, View view);
+        void onClick(A data, View view);
     }
 
     OnDataClickListener<A> onDataClickListener;

@@ -1,0 +1,137 @@
+package ru.ponyhawks.android.fragments;
+
+
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.cab404.libph.requests.LoginRequest;
+import com.cab404.moonlight.framework.AccessProfile;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.statics.ObscurePreferencesStore;
+import ru.ponyhawks.android.statics.ProfileStore;
+
+/**
+ * Login
+ */
+public class LoginFragment extends Fragment {
+    public static final String KEY_PASSWORD = "login.password";
+    public static final String KEY_USERNAME = "login.username";
+    private LoginCallback loginCallback;
+
+    @Bind(R.id.username)
+    EditText fUsername;
+    @Bind(R.id.password)
+    EditText fPassword;
+    @Bind(R.id.save_pwd)
+    CheckBox fRemember;
+
+    @Bind(R.id.loading)
+    ProgressBar loading;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_login, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this, view);
+    }
+
+    @OnClick(R.id.login)
+    void logIn() {
+        final String usermane = fUsername.getText().toString().trim();
+        final String password = fPassword.getText().toString().trim();
+        final boolean remember = fRemember.isChecked();
+
+        String err = null;
+        if (TextUtils.isEmpty(password))
+            err = "Пароль не может быть пустым";
+        if (TextUtils.isEmpty(usermane))
+            err = "Имя пользователя не может быть пустым";
+
+        if (err != null) {
+            toast(err);
+            return;
+        }
+        loading.setVisibility(View.VISIBLE);
+
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    boolean success = ProfileStore.get().login(usermane, password);
+                    if (success) {
+                        // Yay
+                        if (remember) {
+                            SharedPreferences store = ObscurePreferencesStore.getInstance().get();
+                            store.edit().putString(KEY_USERNAME, usermane).putString(KEY_PASSWORD, password).apply();
+                        }
+                        ProfileStore.getInstance().save();
+                        if (loginCallback != null)
+                            loginCallback.onLogin(LoginFragment.this);
+                    } else {
+                        toast("Неправильная пара логин/пароль");
+                    }
+                } catch (Exception e) {
+                    // Errors
+                    toast("Shit happens: " + e.getLocalizedMessage());
+                    e.printStackTrace();
+                } finally {
+                    if (getView() != null)
+                        getView().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                loading.setVisibility(View.GONE);
+                            }
+                        });
+                }
+            }
+        }.start();
+
+    }
+
+    void toast(final String message) {
+        if (getView() != null)
+            getView().post(new Runnable() {
+                @Override
+                public void run() {
+                    final Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT);
+//                    toast.setGravity(Gravity.TOP, 0, 0);
+                    toast.show();
+                }
+            });
+    }
+
+    public LoginCallback getLoginCallback() {
+        return loginCallback;
+    }
+
+    public void setLoginCallback(LoginCallback loginCallback) {
+        this.loginCallback = loginCallback;
+    }
+
+    public interface LoginCallback {
+        void onLogin(LoginFragment fragment);
+    }
+
+}

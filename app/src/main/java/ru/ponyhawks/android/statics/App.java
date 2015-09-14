@@ -14,6 +14,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        ProfileProvider.getInstance().init(this);
+        ObscurePreferencesStore.getInstance().init(this);
+        ProfileStore.getInstance().init(this);
     }
 }
