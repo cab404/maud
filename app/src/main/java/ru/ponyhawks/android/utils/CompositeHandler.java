@@ -10,11 +10,11 @@ import com.cab404.moonlight.framework.ModularBlockParser;
  *
  * @author cab404
  */
-public class MultipleBindHandler implements ModularBlockParser.ParsedObjectHandler{
+public class CompositeHandler implements ModularBlockParser.ParsedObjectHandler{
 
     private final ModularBlockParser.ParsedObjectHandler[] handlers;
 
-    public MultipleBindHandler(ModularBlockParser.ParsedObjectHandler... handlers) {
+    public CompositeHandler(ModularBlockParser.ParsedObjectHandler... handlers) {
         this.handlers = handlers;
     }
 

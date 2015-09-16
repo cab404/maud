@@ -23,8 +23,9 @@ import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.LoginFragment;
 import ru.ponyhawks.android.statics.ObscurePreferencesStore;
 import ru.ponyhawks.android.statics.ProfileStore;
+import ru.ponyhawks.android.statics.UserInfoStore;
 
-public class SplashActivity extends AppCompatActivity implements LoginFragment.LoginCallback {
+public class SplashActivity extends BaseActivity implements LoginFragment.LoginCallback {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -51,7 +52,12 @@ public class SplashActivity extends AppCompatActivity implements LoginFragment.L
                 super.run();
                 msg("attempting connection...");
                 final BasePage basePage = new BasePage();
-                basePage.fetch(ProfileStore.get());
+                try {
+                    basePage.fetch(ProfileStore.get());
+                } catch (Exception e) {
+                    msg("failure: " + e.getLocalizedMessage());
+                    return;
+                }
                 msg("connected to ponyhawks.ru");
                 // checking if we are already logged in
                 if (basePage.c_inf == null) {
@@ -66,7 +72,7 @@ public class SplashActivity extends AppCompatActivity implements LoginFragment.L
                         msg("found saved credentials, logging in as " + username);
                         try {
                             final boolean success = ProfileStore.get().login(username, password);
-                            if (success){
+                            if (success) {
                                 ProfileStore.getInstance().save();
                                 onSuccess();
                             } else {
@@ -74,18 +80,19 @@ public class SplashActivity extends AppCompatActivity implements LoginFragment.L
                                         .putString(LoginFragment.KEY_USERNAME, null)
                                         .putString(LoginFragment.KEY_PASSWORD, null)
                                         .apply();
-                                msg("credentials are invalid, promting login screen");
+                                msg("credentials are invalid");
                                 syncLogin();
                             }
                         } catch (Exception e) {
                             msg("failure: " + e.getLocalizedMessage());
                         }
                     } else {
-                        msg("no login data found, promting login screen");
+                        msg("no login data found");
                         syncLogin();
                     }
 
                 } else {
+                    UserInfoStore.getInstance().setInfo(basePage.c_inf);
                     msg("tokens are still valid, proceeding");
                     onSuccess();
                 }
@@ -127,7 +134,21 @@ public class SplashActivity extends AppCompatActivity implements LoginFragment.L
     }
 
     void onSuccess() {
-        msg("login sequence finished successfully");
+
+        if (UserInfoStore.getInstance().getInfo() == null) {
+            msg("logged in, loading data");
+            final BasePage data = new BasePage();
+            try {
+                data.fetch(ProfileStore.get());
+            } catch (Exception e) {
+                msg("failure: " + e.getLocalizedMessage());
+                return;
+            }
+            UserInfoStore.getInstance().setInfo(data.c_inf);
+        } else {
+            msg("login sequence finished successfully");
+        }
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {

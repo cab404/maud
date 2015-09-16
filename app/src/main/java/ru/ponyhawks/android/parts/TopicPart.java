@@ -11,6 +11,7 @@ import com.cab404.libph.data.Topic;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.text.StaticWebView;
 
 /**
  * Well, sorry for no comments here!
@@ -24,7 +25,7 @@ public class TopicPart extends MoonlitPart<Topic> {
     @Bind(R.id.title)
     TextView title;
     @Bind(R.id.text)
-    TextView text;
+    StaticWebView text;
 
     @Override
     public void convert(View view, Topic data, int index, ViewGroup parent) {
@@ -35,7 +36,7 @@ public class TopicPart extends MoonlitPart<Topic> {
     }
 
     @Override
-    public int getId() {
+    public int getLayoutId() {
         return R.layout.part_topic;
     }
 

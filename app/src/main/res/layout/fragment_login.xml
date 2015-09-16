@@ -3,8 +3,6 @@
     android:layout_height="match_parent"
     tools:context="ru.ponyhawks.android.fragments.LoginFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <LinearLayout
         android:orientation="vertical"
         android:background="@drawable/abc_dialog_material_background_dark"

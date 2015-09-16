@@ -2,8 +2,13 @@ package ru.ponyhawks.android.statics;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.cab404.libph.util.PonyhawksProfile;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.RequestLine;
+import org.apache.http.client.methods.HttpRequestBase;
 
 /**
  * Well, sorry for no comments here!
@@ -24,8 +29,31 @@ public class ProfileStore {
 
     PonyhawksProfile profile;
 
+    private void regen(final String from) {
+        profile = new PonyhawksProfile() {
+            {
+                if (from != null)
+                    setUpFromString(from);
+            }
+
+            @Override
+            public HttpResponse exec(HttpRequestBase request, boolean follow, int timeout) {
+                final RequestLine rl = request.getRequestLine();
+                Log.d("Moonlight", rl.getMethod() + " " + rl.getUri());
+                return super.exec(request, follow, timeout);
+            }
+        };
+
+    }
+
+    public void reset(){
+        regen(null);
+        save();
+        sharedPreferences.edit().commit();
+    }
+
     private ProfileStore() {
-        profile = new PonyhawksProfile();
+        regen(null);
     }
 
     void init(Context ctx) {
@@ -33,9 +61,10 @@ public class ProfileStore {
         final String session = sharedPreferences.getString(KEY_SESSION, null);
         if (session != null)
             try {
-                profile = PonyhawksProfile.parseString(session);
+                regen(session);
             } catch (Exception e) {
-                profile = new PonyhawksProfile();
+                regen(null);
+                e.printStackTrace();
                 save();
             }
     }
@@ -49,7 +78,7 @@ public class ProfileStore {
     }
 
     public void save() {
-        sharedPreferences.edit().putString(KEY_SESSION, profile.toString()).apply();
+        sharedPreferences.edit().putString(KEY_SESSION, profile.serialize()).apply();
     }
 
 

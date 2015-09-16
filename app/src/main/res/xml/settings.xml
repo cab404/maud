@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Данные" />
+    <SwitchPreference
+        android:key="images"
+        android:title="Загружать изображения" />
+    <SwitchPreference
+        android:key="videos"
+        android:title="Загружать видео" />
+    <SwitchPreference
+        android:key="editable"
+        android:title="Выделение текста" />
+
+    <PreferenceCategory android:title="Приложение" />
+    <ListPreference
+        android:entries="@array/themes"
+        android:entryValues="@array/themes"
+        android:key="theme"
+        android:title="Тема" />
+</PreferenceScreen>

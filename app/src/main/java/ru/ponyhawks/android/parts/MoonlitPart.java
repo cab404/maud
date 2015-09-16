@@ -30,7 +30,7 @@ public class MoonlitPart<A> implements ViewConverter<A> {
         this.onDataClickListener = onDataClickListener;
     }
 
-    public int getId(){
+    public int getLayoutId(){
         return -1;
     }
 
@@ -47,7 +47,7 @@ public class MoonlitPart<A> implements ViewConverter<A> {
 
     @Override
     public View createView(ViewGroup parent, LayoutInflater inflater) {
-        return inflater.inflate(getId(), parent, false);
+        return inflater.inflate(getLayoutId(), parent, false);
     }
 
     @Override

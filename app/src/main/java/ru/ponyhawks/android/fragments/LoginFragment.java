@@ -116,7 +116,6 @@ public class LoginFragment extends Fragment {
                 @Override
                 public void run() {
                     final Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT);
-//                    toast.setGravity(Gravity.TOP, 0, 0);
                     toast.show();
                 }
             });
