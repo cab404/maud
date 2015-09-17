@@ -64,8 +64,9 @@ public class HtmlRipper {
     public int blue = 0xff009ad1;
     public int red = 0xffd30035;
 
-    public boolean textIsSelectable = true;
+    public boolean textIsSelectable;
     public boolean loadVideos;
+    public boolean loadImages;
 
     public int cutBackground = R.drawable.quote_background;
     public int codeBackground = R.drawable.quote_background;
@@ -236,12 +237,6 @@ public class HtmlRipper {
                 );
 
         HTMLTree tree = new HTMLTree(builder.toString());
-
-		/* Загружаемые картинки. */
-        final Collection<String> loadImages = new HashSet<>();
-        /* Куда пихать загруженное. */
-        final ArrayMap<String, ImageSpan> targets = new ArrayMap<>();
-        final HashMap<ImageSpan, Tag> meta = new HashMap<>();
 
 		/*
          * Отклонение от индексов. Мы меняем текст дерева, но так как теги привязаны, нам нужно учитывать это вручную.
@@ -463,7 +458,6 @@ public class HtmlRipper {
                         case "img":
                             if (tag.get("src").isEmpty()) continue;
                             final String repl = "I";
-
                             builder.insert(off + tag.start, repl);
 
                             final String src = tag.get("src");
@@ -492,24 +486,27 @@ public class HtmlRipper {
                                     Spanned.SPAN_INCLUSIVE_EXCLUSIVE
                             );
 
-                            int width, height;
-                            if (tag.get("width").isEmpty())
-                                width = 400;
-                            else
-                                width = Integer.parseInt(tag.get("width"));
+                            if (loadImages) {
+                                int width, height;
+                                if (tag.get("width").isEmpty())
+                                    width = 400;
+                                else
+                                    width = Integer.parseInt(tag.get("width"));
 
-                            if (tag.get("height").isEmpty())
-                                height = 200;
-                            else
-                                height = Integer.parseInt(tag.get("height"));
+                                if (tag.get("height").isEmpty())
+                                    height = 200;
+                                else
+                                    height = Integer.parseInt(tag.get("height"));
 
-                            final SpanImageListener imageAware = new SpanImageListener(target, replacer, builder);
-                            ImageSize size = new ImageSize(width, height);
-                            DisplayImageOptions opt = new DisplayImageOptions.Builder()
-                                    .cacheInMemory(true)
-                                    .cacheOnDisk(true)
-                                    .imageScaleType(ImageScaleType.EXACTLY).build();
-                            ImageLoader.getInstance().loadImage(src, size, opt, imageAware);
+                                final SpanImageListener imageAware = new SpanImageListener(target, replacer, builder);
+                                ImageSize size = new ImageSize(width, height);
+                                DisplayImageOptions opt = new DisplayImageOptions.Builder()
+                                        .cacheInMemory(true)
+                                        .cacheOnDisk(true)
+                                        .imageScaleType(ImageScaleType.EXACTLY).build();
+                                ImageLoader.getInstance().loadImage(src, size, opt, imageAware);
+                            }
+
                             off += repl.length();
                             break;
                     }
@@ -530,8 +527,7 @@ public class HtmlRipper {
         simpleEscape(view, text, context);
 
         if (Build.VERSION.SDK_INT > 10) {
-            if (textIsSelectable)
-                view.setTextIsSelectable(true);
+            view.setTextIsSelectable(textIsSelectable);
         }
 
         view.setMovementMethod(LinkMovementMethod.getInstance());

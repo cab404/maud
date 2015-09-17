@@ -21,7 +21,7 @@
                     android:right="4dp"
                     android:top="4dp" />
                 <corners android:radius="4dp" />
-                <solid android:color="@color/background_material_light" />
+                <solid android:color="@color/primary_material_light" />
                 <stroke
                     android:width="2dp"
                     android:color="#0000" />

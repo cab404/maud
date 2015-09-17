@@ -26,6 +26,7 @@ import com.cab404.moonlight.framework.ModularBlockParser;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.parts.CommentPart;
 import ru.ponyhawks.android.parts.MoonlitPart;
+import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.statics.ProfileStore;
 import ru.ponyhawks.android.statics.UserInfoStore;
@@ -57,7 +58,7 @@ public class TopicFragment extends ListFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         topicId = getArguments().getInt(KEY_TOPIC_ID, -1);
@@ -72,8 +73,9 @@ public class TopicFragment extends ListFragment {
             }
         });
         commentPart = new CommentPart();
+        final SpacePart spacePart = new SpacePart();
 
-        adapter.prepareFor(topicPart, commentPart);
+        adapter.prepareFor(topicPart, commentPart, spacePart);
         setAdapter(adapter);
 
         new Thread() {
@@ -81,9 +83,10 @@ public class TopicFragment extends ListFragment {
             public void run() {
                 PonyhawksProfile profile = ProfileStore.get();
                 final TopicPage page = new TopicPage(topicId);
+                final BatchedInsertHandler insertHandler = new BatchedInsertHandler(adapter);
                 page.setHandler(
                         new CompositeHandler(
-                                new BatchedInsertHandler(adapter)
+                                insertHandler
                                         .bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
                                         .bind(MainPage.BLOCK_COMMENT, commentPart),
                                 new ModularBlockParser.ParsedObjectHandler() {
@@ -106,6 +109,8 @@ public class TopicFragment extends ListFragment {
                 );
                 try {
                     page.fetch(profile);
+                    final float dp = view.getResources().getDisplayMetrics().density;
+                    insertHandler.inject((int) (60 * dp), spacePart);
                 } catch (Exception e) {
                     getActivity().finish();
                 }

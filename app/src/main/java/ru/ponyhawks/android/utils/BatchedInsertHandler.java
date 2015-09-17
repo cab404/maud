@@ -30,7 +30,7 @@ public class BatchedInsertHandler implements ModularBlockParser.ParsedObjectHand
         this.target = target;
     }
 
-    public <A> BatchedInsertHandler bind(Integer id, ViewConverter<A> converter){
+    public <A> BatchedInsertHandler bind(Integer id, ViewConverter<A> converter) {
         bindings.put(id, new Binding<>(converter));
         return this;
     }
@@ -54,6 +54,20 @@ public class BatchedInsertHandler implements ModularBlockParser.ParsedObjectHand
             }
     }
 
+    public <V> void inject(V object, ViewConverter<V> use) {
+        try {
+            runnable.lock.lock();
+            //noinspection unchecked
+            runnable.dataToAdd.add(new VV(new Binding(use), object));
+            if (runnable.finished) {
+                runnable.finished = false;
+                handler.postDelayed(runnable, 100);
+            }
+        } finally {
+            runnable.lock.unlock();
+        }
+    }
+
     private class Binding<Clazz> {
         public Binding(ViewConverter<Clazz> converter) {
             this.converter = converter;
@@ -62,7 +76,7 @@ public class BatchedInsertHandler implements ModularBlockParser.ParsedObjectHand
         ViewConverter<Clazz> converter;
 
         @SuppressWarnings("unchecked")
-        void insert(Object object){
+        void insert(Object object) {
             target.add(converter, ((Clazz) object));
         }
     }

@@ -5,12 +5,14 @@
     <declare-styleable name="AppTheme">
         <attr name="main_background_color" format="color" />
         <attr name="main_foreground_color" format="color" />
+        <attr name="icon_fill" format="color" />
         <attr name="new_background" format="reference" />
         <attr name="rounded_background" format="reference" />
         <attr name="settings_theme" format="reference" />
     </declare-styleable>
 
     <style name="AppThemeDark" parent="Theme.AppCompat">
+        <item name="icon_fill">#fff</item>
         <item name="main_foreground_color">@color/primary_material_dark</item>
         <item name="main_background_color">@color/background_material_dark</item>
         <item name="new_background">@drawable/new_background_dark</item>
@@ -19,6 +21,7 @@
     </style>
 
     <style name="AppThemeLight" parent="Theme.AppCompat.Light">
+        <item name="icon_fill">#111</item>
         <item name="main_foreground_color">@color/primary_material_light</item>
         <item name="main_background_color">@color/background_material_light</item>
         <item name="new_background">@drawable/new_background_light</item>

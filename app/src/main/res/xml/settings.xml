@@ -3,13 +3,13 @@
 
     <PreferenceCategory android:title="Данные" />
     <SwitchPreference
-        android:key="images"
+        android:key="loadImages"
         android:title="Загружать изображения" />
     <SwitchPreference
-        android:key="videos"
+        android:key="loadVideos"
         android:title="Загружать видео" />
     <SwitchPreference
-        android:key="editable"
+        android:key="textSelectable"
         android:title="Выделение текста" />
 
     <PreferenceCategory android:title="Приложение" />

@@ -15,6 +15,7 @@ import com.cab404.moonlight.framework.ModularBlockParser;
 
 import ru.ponyhawks.android.activity.TopicActivity;
 import ru.ponyhawks.android.parts.MoonlitPart;
+import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.statics.ProfileStore;
 import ru.ponyhawks.android.utils.BatchedInsertHandler;
@@ -28,7 +29,17 @@ import ru.ponyhawks.android.utils.BatchedInsertHandler;
  * @author cab404
  */
 public class TopicListFragment extends ListFragment {
+    public static final String KEY_URL = "url";
     ChumrollAdapter adapter;
+    private SpacePart spacePart;
+
+    public static TopicListFragment getInstance(String pageUrl) {
+        final TopicListFragment fragment = new TopicListFragment();
+        Bundle args = new Bundle();
+        args.putString(KEY_URL, pageUrl);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -43,6 +54,8 @@ public class TopicListFragment extends ListFragment {
             }
         });
         adapter.prepareFor(topicPart);
+        spacePart = new SpacePart();
+        adapter.prepareFor(spacePart);
         setAdapter(adapter);
 
         new Thread() {
@@ -56,9 +69,9 @@ public class TopicListFragment extends ListFragment {
                         base.bind(new TopicModule(TopicModule.Mode.LIST), BLOCK_TOPIC_HEADER);
                     }
                 };
-                page.setHandler(new BatchedInsertHandler(adapter).bind(MainPage.BLOCK_TOPIC_HEADER, topicPart));
+                final BatchedInsertHandler insertHandler = new BatchedInsertHandler(adapter);
+                page.setHandler(insertHandler.bind(MainPage.BLOCK_TOPIC_HEADER, topicPart));
                 page.fetch(profile);
-                Log.v("This", "Page fetched");
             }
         }.start();
     }

@@ -1,13 +1,13 @@
 package ru.ponyhawks.android.text;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
 /**
- * Well, sorry for no comments here!
- * Still you can send me your question to me@cab404.ru!
- * <p/>
+ * View wrapper arounf HtmlRipper
  * Created at 16:07 on 14/09/15
  *
  * @author cab404
@@ -15,20 +15,30 @@ import android.widget.LinearLayout;
 public class StaticWebView extends LinearLayout {
     HtmlRipper boundRipper = new HtmlRipper(this);
 
+
     public StaticWebView(Context context) {
         super(context);
+        parametrize(context);
         setOrientation(VERTICAL);
     }
 
     public StaticWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        parametrize(context);
+        setOrientation(VERTICAL);
         final String value = attrs.getAttributeValue(null, "text");
         if (value != null)
             setText(value);
-        setOrientation(VERTICAL);
     }
 
-    public void setText(String text){
+    void parametrize(Context ctx) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+        boundRipper.loadImages = sp.getBoolean("loadImages", false);
+        boundRipper.loadVideos = sp.getBoolean("loadVideos", false);
+        boundRipper.textIsSelectable = sp.getBoolean("textSelectable", false);
+    }
+
+    public void setText(String text) {
         boundRipper.escape(text);
     }
 

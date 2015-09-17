@@ -5,12 +5,12 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:background="@drawable/abc_dialog_material_background_dark"
+        android:background="?rounded_background"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:animateLayoutChanges="true"
-        android:padding="@dimen/abc_dialog_padding_material"
+        android:padding="12dp"
         android:paddingBottom="70dp">
 
         <ProgressBar

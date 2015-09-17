@@ -1,10 +1,12 @@
 package ru.ponyhawks.android.parts;
 
+import android.support.v4.widget.PopupMenuCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.cab404.chumroll.ViewConverter;
@@ -39,7 +41,7 @@ public class CommentPart extends MoonlitPart<Comment> {
     @Bind(R.id.avatar)
     ImageView avatar;
 
-    public void register(Comment comment){
+    public void register(Comment comment) {
         parents.put(comment.id, comment.parent);
     }
 

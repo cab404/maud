@@ -5,8 +5,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -32,8 +34,13 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     TextView target;
     @Bind(R.id.send)
     ImageView send;
+    @Bind(R.id.scrim)
+    View scrim;
+    @Bind(R.id.commentFrame)
+    RelativeLayout commentFrame;
 
     private HideablePartBehavior behavior;
+    private SendCallback sendCallback;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,11 +51,21 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        final View commentFrame = view.findViewById(R.id.commentFrame);
+        final IgnorantCoordinatorLayout root = (IgnorantCoordinatorLayout) view.findViewById(R.id.root);
+
         final CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) commentFrame.getLayoutParams();
 
+        commentFrame.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+
         behavior = (HideablePartBehavior) layoutParams.getBehavior();
-        ((IgnorantCoordinatorLayout) view.findViewById(R.id.root)).setResizeCallback(new IgnorantCoordinatorLayout.ResizeCallback() {
+        behavior.setChangeCallback(this);
+
+        root.setResizeCallback(new IgnorantCoordinatorLayout.ResizeCallback() {
             @Override
             public void onSizeChanged(int w, int h, int oldw, int oldh) {
                 commentFrame.post(new Runnable() {
@@ -59,21 +76,29 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
                 });
             }
         });
-        behavior.setChangeCallback(this);
+
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sendCallback != null)
+                    sendCallback.onSend(text.getText());
+            }
+        });
+
         view.post(new Runnable() {
             @Override
             public void run() {
-                behavior.lockOn(commentFrame);
+                behavior.init(root, commentFrame);
             }
         });
-        behavior.sync(commentFrame);
+
     }
 
     boolean collapsed = true;
 
     @Override
     public void onHide(View view) {
-
+        text.clearFocus();
     }
 
     @Override
@@ -104,6 +129,52 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
 
         final InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(text.getWindowToken(), 0);
+    }
+
+    public void focus(){
+        text.requestFocus();
+    }
+
+    public Editable getText(){
+        return text.getText();
+    }
+
+    public interface SendCallback{
+        void onSend(Editable text);
+    }
+
+    public void setSendCallback(SendCallback callback){
+        sendCallback = callback;
+    }
+
+    public void hide(){
+        behavior.hide(commentFrame);
+    }
+    public void collapse(){
+        behavior.collapse(commentFrame);
+    }
+    public void expand(){
+        behavior.expand(commentFrame);
+    }
+
+    @Override
+    public void onExpandCollapse(float state) {
+//        state = 1 - state;
+//        scrim.setBackgroundColor(((int) (160 * state) << 24) + 0x333333);
+//        if (state > 0){
+//            scrim.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View v, MotionEvent event) {
+//                    return true;
+//                }
+//            });
+//            scrim.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    behavior.collapse(commentFrame);
+//                }
+//            });
+//        }
     }
 
 }
