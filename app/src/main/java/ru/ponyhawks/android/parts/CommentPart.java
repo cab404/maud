@@ -1,14 +1,18 @@
 package ru.ponyhawks.android.parts;
 
+import android.graphics.Rect;
 import android.support.v4.widget.PopupMenuCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.chumroll.ViewConverter;
 import com.cab404.libph.data.Comment;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -21,7 +25,9 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.text.HtmlRipper;
 import ru.ponyhawks.android.text.StaticWebView;
+import ru.ponyhawks.android.utils.DoubleClickListener;
 
 /**
  * Well, sorry for no comments here!
@@ -33,6 +39,8 @@ import ru.ponyhawks.android.text.StaticWebView;
  */
 public class CommentPart extends MoonlitPart<Comment> {
     Map<Integer, Integer> parents = new HashMap<>();
+    Map<Integer, HtmlRipper> savedStates = new HashMap<>();
+    public boolean saveState = true;
 
     @Bind(R.id.author)
     TextView author;
@@ -46,6 +54,7 @@ public class CommentPart extends MoonlitPart<Comment> {
     }
 
     private int levelOf(int id, int cl) {
+        if (!parents.containsKey(id)) return 0;
         int parent = parents.get(id);
         if (parent != 0)
             return levelOf(parent, cl + 1);
@@ -57,21 +66,59 @@ public class CommentPart extends MoonlitPart<Comment> {
         return levelOf(id, 0);
     }
 
+    int savedOffset = 0;
+
+    public void offset(AbsListView parent, int offset) {
+        savedOffset = offset;
+        final int position = parent.getFirstVisiblePosition();
+        ChumrollAdapter adapter = (ChumrollAdapter) parent.getAdapter();
+        int type = adapter.typeIdOf(this);
+        for (int i = position; i < position + parent.getChildCount(); i++) {
+            if (adapter.getItemViewType(i) == type) {
+                View view = parent.getChildAt(i - position);
+                Comment data = (Comment) adapter.getData(i);
+                resetOffset(view, data);
+            }
+        }
+
+    }
+
+
+    Rect inv = new Rect();
+
+    void resetOffset(View view, Comment data) {
+        final int lv = (int) (view.getContext().getResources().getDisplayMetrics().density * 16);
+        int level = levelOf(data.id);
+        int padding = -lv * level + savedOffset;
+        view.scrollTo(padding, view.getScrollY());
+
+    }
 
     @Override
-    public void convert(View view, Comment data, int index, ViewGroup parent) {
+    public void convert(View view, final Comment data, int index, final ViewGroup parent) {
+        parents.put(data.id, data.parent);
+
         super.convert(view, data, index, parent);
         ButterKnife.bind(this, view);
 
-        parents.put(data.id, data.parent);
+        final int lv = (int) (view.getContext().getResources().getDisplayMetrics().density * 16);
+        view.setOnClickListener(new DoubleClickListener() {
+            @Override
+            public void act(View v) {
+                offset((AbsListView) parent, levelOf(data.id) * lv);
+            }
+        });
 
-        int level = levelOf(data.id);
-        int padding = (int) (view.getContext().getResources().getDisplayMetrics().density * 16) * level;
-        FrameLayout layout = (FrameLayout) view;
-        layout.setPadding(padding, 0, 0, -padding);
+        resetOffset(view, data);
 
         author.setText(data.author.login);
+
+        if (saveState)
+            if (savedStates.containsKey(data.id))
+                text.setRipper(savedStates.get(data.id));
         text.setText(data.text);
+        if (saveState)
+            savedStates.put(data.id, text.getRipper());
 
         avatar.setVisibility(data.author.is_system ? View.GONE : View.VISIBLE);
         avatar.setImageDrawable(null);

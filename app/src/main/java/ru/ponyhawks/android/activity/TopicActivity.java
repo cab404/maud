@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.fragments.CommentEditFragment;
 import ru.ponyhawks.android.fragments.TopicFragment;
 import ru.ponyhawks.android.utils.HideablePartBehavior;
 
@@ -27,6 +28,9 @@ public class TopicActivity extends BaseActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, TopicFragment.getInstance(getIntent().getIntExtra(KEY_TOPIC_ID, -1)))
                 .commit();
+        final CommentEditFragment editFragment = (CommentEditFragment) getSupportFragmentManager().findFragmentById(R.id.comment_editor);
+        editFragment.hide();
+        editFragment.finishTranslations();
     }
 
     @Override

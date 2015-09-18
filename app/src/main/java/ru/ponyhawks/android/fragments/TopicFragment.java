@@ -25,6 +25,8 @@ import com.cab404.moonlight.framework.ModularBlockParser;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.parts.CommentPart;
+import ru.ponyhawks.android.parts.LabelPart;
+import ru.ponyhawks.android.parts.LoadingPart;
 import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
@@ -46,6 +48,10 @@ public class TopicFragment extends ListFragment {
     ChumrollAdapter adapter;
     private int topicId;
     private CommentPart commentPart;
+
+    public interface CommentCallback {
+        public void onComment(int commentId);
+    }
 
     public static TopicFragment getInstance(int id) {
         final TopicFragment topicFragment = new TopicFragment();
@@ -75,46 +81,55 @@ public class TopicFragment extends ListFragment {
         commentPart = new CommentPart();
         final SpacePart spacePart = new SpacePart();
 
-        adapter.prepareFor(topicPart, commentPart, spacePart);
+        final LabelPart labelPart = new LabelPart();
+        adapter.prepareFor(topicPart, commentPart, spacePart, new LoadingPart(), labelPart);
+        final int loadingPartId = adapter.add(LoadingPart.class, null);
         setAdapter(adapter);
 
+        final TopicPage page = new TopicPage(topicId);
+        final BatchedInsertHandler insertHandler = new BatchedInsertHandler(adapter);
+        page.setHandler(
+                new CompositeHandler(
+                        insertHandler
+                                .bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
+                                .bind(MainPage.BLOCK_COMMENT, commentPart)
+                                .bind(MainPage.BLOCK_COMMENT_NUM, labelPart),
+                        new ModularBlockParser.ParsedObjectHandler() {
+                            @Override
+                            public void handle(final Object object, int key) {
+                                switch (key) {
+                                    case BasePage.BLOCK_TOPIC_HEADER:
+                                        setTitleFromStream(((Topic) object).title);
+                                        break;
+                                    case MainPage.BLOCK_COMMON_INFO:
+                                        UserInfoStore.getInstance().setInfo((CommonInfo) object);
+                                        break;
+                                    case MainPage.BLOCK_COMMENT:
+                                        commentPart.register(((Comment) object));
+                                        break;
+                                }
+                            }
+                        }
+                )
+        );
         new Thread() {
             @Override
             public void run() {
                 PonyhawksProfile profile = ProfileStore.get();
-                final TopicPage page = new TopicPage(topicId);
-                final BatchedInsertHandler insertHandler = new BatchedInsertHandler(adapter);
-                page.setHandler(
-                        new CompositeHandler(
-                                insertHandler
-                                        .bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
-                                        .bind(MainPage.BLOCK_COMMENT, commentPart),
-                                new ModularBlockParser.ParsedObjectHandler() {
-                                    @Override
-                                    public void handle(final Object object, int key) {
-                                        switch (key) {
-                                            case BasePage.BLOCK_TOPIC_HEADER:
-                                                setTitleFromStream(((Topic) object).title);
-                                                break;
-                                            case MainPage.BLOCK_COMMON_INFO:
-                                                UserInfoStore.getInstance().setInfo((CommonInfo) object);
-                                                break;
-                                            case MainPage.BLOCK_COMMENT:
-                                                commentPart.register(((Comment) object));
-                                                break;
-                                        }
-                                    }
-                                }
-                        )
-                );
                 try {
                     page.fetch(profile);
+                    view.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            adapter.removeById(loadingPartId);
+                        }
+                    });
                     final float dp = view.getResources().getDisplayMetrics().density;
+                    // injecting bottom
                     insertHandler.inject((int) (60 * dp), spacePart);
                 } catch (Exception e) {
                     getActivity().finish();
                 }
-                Log.v("This", "Page fetched");
             }
         }.start();
     }

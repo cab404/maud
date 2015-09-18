@@ -21,6 +21,7 @@ import ru.ponyhawks.android.fragments.LoginFragment;
 import ru.ponyhawks.android.fragments.TopicListFragment;
 import ru.ponyhawks.android.statics.ObscurePreferencesStore;
 import ru.ponyhawks.android.statics.ProfileStore;
+import ru.ponyhawks.android.statics.UserInfoStore;
 
 public class MainActivity extends BaseActivity implements DrawerContentFragment.DrawerClickCallback {
 
@@ -85,13 +86,21 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
         if (currentSection == id)
             return;
 
+        String login = UserInfoStore.getInstance().getInfo().username;
+
         switch (id) {
             case DrawerContentFragment.ID_SETTINGS:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
 
             case DrawerContentFragment.ID_MAIN:
-                use = new TopicListFragment();
+                use = TopicListFragment.getInstance("/");
+                break;
+            case DrawerContentFragment.ID_FAVOURITES:
+                use = TopicListFragment.getInstance("/profile/" + login + "/favourites/topics");
+                break;
+            case DrawerContentFragment.ID_PUBLICATIONS:
+                use = TopicListFragment.getInstance("/profile/" + login + "/created/topics");
                 break;
 
             case DrawerContentFragment.ID_EXIT:

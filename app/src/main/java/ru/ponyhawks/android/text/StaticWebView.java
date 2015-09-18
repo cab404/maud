@@ -38,6 +38,21 @@ public class StaticWebView extends LinearLayout {
         boundRipper.textIsSelectable = sp.getBoolean("textSelectable", false);
     }
 
+    public HtmlRipper getRipper(){
+        return boundRipper;
+    }
+
+    public void setRipper(HtmlRipper ripper){
+        ripper.changeLayout(this);
+        this.boundRipper = ripper;
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        boundRipper.layout();
+    }
+
     public void setText(String text) {
         boundRipper.escape(text);
     }

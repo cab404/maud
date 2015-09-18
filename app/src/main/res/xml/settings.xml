@@ -4,6 +4,7 @@
     <PreferenceCategory android:title="Данные" />
     <SwitchPreference
         android:key="loadImages"
+        android:defaultValue="true"
         android:title="Загружать изображения" />
     <SwitchPreference
         android:key="loadVideos"
@@ -14,8 +15,15 @@
 
     <PreferenceCategory android:title="Приложение" />
     <ListPreference
-        android:entries="@array/themes"
+        android:entries="@array/theme_names"
         android:entryValues="@array/themes"
+        android:defaultValue="Dark"
         android:key="theme"
         android:title="Тема" />
+    <SwitchPreference
+        android:contentDescription="Выключите при суровом недостатке оперативной памяти"
+        android:defaultValue="true"
+        android:key="saveCommentState"
+        android:title="Сохранять состояние комментария" />
+
 </PreferenceScreen>

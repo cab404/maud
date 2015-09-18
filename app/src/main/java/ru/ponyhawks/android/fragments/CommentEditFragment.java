@@ -157,6 +157,10 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
         behavior.expand(commentFrame);
     }
 
+    public void finishTranslations(){
+        behavior.syncImmediate(commentFrame);
+    }
+
     @Override
     public void onExpandCollapse(float state) {
 //        state = 1 - state;

@@ -13,7 +13,11 @@ import com.cab404.libph.pages.MainPage;
 import com.cab404.libph.util.PonyhawksProfile;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import ru.ponyhawks.android.activity.TopicActivity;
+import ru.ponyhawks.android.parts.LoadingPart;
 import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
@@ -31,7 +35,6 @@ import ru.ponyhawks.android.utils.BatchedInsertHandler;
 public class TopicListFragment extends ListFragment {
     public static final String KEY_URL = "url";
     ChumrollAdapter adapter;
-    private SpacePart spacePart;
 
     public static TopicListFragment getInstance(String pageUrl) {
         final TopicListFragment fragment = new TopicListFragment();
@@ -42,7 +45,7 @@ public class TopicListFragment extends ListFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         adapter = new ChumrollAdapter();
@@ -53,25 +56,40 @@ public class TopicListFragment extends ListFragment {
                 switchToPage(data);
             }
         });
-        adapter.prepareFor(topicPart);
-        spacePart = new SpacePart();
-        adapter.prepareFor(spacePart);
+        SpacePart spacePart = new SpacePart();
+
+        adapter.prepareFor(spacePart, topicPart, new LoadingPart());
+        final int loadingID = adapter.add(LoadingPart.class, null);
         setAdapter(adapter);
+
+        final MainPage page = new MainPage() {
+            @Override
+            public String getURL() {
+                return getArguments().getString(KEY_URL);
+            }
+
+            @Override
+            protected void bindParsers(ModularBlockParser base) {
+                super.bindParsers(base);
+                base.bind(new TopicModule(TopicModule.Mode.LIST), BLOCK_TOPIC_HEADER);
+            }
+        };
+        final BatchedInsertHandler insertHandler = new BatchedInsertHandler(adapter);
+        page.setHandler(
+                insertHandler.bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
+        );
 
         new Thread() {
             @Override
             public void run() {
                 PonyhawksProfile profile = ProfileStore.get();
-                final MainPage page = new MainPage() {
-                    @Override
-                    protected void bindParsers(ModularBlockParser base) {
-                        super.bindParsers(base);
-                        base.bind(new TopicModule(TopicModule.Mode.LIST), BLOCK_TOPIC_HEADER);
-                    }
-                };
-                final BatchedInsertHandler insertHandler = new BatchedInsertHandler(adapter);
-                page.setHandler(insertHandler.bind(MainPage.BLOCK_TOPIC_HEADER, topicPart));
                 page.fetch(profile);
+                view.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.removeById(loadingID);
+                    }
+                });
             }
         }.start();
     }

@@ -2,6 +2,9 @@ package ru.ponyhawks.android.parts;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import ru.ponyhawks.android.R;
 
 /**
  * Well, sorry for no comments here!
@@ -11,15 +14,16 @@ import android.view.ViewGroup;
  *
  * @author cab404
  */
-public class LabelPart extends MoonlitPart<CharSequence> {
+public class LabelPart extends MoonlitPart<Integer> {
 
     @Override
-    public void convert(View view, CharSequence data, int index, ViewGroup parent) {
+    public void convert(View view, Integer data, int index, ViewGroup parent) {
         super.convert(view, data, index, parent);
+        ((TextView) view).setText(data + " комментариев");
     }
 
     @Override
     public int getLayoutId() {
-        return super.getLayoutId();
+        return R.layout.part_label;
     }
 }

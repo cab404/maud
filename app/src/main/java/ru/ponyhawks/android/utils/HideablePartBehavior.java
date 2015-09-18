@@ -189,6 +189,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
     public void syncImmediate(View child) {
         child.offsetTopAndBottom(calculateDst(state, child) - child.getTop());
+        finish = true;
     }
 
 
@@ -285,6 +286,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     boolean started = false;
+    boolean finish = false;
 
     class SettleRunnable implements Runnable {
         private final View view;
@@ -297,6 +299,11 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
         @Override
         public void run() {
+            if (finish){
+                finish = false;
+                started = false;
+                return;
+            }
             started = true;
             if (startHeight != view.getHeight()) {
                 dragHelper.smoothSlideViewTo(view, 0, calculateDst(state, view));
