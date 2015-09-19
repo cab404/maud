@@ -3,6 +3,7 @@ package ru.ponyhawks.android.fragments;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.SwipeDismissBehavior;
@@ -71,14 +72,10 @@ public class TopicFragment extends ListFragment {
 
         adapter = new ChumrollAdapter();
         final TopicPart topicPart = new TopicPart();
-        topicPart.setOnDataClickListener(new MoonlitPart.OnDataClickListener<Topic>() {
-            @Override
-            public void onClick(Topic data, View view) {
-                System.out.println(data.id);
 
-            }
-        });
         commentPart = new CommentPart();
+        commentPart.saveState = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("saveCommentState", true);
+
         final SpacePart spacePart = new SpacePart();
 
         final LabelPart labelPart = new LabelPart();
@@ -132,6 +129,12 @@ public class TopicFragment extends ListFragment {
                 }
             }
         }.start();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        commentPart.destroy();
     }
 
     void setTitleFromStream(final String title) {

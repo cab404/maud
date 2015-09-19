@@ -13,48 +13,49 @@ import android.widget.LinearLayout;
  * @author cab404
  */
 public class StaticWebView extends LinearLayout {
-    HtmlRipper boundRipper = new HtmlRipper(this);
+    HtmlRipper boundRipper = null;
 
 
     public StaticWebView(Context context) {
         super(context);
-        parametrize(context);
         setOrientation(VERTICAL);
     }
 
     public StaticWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        parametrize(context);
         setOrientation(VERTICAL);
         final String value = attrs.getAttributeValue(null, "text");
         if (value != null)
             setText(value);
     }
 
-    void parametrize(Context ctx) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ctx);
+    public void parametrize() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
         boundRipper.loadImages = sp.getBoolean("loadImages", false);
         boundRipper.loadVideos = sp.getBoolean("loadVideos", false);
         boundRipper.textIsSelectable = sp.getBoolean("textSelectable", false);
     }
 
-    public HtmlRipper getRipper(){
-        return boundRipper;
-    }
 
-    public void setRipper(HtmlRipper ripper){
-        ripper.changeLayout(this);
+    public void setRipper(HtmlRipper ripper) {
         this.boundRipper = ripper;
+        parametrize();
+        ripper.changeLayout(this);
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-        boundRipper.layout();
+        if (boundRipper != null)
+            boundRipper.layout();
     }
 
-    public void setText(String text) {
+    public HtmlRipper setText(String text) {
+        System.out.println("SET TEXT");
+        boundRipper = new HtmlRipper(this);
+        parametrize();
         boundRipper.escape(text);
+        return boundRipper;
     }
 
     @Override

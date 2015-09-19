@@ -113,14 +113,15 @@ public class HtmlRipper {
      */
     public void changeLayout(ViewGroup group) {
         layout = group;
-        group.removeViews(0, group.getChildCount());
+        layout.removeAllViews();
 
         for (View view : cached_contents) {
             if (view.getParent() != null)
                 ((ViewGroup) view.getParent()).removeView(view);
-            group.addView(view);
+            layout.addView(view);
         }
 
+        layout.invalidate();
         layout.requestLayout();
     }
 

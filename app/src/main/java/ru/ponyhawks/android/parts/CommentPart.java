@@ -95,42 +95,52 @@ public class CommentPart extends MoonlitPart<Comment> {
     }
 
     @Override
-    public void convert(View view, final Comment data, int index, final ViewGroup parent) {
-        parents.put(data.id, data.parent);
+    public void convert(View view, final Comment cm, int index, final ViewGroup parent) {
+        parents.put(cm.id, cm.parent);
 
-        super.convert(view, data, index, parent);
+        super.convert(view, cm, index, parent);
         ButterKnife.bind(this, view);
 
         final int lv = (int) (view.getContext().getResources().getDisplayMetrics().density * 16);
         view.setOnClickListener(new DoubleClickListener() {
             @Override
             public void act(View v) {
-                offset((AbsListView) parent, levelOf(data.id) * lv);
+                offset((AbsListView) parent, levelOf(cm.id) * lv);
             }
         });
 
-        resetOffset(view, data);
+        resetOffset(view, cm);
 
-        author.setText(data.author.login);
+        author.setText(cm.author.login);
 
-        if (saveState)
-            if (savedStates.containsKey(data.id))
-                text.setRipper(savedStates.get(data.id));
-        text.setText(data.text);
-        if (saveState)
-            savedStates.put(data.id, text.getRipper());
+        if (saveState) {
+            if (savedStates.containsKey(cm.id)) {
+                System.out.println("Got ripper for " + cm.id);
+                text.setRipper(savedStates.get(cm.id));
+            } else {
+                savedStates.put(cm.id, text.setText(cm.text));
+            }
+        } else {
+            text.setText(cm.text);
+        }
 
-        avatar.setVisibility(data.author.is_system ? View.GONE : View.VISIBLE);
+        avatar.setVisibility(cm.author.is_system ? View.GONE : View.VISIBLE);
+
         avatar.setImageDrawable(null);
-        if (!data.author.is_system) {
+        if (!cm.author.is_system) {
             final DisplayImageOptions cfg = new DisplayImageOptions.Builder().cacheInMemory(true).build();
-            ImageLoader.getInstance().displayImage(data.author.small_icon, avatar, cfg);
+            ImageLoader.getInstance().displayImage(cm.author.small_icon, avatar, cfg);
         }
     }
 
     @Override
     public int getLayoutId() {
         return R.layout.part_comment;
+    }
+
+    public void destroy() {
+        for (HtmlRipper ripper : savedStates.values())
+            ripper.destroy();
     }
 
 }
