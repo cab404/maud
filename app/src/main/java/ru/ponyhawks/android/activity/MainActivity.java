@@ -11,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 
+import com.cab404.libph.data.CommonInfo;
+
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.DrawerContentFragment;
 import ru.ponyhawks.android.fragments.LoginFragment;
@@ -79,7 +81,13 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
         if (currentSection == id)
             return;
 
-        String login = UserInfoStore.getInstance().getInfo().username;
+        final CommonInfo info = UserInfoStore.getInstance().getInfo();
+        if (info == null) {
+            startActivity(new Intent(MainActivity.this, SplashActivity.class));
+            finish();
+            return;
+        }
+        String login = info.username;
 
         switch (id) {
             case DrawerContentFragment.ID_MAIN:

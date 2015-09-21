@@ -1,13 +1,10 @@
 package ru.ponyhawks.android.fragments;
 
-import android.app.ActivityManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,8 +24,6 @@ import com.cab404.libph.requests.RefreshCommentsRequest;
 import com.cab404.libph.util.PonyhawksProfile;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
-import org.apache.http.HttpResponse;
-
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.parts.CommentPart;
 import ru.ponyhawks.android.parts.LabelPart;
@@ -37,8 +32,9 @@ import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.statics.ProfileStore;
 import ru.ponyhawks.android.statics.UserInfoStore;
-import ru.ponyhawks.android.utils.UniteSynchronization;
+import ru.ponyhawks.android.utils.MidnightSync;
 import ru.ponyhawks.android.utils.CompositeHandler;
+import ru.ponyhawks.android.utils.UpdateView;
 
 /**
  * Well, sorry for no comments here!
@@ -53,7 +49,7 @@ public class TopicFragment extends ListFragment {
     ChumrollAdapter adapter;
     private int topicId;
     private CommentPart commentPart;
-    private UniteSynchronization sync;
+    private MidnightSync sync;
 
 
     public interface CommentCallback {
@@ -96,7 +92,7 @@ public class TopicFragment extends ListFragment {
         setAdapter(adapter);
 
         final TopicPage page = new TopicPage(topicId);
-        sync = new UniteSynchronization(adapter);
+        sync = new MidnightSync(adapter);
         page.setHandler(
                 new CompositeHandler(
                         sync

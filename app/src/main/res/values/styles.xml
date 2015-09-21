@@ -7,6 +7,6 @@
         <item name="android:tint">?attr/inverse_bg_color</item>
     </style>
 
-    <drawable name="quote_background">#f445</drawable>
+    <drawable name="quote_background">#5445</drawable>
 
 </resources>

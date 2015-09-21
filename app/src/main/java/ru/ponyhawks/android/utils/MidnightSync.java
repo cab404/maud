@@ -21,42 +21,39 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author cab404
  */
-public class UniteSynchronization implements ModularBlockParser.ParsedObjectHandler {
+public class MidnightSync extends UniteSyncronization implements ModularBlockParser.ParsedObjectHandler {
 
     private final Map<Integer, Binding> bindings;
     private final ChumrollAdapter target;
 
-    public UniteSynchronization(ChumrollAdapter target) {
+    public MidnightSync(ChumrollAdapter target) {
         this.bindings = new HashMap<>();
         this.target = target;
     }
 
-    public <A> UniteSynchronization bind(Integer id, ViewConverter<A> converter) {
+    public <A> MidnightSync bind(Integer id, ViewConverter<A> converter) {
         return bind(id, converter, null);
     }
 
-    public <A> UniteSynchronization bind(Integer id, ViewConverter<A> converter, InsertionRule<A> rule) {
+    public <A> MidnightSync bind(Integer id, ViewConverter<A> converter, InsertionRule<A> rule) {
         bindings.put(id, new Binding<>(converter, rule));
         return this;
     }
 
-    Handler handler = new Handler(Looper.getMainLooper());
-    BatchRunnable runnable = new BatchRunnable();
+    public <A> MidnightSync bind(Integer id, Class<ViewConverter<A>> converter) {
+        return bind(id, converter, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <A> MidnightSync bind(Integer id, Class<ViewConverter<A>> converter, InsertionRule<A> rule) {
+        bindings.put(id, new Binding<>(target.getConverters().getInstance(converter), rule));
+        return this;
+    }
 
     @Override
     public void handle(Object object, int key) {
         if (bindings.containsKey(key))
-            try {
-                runnable.lock.lock();
-                //noinspection unchecked
-                runnable.dataToAdd.add(new VV(bindings.get(key), object));
-                if (runnable.finished) {
-                    runnable.finished = false;
-                    handler.postDelayed(runnable, 100);
-                }
-            } finally {
-                runnable.lock.unlock();
-            }
+            post(new InsertObject(bindings.get(key), object));
     }
 
     public <V> void inject(V object, ViewConverter<V> use) {
@@ -65,17 +62,7 @@ public class UniteSynchronization implements ModularBlockParser.ParsedObjectHand
 
 
     public <V> void inject(V object, ViewConverter<V> use, InsertionRule<V> rule) {
-        try {
-            runnable.lock.lock();
-            //noinspection unchecked
-            runnable.dataToAdd.add(new VV(new Binding(use, rule), object));
-            if (runnable.finished) {
-                runnable.finished = false;
-                handler.postDelayed(runnable, 100);
-            }
-        } finally {
-            runnable.lock.unlock();
-        }
+        post(new InsertObject(new Binding<>(use, rule), object));
     }
 
     private class Binding<Clazz> {
@@ -100,38 +87,22 @@ public class UniteSynchronization implements ModularBlockParser.ParsedObjectHand
         }
     }
 
-    private class VV {
+    private class InsertObject implements Runnable {
         Binding binding;
         Object object;
 
-        public VV(Binding binding, Object object) {
+        public InsertObject(Binding binding, Object object) {
+            if (binding == null) throw new RuntimeException("Binding cannot be empty");
             this.binding = binding;
             this.object = object;
         }
-    }
-
-
-    private class BatchRunnable implements Runnable {
-
-        List<VV> dataToAdd = new ArrayList<>();
-        boolean finished = true;
-        final ReentrantLock lock = new ReentrantLock();
 
         @Override
         public void run() {
-            try {
-                lock.lock();
-                for (VV a : dataToAdd)
-                    a.binding.insert(a.object);
-
-                target.notifyDataSetChanged();
-                dataToAdd.clear();
-                finished = true;
-            } finally {
-                lock.unlock();
-            }
+            binding.insert(object);
         }
     }
+
 
     public interface InsertionRule<V> {
         int indexFor(V object, ViewConverter<V> converter, ChumrollAdapter adapter);

@@ -1,6 +1,7 @@
 package ru.ponyhawks.android.activity;
 
 import android.app.ActivityManager;
+import android.content.Intent;
 import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -45,7 +46,15 @@ public class TopicActivity extends BaseActivity {
     }
 
     void backToMain() {
+        final Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
 
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        backToMain();
     }
 
     @Override
@@ -54,7 +63,7 @@ public class TopicActivity extends BaseActivity {
 
         switch (id) {
             case android.R.id.home:
-                finish();
+                backToMain();
                 return true;
         }
 

@@ -15,6 +15,7 @@
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="keyboard|orientation|screenSize"
+            android:launchMode="singleTask"
             >
         </activity>
 
@@ -47,7 +48,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
 
     </application>
 

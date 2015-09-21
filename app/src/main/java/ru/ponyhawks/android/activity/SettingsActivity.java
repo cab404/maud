@@ -48,6 +48,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     public boolean onPreparePanel(int featureId, View view, Menu menu) {
         addPreferencesFromResource(R.xml.settings);
+        if (Build.VERSION.SDK_INT >= 21)
+            addPreferencesFromResource(R.xml.settings_v21);
         getPreferenceManager().findPreference("theme").setOnPreferenceChangeListener(this);
         return super.onPreparePanel(featureId, view, menu);
     }

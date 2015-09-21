@@ -9,9 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.Adapter;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -34,7 +31,11 @@ public class ListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_chumroll_base, container, false);
+        return inflater.inflate(getLayoutId(), container, false);
+    }
+
+    protected int getLayoutId(){
+        return R.layout.fragment_list;
     }
 
     @Override

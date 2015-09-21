@@ -1,10 +1,21 @@
 package ru.ponyhawks.android.fragments;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Topic;
@@ -13,13 +24,17 @@ import com.cab404.libph.pages.MainPage;
 import com.cab404.libph.util.PonyhawksProfile;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.activity.TopicActivity;
-import ru.ponyhawks.android.parts.LoadingPart;
 import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.statics.ProfileStore;
-import ru.ponyhawks.android.utils.UniteSynchronization;
+import ru.ponyhawks.android.utils.ClearAdapterTask;
+import ru.ponyhawks.android.utils.CompositeHandler;
+import ru.ponyhawks.android.utils.MidnightSync;
 
 /**
  * Well, sorry for no comments here!
@@ -29,9 +44,15 @@ import ru.ponyhawks.android.utils.UniteSynchronization;
  *
  * @author cab404
  */
-public class TopicListFragment extends ListFragment {
+public class TopicListFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener {
     public static final String KEY_URL = "url";
     ChumrollAdapter adapter;
+
+    @Bind(R.id.swipe_to_refresh)
+    SwipeRefreshLayout swipe;
+    private MidnightSync sync;
+    private TopicPart topicPart;
+
 
     public static TopicListFragment getInstance(String pageUrl) {
         final TopicListFragment fragment = new TopicListFragment();
@@ -42,22 +63,81 @@ public class TopicListFragment extends ListFragment {
     }
 
     @Override
+    protected int getLayoutId() {
+        return R.layout.fragment_refreshable_list;
+    }
+
+    @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ButterKnife.bind(this, view);
+
+        final TypedArray styledAttributes = getActivity().getTheme().obtainStyledAttributes(
+                new int[]{R.attr.colorPrimary, R.attr.inverse_action_bar_color}
+        );
+        swipe.setColorSchemeColors(styledAttributes.getColor(1, 0), styledAttributes.getColor(1, 0));
+        swipe.setProgressBackgroundColorSchemeColor(styledAttributes.getColor(0, 0));
+        swipe.setOnRefreshListener(this);
 
         adapter = new ChumrollAdapter();
-        final TopicPart topicPart = new TopicPart();
+        sync = new MidnightSync(adapter);
+        topicPart = new TopicPart();
+        SpacePart spacePart = new SpacePart();
+
         topicPart.setOnDataClickListener(new MoonlitPart.OnDataClickListener<Topic>() {
             @Override
             public void onClick(Topic data, View view) {
                 switchToPage(data);
             }
         });
-        SpacePart spacePart = new SpacePart();
 
-        adapter.prepareFor(spacePart, topicPart, new LoadingPart());
-        final int loadingID = adapter.add(LoadingPart.class, null);
+        adapter.prepareFor(spacePart, topicPart);
         setAdapter(adapter);
+        onRefresh();
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                // workaround for refresher to show up
+                swipe.measure(swipe.getWidth(), swipe.getHeight());
+                swipe.setRefreshing(true);
+            }
+        });
+    }
+
+    private void switchToPage(Topic data) {
+        Intent startTopicActivity = new Intent(getActivity(), TopicActivity.class);
+        startTopicActivity.putExtra(TopicActivity.KEY_TOPIC_ID, data.id);
+        startTopicActivity.putExtra("title", data.title);
+        boolean useMultitasking =
+                PreferenceManager.getDefaultSharedPreferences(getActivity())
+                        .getBoolean("multitasking", false);
+
+        if (useMultitasking && Build.VERSION.SDK_INT >= 21) {
+            /* Restarting activity if exists in background */
+            ActivityManager man = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
+            final ComponentName topicActivityComponent = new ComponentName(getActivity(), TopicActivity.class);
+            for (ActivityManager.AppTask task : man.getAppTasks()) {
+                final ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
+
+                if (topicActivityComponent.equals(taskInfo.baseIntent.getComponent())) {
+                    final Intent running = taskInfo.baseIntent;
+                    if (running.getIntExtra(TopicActivity.KEY_TOPIC_ID, -1) == data.id) {
+                        task.moveToFront();
+                        return;
+                    }
+                }
+            }
+            /* Otherwise just adding things to intent. */
+            startTopicActivity.addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+            );
+        }
+
+        startActivity(startTopicActivity);
+    }
+
+    @Override
+    public void onRefresh() {
 
         final MainPage page = new MainPage() {
             @Override
@@ -71,45 +151,43 @@ public class TopicListFragment extends ListFragment {
                 base.bind(new TopicModule(TopicModule.Mode.LIST), BLOCK_TOPIC_HEADER);
             }
         };
-        final UniteSynchronization insertHandler = new UniteSynchronization(adapter);
+
         page.setHandler(
-                insertHandler.bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
+                new CompositeHandler(
+                        new ClearAdapterTask(adapter, sync),
+                        sync.bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
+                )
         );
 
         new Thread() {
             @Override
             public void run() {
-                PonyhawksProfile profile = ProfileStore.get();
-                page.fetch(profile);
-                view.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.removeById(loadingID);
-                    }
-                });
+                try {
+                    PonyhawksProfile profile = ProfileStore.get();
+                    page.fetch(profile);
+                } catch (final Exception e) {
+                    e.printStackTrace();
+                    sync.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast
+                                    .makeText(
+                                            getActivity(),
+                                            "Не удалось загрузить страницу\n" + e.getLocalizedMessage(),
+                                            Toast.LENGTH_LONG
+                                    ).show();
+                        }
+                    });
+                } finally {
+                    sync.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipe.setRefreshing(false);
+                        }
+                    });
+                }
             }
         }.start();
     }
 
-    private void switchToPage(Topic data) {
-        Intent startTopicActivity = new Intent(getActivity(), TopicActivity.class);
-        startTopicActivity.putExtra(TopicActivity.KEY_TOPIC_ID, data.id);
-        startTopicActivity.putExtra("title", data.title);
-        if (Build.VERSION.SDK_INT >= 21)
-            startTopicActivity.addFlags(
-                    Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK
-            );
-        startActivity(startTopicActivity);
-    }
-
-//    @Override
-//    public void handle(Object object, int key) {
-//        Log.v("This", "Got object ");
-//        switch (key) {
-//            case MainPage.BLOCK_TOPIC_HEADER:
-//                adapter.add(TopicPart.class, ((Topic) object));
-//                System.out.println(((Topic) object).title);
-//                break;
-//        }
-//    }
 }
