@@ -135,7 +135,7 @@ public class TopicFragment extends ListFragment {
                     });
                     final float dp = view.getResources().getDisplayMetrics().density;
                     // injecting bottom
-                    sync.inject((int) (60 * dp), spacePart);
+                    sync.inject((int) (68 * dp), spacePart);
                 } catch (Exception e) {
                     getActivity().finish();
                 }
@@ -157,8 +157,8 @@ public class TopicFragment extends ListFragment {
                 super.handleResponse(response);
                 System.out.println("UPD " + "GOT " + comments.size());
                 for (Comment cm : comments) {
-                    commentPart.register(cm);
                     sync.inject(cm, commentPart, commentPart);
+                    commentPart.register(cm);
                 }
             }
         };

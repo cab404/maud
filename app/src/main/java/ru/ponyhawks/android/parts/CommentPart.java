@@ -1,6 +1,7 @@
 package ru.ponyhawks.android.parts;
 
 import android.graphics.Rect;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.PopupMenuCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,7 @@ import ru.ponyhawks.android.utils.UniteSynchronization;
  */
 public class CommentPart extends MoonlitPart<Comment> implements UniteSynchronization.InsertionRule<Comment> {
     Map<Integer, Comment> data = new HashMap<>();
+    Map<Integer, Integer> ids = new HashMap<>();
     Map<Integer, HtmlRipper> savedStates = new HashMap<>();
 
     public boolean saveState = true;
@@ -108,15 +110,25 @@ public class CommentPart extends MoonlitPart<Comment> implements UniteSynchroniz
         int level = levelOf(data.id);
         int padding = -lv * level + savedOffset;
         view.scrollTo(padding, view.getScrollY());
+    }
 
+    public void updateIndexes(ChumrollAdapter adapter) {
+        int sid = adapter.typeIdOf(this);
+        for (int i = 0; i < adapter.getCount(); i++)
+            if (sid == adapter.getItemViewType(i)) {
+                final Comment data = (Comment) adapter.getData(i);
+                ids.put(data.id, adapter.idOf(i));
+            }
     }
 
     @Override
     public void convert(View view, final Comment cm, int index, final ViewGroup parent) {
-        data.put(cm.id, cm);
+        register(cm);
 
         super.convert(view, cm, index, parent);
         ButterKnife.bind(this, view);
+
+        view.setBackgroundColor(cm.is_new ? 0x66000000 : 0);
 
         final int lv = (int) (view.getContext().getResources().getDisplayMetrics().density * 16);
         view.setOnClickListener(new DoubleClickListener() {
@@ -194,31 +206,51 @@ public class CommentPart extends MoonlitPart<Comment> implements UniteSynchroniz
     }
 
     /**
-     * Fuck yes. It's a complete, movable tree function, not some sort of offset bullshit >X)
+     * Finds last index in children's tree
+     */
+    int upfall(ChumrollAdapter adapter, Comment parent) {
+        final List<Comment> parentsNeighbours = collectChildren(parent.id);
+        Collections.sort(parentsNeighbours, CC_INST);
+
+        if (parentsNeighbours.size() == 0)
+            return adapter.indexOfId(ids.get(parent.id));
+        else
+            return upfall(adapter, parentsNeighbours.get(parentsNeighbours.size() - 1));
+    }
+
+
+    /**
+     * Fuck yes.
      */
     @Override
     public int indexFor(Comment newC, ViewConverter<Comment> converter, ChumrollAdapter adapter) {
-        List<Comment> parentNeighbours = collectChildren(newC.parent);
+        updateIndexes(adapter);
 
-        if (parentNeighbours.size() == 0)
-            return newC.parent == 0 ? baseIndex : (adapter.indexOf(data.get(newC.parent)) + 1);
+        System.out.println("adding " + newC.id + " parent " + newC.parent);
+        List<Comment> nbrs = collectChildren(newC.parent);
+        for (int i = 0; i < nbrs.size(); )
+            if (adapter.indexOf(nbrs.get(i)) == -1)
+                nbrs.remove(i);
+            else
+                i++;
 
-        parentNeighbours.add(newC);
-        Collections.sort(parentNeighbours, CC_INST);
-        int index = parentNeighbours.indexOf(newC);
 
-        if (index == parentNeighbours.size() - 1)
+        if (nbrs.size() == 0)
+            return newC.parent == 0 ? baseIndex : (adapter.indexOfId(ids.get(newC.parent)) + 1);
+
+        nbrs.add(newC);
+        Collections.sort(nbrs, CC_INST);
+        int index = nbrs.indexOf(newC);
+
+        if (index == nbrs.size() - 1)
             if (newC.parent == 0)
                 // Play dirty!
-                return baseIndex + index;
-            else if (index < parentNeighbours.size() - 2)
-                // just before next neighbour
-                return adapter.indexOf(parentNeighbours.get(index + 1));
+                return upfall(adapter, nbrs.get(nbrs.size() - 2)) + 1;
             else
                 // well, shit. Before next parent's neighbour, if exists
                 return downfall(adapter, data.get(newC.parent));
         else
-            return adapter.indexOf(parentNeighbours.get(index + 1));
+            return adapter.indexOfId(ids.get(nbrs.get(index + 1).id));
 
     }
 }
