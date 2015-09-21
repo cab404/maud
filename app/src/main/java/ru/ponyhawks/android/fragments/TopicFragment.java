@@ -1,39 +1,43 @@
 package ru.ponyhawks.android.fragments;
 
+import android.app.ActivityManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.SwipeDismissBehavior;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Comment;
 import com.cab404.libph.data.CommonInfo;
 import com.cab404.libph.data.Topic;
+import com.cab404.libph.data.Type;
 import com.cab404.libph.pages.BasePage;
 import com.cab404.libph.pages.MainPage;
 import com.cab404.libph.pages.TopicPage;
+import com.cab404.libph.requests.RefreshCommentsRequest;
 import com.cab404.libph.util.PonyhawksProfile;
 import com.cab404.moonlight.framework.ModularBlockParser;
+
+import org.apache.http.HttpResponse;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.parts.CommentPart;
 import ru.ponyhawks.android.parts.LabelPart;
 import ru.ponyhawks.android.parts.LoadingPart;
-import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.statics.ProfileStore;
 import ru.ponyhawks.android.statics.UserInfoStore;
-import ru.ponyhawks.android.utils.BatchedInsertHandler;
+import ru.ponyhawks.android.utils.UniteSynchronization;
 import ru.ponyhawks.android.utils.CompositeHandler;
 
 /**
@@ -49,9 +53,11 @@ public class TopicFragment extends ListFragment {
     ChumrollAdapter adapter;
     private int topicId;
     private CommentPart commentPart;
+    private UniteSynchronization sync;
+
 
     public interface CommentCallback {
-        public void onComment(int commentId);
+        void onComment(int commentId);
     }
 
     public static TopicFragment getInstance(int id) {
@@ -62,6 +68,12 @@ public class TopicFragment extends ListFragment {
 
         topicFragment.setArguments(args);
         return topicFragment;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -84,10 +96,10 @@ public class TopicFragment extends ListFragment {
         setAdapter(adapter);
 
         final TopicPage page = new TopicPage(topicId);
-        final BatchedInsertHandler insertHandler = new BatchedInsertHandler(adapter);
+        sync = new UniteSynchronization(adapter);
         page.setHandler(
                 new CompositeHandler(
-                        insertHandler
+                        sync
                                 .bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
                                 .bind(MainPage.BLOCK_COMMENT, commentPart)
                                 .bind(MainPage.BLOCK_COMMENT_NUM, labelPart),
@@ -123,9 +135,37 @@ public class TopicFragment extends ListFragment {
                     });
                     final float dp = view.getResources().getDisplayMetrics().density;
                     // injecting bottom
-                    insertHandler.inject((int) (60 * dp), spacePart);
+                    sync.inject((int) (60 * dp), spacePart);
                 } catch (Exception e) {
                     getActivity().finish();
+                }
+            }
+        }.start();
+    }
+
+    volatile boolean updating = false;
+
+    public void update() {
+        if (updating) return;
+        updating = true;
+
+        final RefreshCommentsRequest request
+                = new RefreshCommentsRequest(Type.TOPIC, topicId, commentPart.getLastCommentId()) {
+            @Override
+            protected void onResponseGain(HttpResponse response) {
+                super.onResponseGain(response);
+                System.out.println("GOT " + comments.size());
+                for (Comment cm : comments)
+                    sync.inject(cm, commentPart, commentPart);
+            }
+        };
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    request.exec(ProfileStore.get());
+                } finally {
+                    updating = false;
                 }
             }
         }.start();
@@ -137,15 +177,29 @@ public class TopicFragment extends ListFragment {
         commentPart.destroy();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.refresh) {
+            update();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     void setTitleFromStream(final String title) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 if (getActivity() != null)
                     //noinspection ConstantConditions
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(title);
+                    getActivity().setTitle(title);
             }
         });
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_topic, menu);
+    }
 }

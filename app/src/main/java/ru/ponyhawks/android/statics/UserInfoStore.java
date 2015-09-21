@@ -26,8 +26,9 @@ public class UserInfoStore extends Observable {
     }
 
     public synchronized void setInfo(CommonInfo info) {
+        if (info == null)
+            return;
         this.info = info;
-        if (info != null)
-            notifyObservers(info);
+        notifyObservers(info);
     }
 }

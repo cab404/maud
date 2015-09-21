@@ -1,8 +1,11 @@
 package ru.ponyhawks.android.activity;
 
+import android.content.Intent;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.v7.internal.widget.ThemeUtils;
@@ -16,19 +19,19 @@ import android.view.ViewGroup;
 import ru.ponyhawks.android.R;
 
 /**
- * Well, sorry for no comments here!
- * Still you can send me your question to me@cab404.ru!
+ * Settings
  * <p/>
  * Created at 13:59 on 15/09/15
  *
  * @author cab404
  */
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
 
     private static final String TAG = "SETTINGS";
 
     boolean set = false;
-    void set(){
+
+    void set() {
         if (set) return;
         set = true;
         final TypedArray id = getTheme().obtainStyledAttributes(new int[]{R.attr.settings_theme});
@@ -45,7 +48,25 @@ public class SettingsActivity extends PreferenceActivity {
     @Override
     public boolean onPreparePanel(int featureId, View view, Menu menu) {
         addPreferencesFromResource(R.xml.settings);
+        getPreferenceManager().findPreference("theme").setOnPreferenceChangeListener(this);
         return super.onPreparePanel(featureId, view, menu);
+    }
+
+    boolean changedTheme = false;
+
+    protected void onExit() {
+        if (changedTheme) {
+            Intent start = new Intent(this, MainActivity.class);
+            if (Build.VERSION.SDK_INT >= 11)
+                start.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(start);
+        }
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        onExit();
     }
 
     @Override
@@ -54,7 +75,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         switch (id) {
             case android.R.id.home:
-                finish();
+                onExit();
                 return true;
         }
 
@@ -62,4 +83,11 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
 
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if ("theme".equals(preference.getKey()))
+            changedTheme = true;
+        System.out.println("CH");
+        return true;
+    }
 }

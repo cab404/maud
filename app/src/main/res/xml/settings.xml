@@ -16,7 +16,7 @@
     <PreferenceCategory android:title="Приложение" />
     <ListPreference
         android:entries="@array/theme_names"
-        android:entryValues="@array/themes"
+        android:entryValues="@array/theme_values"
         android:defaultValue="Dark"
         android:key="theme"
         android:title="Тема" />

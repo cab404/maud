@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="?attr/main_foreground_color"
+    android:background="?attr/colorPrimary"
     android:padding="16dp">
 
     <ImageView
@@ -18,7 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="cab404"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="18sp"
+        android:textColor="?attr/inverse_action_bar_color"
         android:textStyle="bold" />
 
 </LinearLayout>

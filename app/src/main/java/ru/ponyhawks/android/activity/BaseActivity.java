@@ -21,15 +21,11 @@ public class BaseActivity extends AppCompatActivity {
 
     private void setupTheme() {
         final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        final String s = sp.getString("theme", "Dark");
-        final String[] array = getResources().getStringArray(R.array.themes);
-        int i;
-        for (i = 0; i < array.length; i++)
-            if (array[i].equals(s))
-                break;
+        final String theme = sp.getString("theme", "AppThemeDark");
 
-        String theme = getResources().getStringArray(R.array.theme_values)[i];
-        final int id = getResources().getIdentifier(theme, "style", getPackageName());
+        int id = getResources().getIdentifier(theme, "style", getPackageName());
+        if (id == 0) id = R.style.AppThemeDark;
+
         setTheme(id);
     }
 

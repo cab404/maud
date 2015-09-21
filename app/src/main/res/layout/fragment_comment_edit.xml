@@ -55,7 +55,8 @@
             android:layout_alignBottom="@+id/text"
             android:layout_alignParentRight="true"
             android:clickable="true"
-            android:tint="?icon_fill"
+            style="@style/EditIconPadded"
+            android:tint="?attr/inverse_bg_color"
             android:src="@drawable/ic_send" />
 
         <LinearLayout
@@ -70,8 +71,9 @@
                 android:layout_width="64dp"
                 android:layout_height="42dp"
                 android:background="?selectableItemBackground"
-                android:tint="?icon_fill"
+                android:tint="?attr/inverse_bg_color"
                 android:clickable="true"
+                style="@style/EditIconPadded"
                 android:src="@drawable/ic_image" />
 
             <ImageView
@@ -80,7 +82,8 @@
                 android:layout_height="42dp"
                 android:background="?selectableItemBackground"
                 android:clickable="true"
-                android:tint="?icon_fill"
+                android:tint="?attr/inverse_bg_color"
+                style="@style/EditIconPadded"
                 android:src="@drawable/ic_link" />
 
             <ImageView
@@ -89,7 +92,8 @@
                 android:layout_height="42dp"
                 android:background="?selectableItemBackground"
                 android:clickable="true"
-                android:tint="?icon_fill"
+                android:tint="?attr/inverse_bg_color"
+                style="@style/EditIconPadded"
                 android:src="@drawable/ic_palette" />
         </LinearLayout>
     </RelativeLayout>

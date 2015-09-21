@@ -1,9 +1,9 @@
 package ru.ponyhawks.android.fragments;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 
 import com.cab404.chumroll.ChumrollAdapter;
@@ -13,16 +13,13 @@ import com.cab404.libph.pages.MainPage;
 import com.cab404.libph.util.PonyhawksProfile;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import ru.ponyhawks.android.activity.TopicActivity;
 import ru.ponyhawks.android.parts.LoadingPart;
 import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.statics.ProfileStore;
-import ru.ponyhawks.android.utils.BatchedInsertHandler;
+import ru.ponyhawks.android.utils.UniteSynchronization;
 
 /**
  * Well, sorry for no comments here!
@@ -74,7 +71,7 @@ public class TopicListFragment extends ListFragment {
                 base.bind(new TopicModule(TopicModule.Mode.LIST), BLOCK_TOPIC_HEADER);
             }
         };
-        final BatchedInsertHandler insertHandler = new BatchedInsertHandler(adapter);
+        final UniteSynchronization insertHandler = new UniteSynchronization(adapter);
         page.setHandler(
                 insertHandler.bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
         );
@@ -97,6 +94,11 @@ public class TopicListFragment extends ListFragment {
     private void switchToPage(Topic data) {
         Intent startTopicActivity = new Intent(getActivity(), TopicActivity.class);
         startTopicActivity.putExtra(TopicActivity.KEY_TOPIC_ID, data.id);
+        startTopicActivity.putExtra("title", data.title);
+        if (Build.VERSION.SDK_INT >= 21)
+            startTopicActivity.addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK
+            );
         startActivity(startTopicActivity);
     }
 

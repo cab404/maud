@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <declare-styleable name="AppTheme">
+        <attr name="main_background_color" format="color" />
+        <attr name="main_foreground_color" format="color" />
+        <attr name="inverse_bg_color" format="color" />
+        <attr name="inverse_action_bar_color" format="color" />
+        <attr name="new_background" format="reference" />
+        <attr name="rounded_background" format="reference" />
+        <attr name="settings_theme" format="reference" />
+    </declare-styleable>
+
+    <style name="AppThemeDark" parent="Theme.AppCompat">
+        <item name="inverse_bg_color">#fff</item>
+        <item name="inverse_action_bar_color">@color/abc_primary_text_material_dark</item>
+        <item name="main_foreground_color">@color/primary_material_dark</item>
+        <item name="main_background_color">@color/background_material_dark</item>
+        <item name="new_background">@drawable/new_background_dark</item>
+        <item name="rounded_background">@drawable/rounded_background_dark</item>
+        <item name="settings_theme">@style/SettingsThemeDark</item>
+    </style>
+
+    <style name="AppThemeLight" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="inverse_bg_color">#111</item>
+        <item name="inverse_action_bar_color">@color/abc_primary_text_material_dark</item>
+        <item name="main_foreground_color">@color/primary_material_light</item>
+        <item name="main_background_color">@color/background_material_light</item>
+        <item name="new_background">@drawable/new_background_light</item>
+        <item name="rounded_background">@drawable/rounded_background_light</item>
+        <item name="settings_theme">@style/SettingsThemeLight</item>
+    </style>
+
+    <style name="AppThemeDark.Green">
+        <item name="colorPrimary">#42787e</item>
+    </style>
+
+    <style name="AppThemeLight.Rariteh">
+        <item name="colorPrimary">#5e50a1</item>
+    </style>
+
+    <string-array name="theme_names">
+        <item>Светлая</item>
+        <item>Тёмная</item>
+        <item>Зелёная</item>
+        <item>Зефирка</item>
+    </string-array>
+
+    <string-array name="theme_values">
+        <item>AppThemeLight</item>
+        <item>AppThemeDark</item>
+        <item>AppThemeDark.Green</item>
+        <item>AppThemeLight.Rariteh</item>
+    </string-array>
+
+    <style name="SettingsThemeDark" parent="android:Theme.DeviceDefault" tools:targetApi="ice_cream_sandwich" />
+    <style name="SettingsThemeLight" parent="android:Theme.DeviceDefault.Light" tools:targetApi="ice_cream_sandwich" />
+
+</resources>

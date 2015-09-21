@@ -1,5 +1,7 @@
 package ru.ponyhawks.android.activity;
 
+import android.app.ActivityManager;
+import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.SwipeDismissBehavior;
@@ -20,9 +22,18 @@ public class TopicActivity extends BaseActivity {
 
     public static final String KEY_TOPIC_ID = "topicId";
 
+    CommentEditFragment ced;
+    TopicFragment topic;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle(getIntent().getStringExtra("title"));
+        if (Build.VERSION.SDK_INT >= 21)
+            setTaskDescription(
+                    new ActivityManager.TaskDescription(getIntent().getStringExtra("title"))
+            );
+
         setContentView(R.layout.activity_topic);
         ButterKnife.bind(this);
         getSupportFragmentManager().beginTransaction()
@@ -33,11 +44,8 @@ public class TopicActivity extends BaseActivity {
         editFragment.finishTranslations();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_topic, menu);
-        return true;
+    void backToMain() {
+
     }
 
     @Override

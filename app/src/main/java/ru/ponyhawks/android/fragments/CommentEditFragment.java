@@ -89,6 +89,7 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
             @Override
             public void run() {
                 behavior.init(root, commentFrame);
+                collapse();
             }
         });
 
@@ -131,33 +132,35 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
         inputMethodManager.hideSoftInputFromWindow(text.getWindowToken(), 0);
     }
 
-    public void focus(){
+    public void focus() {
         text.requestFocus();
     }
 
-    public Editable getText(){
+    public Editable getText() {
         return text.getText();
     }
 
-    public interface SendCallback{
+    public interface SendCallback {
         void onSend(Editable text);
     }
 
-    public void setSendCallback(SendCallback callback){
+    public void setSendCallback(SendCallback callback) {
         sendCallback = callback;
     }
 
-    public void hide(){
+    public void hide() {
         behavior.hide(commentFrame);
     }
-    public void collapse(){
+
+    public void collapse() {
         behavior.collapse(commentFrame);
     }
-    public void expand(){
+
+    public void expand() {
         behavior.expand(commentFrame);
     }
 
-    public void finishTranslations(){
+    public void finishTranslations() {
         behavior.syncImmediate(commentFrame);
     }
 

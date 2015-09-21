@@ -1,5 +1,6 @@
 package ru.ponyhawks.android.parts;
 
+import android.support.annotation.LayoutRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ public class MoonlitPart<A> implements ViewConverter<A> {
         this.onDataClickListener = onDataClickListener;
     }
 
+    @LayoutRes
     public int getLayoutId(){
         return -1;
     }

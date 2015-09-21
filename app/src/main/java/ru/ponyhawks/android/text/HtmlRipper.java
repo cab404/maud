@@ -525,6 +525,17 @@ public class HtmlRipper {
 
     private TextView form(String text, Context context) {
         TextView view = new TextView(context);
+        view.setTextAppearance(
+                context,
+                context
+                        .getTheme()
+                        .obtainStyledAttributes(
+                                new int[]{
+                                        android.R.attr.textAppearance
+                                }
+                        )
+                        .getResourceId(0, android.R.style.TextAppearance)
+        );
         simpleEscape(view, text, context);
 
         if (Build.VERSION.SDK_INT > 10) {

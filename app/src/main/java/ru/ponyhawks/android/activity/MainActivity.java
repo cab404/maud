@@ -1,19 +1,15 @@
 package ru.ponyhawks.android.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.TypedArray;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
-import android.view.View;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.DrawerContentFragment;
@@ -22,6 +18,7 @@ import ru.ponyhawks.android.fragments.TopicListFragment;
 import ru.ponyhawks.android.statics.ObscurePreferencesStore;
 import ru.ponyhawks.android.statics.ProfileStore;
 import ru.ponyhawks.android.statics.UserInfoStore;
+import ru.ponyhawks.android.utils.Randomness;
 
 public class MainActivity extends BaseActivity implements DrawerContentFragment.DrawerClickCallback {
 
@@ -71,11 +68,7 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
         drawerToggle.onOptionsItemSelected(item);
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+         return super.onOptionsItemSelected(item);
     }
 
     int currentSection = -1;
@@ -89,12 +82,11 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
         String login = UserInfoStore.getInstance().getInfo().username;
 
         switch (id) {
-            case DrawerContentFragment.ID_SETTINGS:
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
-
             case DrawerContentFragment.ID_MAIN:
                 use = TopicListFragment.getInstance("/");
+                break;
+            case DrawerContentFragment.ID_SETTINGS:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case DrawerContentFragment.ID_FAVOURITES:
                 use = TopicListFragment.getInstance("/profile/" + login + "/favourites/topics");
@@ -102,18 +94,22 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
             case DrawerContentFragment.ID_PUBLICATIONS:
                 use = TopicListFragment.getInstance("/profile/" + login + "/created/topics");
                 break;
-
             case DrawerContentFragment.ID_EXIT:
-                ObscurePreferencesStore.getInstance().get().edit()
-                        .remove(LoginFragment.KEY_USERNAME)
-                        .remove(LoginFragment.KEY_PASSWORD)
-                        .commit();
-                ProfileStore.getInstance().reset();
-
-                final Intent intent = new Intent(this, SplashActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
+                new AlertDialog.Builder(this)
+                        .setMessage("Выйти из аккаунта?")
+                        .setPositiveButton(Randomness.getRandomOf(this, R.array.exit), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                logout();
+                                dialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("Не сейчас", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
                 break;
         }
 
@@ -126,5 +122,19 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
             drawerLayout.closeDrawer(GravityCompat.START);
             currentSection = id;
         }
+    }
+
+    protected void logout() {
+        ObscurePreferencesStore.getInstance().get().edit()
+                .remove(LoginFragment.KEY_USERNAME)
+                .remove(LoginFragment.KEY_PASSWORD)
+                .commit();
+        ProfileStore.getInstance().reset();
+
+        final Intent intent = new Intent(this, SplashActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+
     }
 }

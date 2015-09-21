@@ -1,29 +1,19 @@
 <resources>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_settings">Settings</string>
-
+    <string name="navigation_drawer_open">Открыть боковое меню</string>
+    <string name="navigation_drawer_close">Закрыть боковое меню</string>
 
     <string name="app_name">Ponyhawks</string>
-    <string name="title_activity_topic">Ponyhawks</string>
-    <string name="title_activity_splash">Ponyhawks</string>
+    <string name="favorites">Избранное</string>
+    <string name="refresh">Обновить</string>
+    <string name="write_reply">Написать комментарий</string>
+    <string name="copy_link">Копировать ссылку</string>
+    <string name="add_to_favourites">Добавить в избранное</string>
 
-    <string-array name="theme_names">
-        <item>Светлая</item>
-        <item>Тёмная</item>
-    </string-array>
-
-    <string-array name="themes">
-        <item>Light</item>
-        <item>Dark</item>
-    </string-array>
-
-
-    <string-array name="theme_values">
-        <item>AppThemeLight</item>
-        <item>AppThemeDark</item>
+    <string-array name="exit">
+        <item>Я устал, я ухожу.</item>
+        <item>Beam me up, Scotty!</item>
+        <item>Хоуки уже не торт.</item>
     </string-array>
 
 </resources>

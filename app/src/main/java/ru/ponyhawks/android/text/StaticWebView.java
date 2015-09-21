@@ -51,7 +51,6 @@ public class StaticWebView extends LinearLayout {
     }
 
     public HtmlRipper setText(String text) {
-        System.out.println("SET TEXT");
         boundRipper = new HtmlRipper(this);
         parametrize();
         boundRipper.escape(text);
