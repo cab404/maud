@@ -44,7 +44,6 @@ import ru.ponyhawks.android.utils.UniteSynchronization;
  */
 public class CommentPart extends MoonlitPart<Comment> implements UniteSynchronization.InsertionRule<Comment> {
     Map<Integer, Comment> data = new HashMap<>();
-    Map<Integer, Integer> parents = new HashMap<>();
     Map<Integer, HtmlRipper> savedStates = new HashMap<>();
 
     public boolean saveState = true;
@@ -100,7 +99,7 @@ public class CommentPart extends MoonlitPart<Comment> implements UniteSynchroniz
 
     public int getLastCommentId() {
         int max = 0;
-        for (Integer id : parents.keySet()) max = Math.max(id, max);
+        for (Integer id : data.keySet()) max = Math.max(id, max);
         return max;
     }
 
@@ -114,7 +113,7 @@ public class CommentPart extends MoonlitPart<Comment> implements UniteSynchroniz
 
     @Override
     public void convert(View view, final Comment cm, int index, final ViewGroup parent) {
-        parents.put(cm.id, cm.parent);
+        data.put(cm.id, cm);
 
         super.convert(view, cm, index, parent);
         ButterKnife.bind(this, view);

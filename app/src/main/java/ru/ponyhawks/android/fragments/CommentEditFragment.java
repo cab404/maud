@@ -85,14 +85,6 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
             }
         });
 
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                behavior.init(root, commentFrame);
-                collapse();
-            }
-        });
-
     }
 
     boolean collapsed = true;

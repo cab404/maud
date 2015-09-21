@@ -149,21 +149,24 @@ public class TopicFragment extends ListFragment {
         if (updating) return;
         updating = true;
 
+        System.out.println("UPD " + topicId);
         final RefreshCommentsRequest request
                 = new RefreshCommentsRequest(Type.TOPIC, topicId, commentPart.getLastCommentId()) {
             @Override
-            protected void onResponseGain(HttpResponse response) {
-                super.onResponseGain(response);
-                System.out.println("GOT " + comments.size());
-                for (Comment cm : comments)
+            protected void handleResponse(String response) {
+                super.handleResponse(response);
+                System.out.println("UPD " + "GOT " + comments.size());
+                for (Comment cm : comments) {
+                    commentPart.register(cm);
                     sync.inject(cm, commentPart, commentPart);
+                }
             }
         };
         new Thread() {
             @Override
             public void run() {
                 try {
-                    request.exec(ProfileStore.get());
+                    request.fetch(ProfileStore.get());
                 } finally {
                     updating = false;
                 }

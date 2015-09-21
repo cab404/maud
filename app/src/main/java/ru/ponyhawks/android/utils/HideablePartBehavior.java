@@ -6,6 +6,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +26,9 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
     private boolean scrollTransferred = false;
     private boolean animationStarted = false;
-    private boolean calculateOffset = true;
-
+    private boolean calculateOffset = false;
     private boolean finishAnimate = false;
+
 
     ViewDragHelper dragHelper;
     int collapsedOffset = -1;
@@ -38,10 +39,16 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     ViewDragHelper.Callback callback = new ViewDragHelper.Callback() {
         @Override
         public boolean tryCaptureView(View child, int pointerId) {
+            System.out.println("HideablePartBehavior.tryCaptureView");
+//            Log.v("AnimDebug", "scrollTransferred = " + scrollTransferred);
+//            Log.v("AnimDebug", "animationStarted = " + animationStarted);
+//            Log.v("AnimDebug", "calculateOffset = " + calculateOffset);
+//            Log.v("AnimDebug", "collapsedOffset = " + collapsedOffset);
+//            Log.v("AnimDebug", "finishAnimate = " + finishAnimate);
+//            Log.v("AnimDebug", "state = " + state);
             calculateOffset = true;
             if (collapsedOffset == -1)
                 lockOn(child);
-            System.out.println("CAPTURE " + child);
             return true;
         }
 
@@ -52,7 +59,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
         @Override
         public void onViewReleased(View view, float xvel, float yvel) {
-            System.out.println("RELEASE");
+            System.out.println("HideablePartBehavior.onViewReleased");
             super.onViewReleased(view, xvel, yvel);
             final int height = ((View) view.getParent()).getHeight();
             int dst;
@@ -94,7 +101,6 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
             lastTop = top;
-            System.out.println("CHANGE " + lastTop);
 
             if (calculateOffset && (state == State.EXPANDED || state == State.COLLAPSED)) {
                 int expandLimit = calculateDst(State.EXPANDED, changedView);
@@ -126,11 +132,13 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void init(ViewGroup parent, View child) {
+        System.out.println("HideablePartBehavior.init");
         dragHelper = ViewDragHelper.create(parent, callback);
         lockOn(child);
     }
 
     public void lockOn(View child) {
+        System.out.println("HideablePartBehavior.lockOn");
         lastTop = collapsedOffset = child.getBottom() - ((View) child.getParent()).getHeight();
     }
 
@@ -139,6 +147,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void collapse(View view) {
+        System.out.println("HideablePartBehavior.collapse");
         calculateOffset = true;
         if (dragHelper == null) return;
         final int dst = calculateDst(State.COLLAPSED, view);
@@ -152,6 +161,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void expand(View view) {
+        System.out.println("HideablePartBehavior.expand");
         calculateOffset = true;
         if (dragHelper == null) return;
         final int dst = calculateDst(State.EXPANDED, view);
@@ -165,6 +175,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void hide(View view) {
+        System.out.println("HideablePartBehavior.hide");
         calculateOffset = true;
         if (dragHelper == null) return;
         final int dst = calculateDst(State.HIDDEN, view);
@@ -192,11 +203,13 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void syncImmediate(View child) {
+        System.out.println("HideablePartBehavior.syncImmediate");
         child.offsetTopAndBottom(calculateDst(state, child) - child.getTop());
         finishAnimate = true;
     }
 
     public void sync(View child) {
+        System.out.println("HideablePartBehavior.sync");
         calculateOffset = true;
         switch (state) {
             case HIDDEN:
@@ -221,6 +234,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     @Override
     @SuppressWarnings("SimplifiableIfStatement")
     public boolean onInterceptTouchEvent(CoordinatorLayout parent, V child, MotionEvent ev) {
+        System.out.println("HideablePartBehavior.onInterceptTouchEvent");
         if (dragHelper == null)
             init(parent, child);
 
@@ -233,12 +247,13 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
             return false;
         if (checkOldNestedThings(child, ev)) {
             scrollTransferred = true;
-            System.out.println("GNS");
             return false;
         }
 
         if (parent.isPointInChildBounds(child, (int) ev.getX(), (int) ev.getY())) {
-            return dragHelper.shouldInterceptTouchEvent(ev);
+            final boolean should = dragHelper.shouldInterceptTouchEvent(ev);
+            System.out.println("should = " + should);
+            return should;
         } else
             return false;
     }
@@ -263,6 +278,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
     @Override
     public boolean onTouchEvent(CoordinatorLayout parent, V child, MotionEvent ev) {
+        System.out.println("HideablePartBehavior.onTouchEvent");
         if (dragHelper != null)
             dragHelper.processTouchEvent(ev);
         return true;
