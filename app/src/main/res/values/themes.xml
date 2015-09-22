@@ -12,6 +12,7 @@
     </declare-styleable>
 
     <style name="AppThemeDark" parent="Theme.AppCompat">
+        <item name="android:statusBarColor" tools:targetApi="lollipop">?attr/colorPrimaryDark</item>
         <item name="inverse_bg_color">#fff</item>
         <item name="inverse_action_bar_color">@color/abc_primary_text_material_dark</item>
         <item name="main_foreground_color">@color/primary_material_dark</item>
@@ -22,6 +23,7 @@
     </style>
 
     <style name="AppThemeLight" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:statusBarColor" tools:targetApi="lollipop">?attr/colorPrimaryDark</item>
         <item name="inverse_bg_color">#111</item>
         <item name="inverse_action_bar_color">@color/abc_primary_text_material_dark</item>
         <item name="main_foreground_color">@color/primary_material_light</item>
@@ -33,10 +35,12 @@
 
     <style name="AppThemeDark.Green">
         <item name="colorPrimary">#42787e</item>
+        <item name="colorPrimaryDark">#37686e</item>
     </style>
 
     <style name="AppThemeLight.Rariteh">
         <item name="colorPrimary">#5e50a1</item>
+        <item name="colorPrimaryDark">#4c4589</item>
     </style>
 
     <string-array name="theme_names">

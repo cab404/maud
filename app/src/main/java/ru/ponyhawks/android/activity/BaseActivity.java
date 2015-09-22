@@ -27,6 +27,7 @@ public class BaseActivity extends AppCompatActivity {
         if (id == 0) id = R.style.AppThemeDark;
 
         setTheme(id);
+
     }
 
     @Override

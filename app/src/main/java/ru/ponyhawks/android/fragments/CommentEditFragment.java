@@ -34,10 +34,12 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     TextView target;
     @Bind(R.id.send)
     ImageView send;
-    @Bind(R.id.scrim)
-    View scrim;
+//    @Bind(R.id.scrim)
+//    View scrim;
     @Bind(R.id.commentFrame)
     RelativeLayout commentFrame;
+    @Bind(R.id.root)
+    IgnorantCoordinatorLayout root;
 
     private HideablePartBehavior behavior;
     private SendCallback sendCallback;
@@ -51,7 +53,6 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        final IgnorantCoordinatorLayout root = (IgnorantCoordinatorLayout) view.findViewById(R.id.root);
 
         final CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) commentFrame.getLayoutParams();
 
@@ -85,6 +86,21 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
             }
         });
 
+        text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus)
+                    expand();
+            }
+        });
+
+//        view.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                behavior.init(root, commentFrame);
+//            }
+//        });
+
     }
 
     boolean collapsed = true;
@@ -105,7 +121,11 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
 
         text.setVerticalScrollBarEnabled(true);
         text.setSingleLine(false);
+        text.requestFocus();
         text.setMaxLines(5);
+
+        final InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.showSoftInput(text, 0);
     }
 
     @Override
@@ -117,6 +137,7 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
         ((RelativeLayout.LayoutParams) target.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = 0;
         ((RelativeLayout.LayoutParams) text.getLayoutParams()).getRules()[RelativeLayout.LEFT_OF] = R.id.send;
 
+        text.clearFocus();
         text.setSingleLine(true);
         text.setVerticalScrollBarEnabled(false);
 

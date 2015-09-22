@@ -11,6 +11,7 @@
         android:layout_gravity="center"
         android:animateLayoutChanges="true"
         android:padding="12dp"
+        android:elevation="16dp"
         android:paddingBottom="70dp">
 
         <ProgressBar

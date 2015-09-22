@@ -145,13 +145,12 @@ public class TopicFragment extends ListFragment {
         if (updating) return;
         updating = true;
 
-        System.out.println("UPD " + topicId);
         final RefreshCommentsRequest request
                 = new RefreshCommentsRequest(Type.TOPIC, topicId, commentPart.getLastCommentId()) {
             @Override
             protected void handleResponse(String response) {
                 super.handleResponse(response);
-                System.out.println("UPD " + "GOT " + comments.size());
+
                 for (Comment cm : comments) {
                     sync.inject(cm, commentPart, commentPart);
                     commentPart.register(cm);
@@ -178,10 +177,10 @@ public class TopicFragment extends ListFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.refresh) {
-            update();
-            return true;
-        }
+//        if (item.getItemId() == R.id.refresh) {
+//            update();
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 

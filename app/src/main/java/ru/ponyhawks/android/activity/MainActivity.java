@@ -57,15 +57,6 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            getMenuInflater().inflate(R.menu.main, menu);
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         drawerToggle.onOptionsItemSelected(item);
         int id = item.getItemId();

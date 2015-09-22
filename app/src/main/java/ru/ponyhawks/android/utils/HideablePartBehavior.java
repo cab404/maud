@@ -124,7 +124,8 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void init(ViewGroup parent, View child) {
-        dragHelper = ViewDragHelper.create(parent, callback);
+        if (dragHelper == null)
+            dragHelper = ViewDragHelper.create(parent, callback);
         lockOn(child);
     }
 
@@ -229,6 +230,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
         }
         if (scrollTransferred)
             return false;
+
         if (checkOldNestedThings(child, ev)) {
             scrollTransferred = true;
             return false;
@@ -260,8 +262,9 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
     @Override
     public boolean onTouchEvent(CoordinatorLayout parent, V child, MotionEvent ev) {
-        if (dragHelper != null)
-            dragHelper.processTouchEvent(ev);
+        if (dragHelper == null)
+            init(parent, child);
+        dragHelper.processTouchEvent(ev);
         return true;
     }
 

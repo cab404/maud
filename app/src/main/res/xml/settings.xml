@@ -26,6 +26,6 @@
         android:contentDescription="Выключите при суровом недостатке оперативной памяти"
         android:defaultValue="true"
         android:key="saveCommentState"
-        android:title="Сохранять состояние комментария" />
+        android:title="Сохранять состояние комментариев" />
 
 </PreferenceScreen>
