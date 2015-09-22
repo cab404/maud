@@ -1,14 +1,23 @@
 package ru.ponyhawks.android.parts;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.chumroll.ViewConverter;
 import com.cab404.libph.data.Comment;
+import com.cab404.libph.data.Type;
+import com.cab404.libph.requests.FavRequest;
+import com.cab404.moonlight.parser.Tag;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -22,6 +31,7 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.statics.ProfileStore;
 import ru.ponyhawks.android.text.HtmlRipper;
 import ru.ponyhawks.android.text.StaticWebView;
 import ru.ponyhawks.android.utils.DoubleClickListener;
@@ -41,14 +51,10 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
     public boolean saveState = true;
     Map<Integer, HtmlRipper> savedStates = new HashMap<>();
+    private CommentPart.CommentPartCallback callback;
 
-    @Bind(R.id.author)
-    TextView author;
-    @Bind(R.id.text)
-    StaticWebView text;
-    @Bind(R.id.avatar)
-    ImageView avatar;
     private int baseIndex;
+    public static final DisplayImageOptions IMG_CFG = new DisplayImageOptions.Builder().cacheInMemory(true).build();
 
     public void register(Comment comment) {
         data.put(comment.id, comment);
@@ -113,6 +119,13 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
             }
     }
 
+    @Bind(R.id.text)
+    StaticWebView text;
+    @Bind(R.id.author)
+    TextView author;
+    @Bind(R.id.avatar)
+    ImageView avatar;
+
     @Override
     public void convert(View view, final Comment cm, int index, final ViewGroup parent) {
         register(cm);
@@ -132,9 +145,15 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
             }
         });
 
-        resetOffset(view, cm);
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(final View v) {
+                showActionDialog(cm, v.getContext());
+                return true;
+            }
+        });
 
-        author.setText(cm.author.login);
+        resetOffset(view, cm);
 
         if (saveState)
             if (savedStates.containsKey(cm.id))
@@ -147,11 +166,24 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
         avatar.setVisibility(cm.author.is_system ? View.GONE : View.VISIBLE);
 
+        author.setText(cm.author.login);
         avatar.setImageDrawable(null);
         if (!cm.author.is_system) {
-            final DisplayImageOptions cfg = new DisplayImageOptions.Builder().cacheInMemory(true).build();
-            ImageLoader.getInstance().displayImage(cm.author.small_icon, avatar, cfg);
+            ImageLoader.getInstance().displayImage(cm.author.small_icon, avatar, IMG_CFG);
         }
+    }
+
+    public void setCallback(CommentPartCallback callback) {
+        this.callback = callback;
+    }
+
+    public interface CommentPartCallback {
+        void onFavInvoked(Comment cm, Context context);
+
+        void onShareInvoked(Comment cm, Context context);
+
+        void onReplyInvoked(Comment cm, Context context);
+
     }
 
     @Override
@@ -165,6 +197,11 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     }
 
     private final static CommentComparator CC_INST = new CommentComparator();
+
+    public void clearNew() {
+        for (Comment cm : data.values())
+            cm.is_new = false;
+    }
 
     private final static class CommentComparator implements Comparator<Comment> {
 
@@ -245,5 +282,58 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         else
             return adapter.indexOfId(ids.get(nbrs.get(index + 1).id));
 
+    }
+
+    void showActionDialog(final Comment cm, Context ctx) {
+        final int theme = ctx
+                .getTheme()
+                .obtainStyledAttributes(new int[]{R.attr.alert_dialog_nobg_theme})
+                .getResourceId(0, 0);
+
+        @SuppressLint("InflateParams") final
+        View controls = LayoutInflater.from(ctx)
+                .inflate(R.layout.alert_comment_controls, null, false);
+
+        final AlertDialog dialog = new AlertDialog
+                .Builder(ctx, theme)
+                .setView(controls)
+                .show();
+
+        final ImageView fav = (ImageView) controls.findViewById(R.id.fav);
+        final ImageView reply = (ImageView) controls.findViewById(R.id.reply);
+        final ImageView share = (ImageView) controls.findViewById(R.id.copy_link);
+
+        fav.setImageResource(
+                cm.in_favs ?
+                        R.drawable.ic_star :
+                        R.drawable.ic_star_outline
+        );
+
+        fav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (callback != null)
+                    callback.onFavInvoked(cm, v.getContext());
+                dialog.dismiss();
+            }
+        });
+
+        reply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (callback != null)
+                    callback.onReplyInvoked(cm, v.getContext());
+                dialog.dismiss();
+            }
+        });
+
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (callback != null)
+                    callback.onShareInvoked(cm, v.getContext());
+                dialog.dismiss();
+            }
+        });
     }
 }

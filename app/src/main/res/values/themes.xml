@@ -9,6 +9,7 @@
         <attr name="new_background" format="reference" />
         <attr name="rounded_background" format="reference" />
         <attr name="settings_theme" format="reference" />
+        <attr name="alert_dialog_nobg_theme" format="reference" />
     </declare-styleable>
 
     <style name="AppThemeDark" parent="Theme.AppCompat">
@@ -20,6 +21,7 @@
         <item name="new_background">@drawable/new_background_dark</item>
         <item name="rounded_background">@drawable/rounded_background_dark</item>
         <item name="settings_theme">@style/SettingsThemeDark</item>
+        <item name="alert_dialog_nobg_theme">@style/Theme.AppCompat.Dialog.Alert.NoBG</item>
     </style>
 
     <style name="AppThemeLight" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -31,6 +33,7 @@
         <item name="new_background">@drawable/new_background_light</item>
         <item name="rounded_background">@drawable/rounded_background_light</item>
         <item name="settings_theme">@style/SettingsThemeLight</item>
+        <item name="alert_dialog_nobg_theme">@style/Theme.AppCompat.Light.Dialog.Alert.NoBG</item>
     </style>
 
     <style name="AppThemeDark.Green">
@@ -41,6 +44,31 @@
     <style name="AppThemeLight.Rariteh">
         <item name="colorPrimary">#5e50a1</item>
         <item name="colorPrimaryDark">#4c4589</item>
+    </style>
+
+    <style name="Theme.AppCompat.Dialog.Alert.NoBG">
+        <item name="android:colorBackgroundCacheHint">@null</item>
+
+        <item name="android:windowFrame">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+    </style>
+
+
+    <style name="Theme.AppCompat.Light.Dialog.Alert.NoBG">
+        <item name="android:colorBackgroundCacheHint">@null</item>
+
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
     </style>
 
     <string-array name="theme_names">
@@ -58,6 +86,7 @@
     </string-array>
 
     <style name="SettingsThemeDark" parent="android:Theme.DeviceDefault" tools:targetApi="ice_cream_sandwich" />
+
     <style name="SettingsThemeLight" parent="android:Theme.DeviceDefault.Light" tools:targetApi="ice_cream_sandwich" />
 
 </resources>

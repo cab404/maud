@@ -14,12 +14,17 @@ import ru.ponyhawks.android.R;
  *
  * @author cab404
  */
-public class LabelPart extends MoonlitPart<Integer> {
+public class CommentNumPart extends MoonlitPart<Integer> {
 
     @Override
     public void convert(View view, Integer data, int index, ViewGroup parent) {
         super.convert(view, data, index, parent);
-        ((TextView) view).setText(data + " комментариев");
+        ((TextView) view)
+                .setText(
+                        data + " " + view.getContext().getResources().getQuantityString(
+                                R.plurals.comment_num, data
+                        )
+                );
     }
 
     @Override

@@ -10,6 +10,28 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Заголовок"
         android:id="@+id/title" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="2dp">
+
+        <ImageView
+            android:id="@+id/avatar"
+            android:layout_width="@dimen/abc_text_size_medium_material"
+            android:layout_height="@dimen/abc_text_size_medium_material"
+            android:src="#fff" />
+
+        <TextView
+            android:id="@+id/author"
+            style="@android:style/TextAppearance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="author"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
 
     <ru.ponyhawks.android.text.StaticWebView
         android:layout_width="match_parent"

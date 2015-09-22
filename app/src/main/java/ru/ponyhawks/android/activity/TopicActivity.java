@@ -1,15 +1,21 @@
 package ru.ponyhawks.android.activity;
 
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.SwipeDismissBehavior;
+import android.support.v4.view.WindowCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
 import android.widget.FrameLayout;
 
 import butterknife.Bind;
@@ -26,30 +32,65 @@ public class TopicActivity extends BaseActivity {
     CommentEditFragment ced;
     TopicFragment topic;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setTitle(getIntent().getStringExtra("title"));
-        if (Build.VERSION.SDK_INT >= 21)
-            setTaskDescription(
-                    new ActivityManager.TaskDescription(getIntent().getStringExtra("title"))
-            );
-
-        setContentView(R.layout.activity_topic);
-        ButterKnife.bind(this);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, TopicFragment.getInstance(getIntent().getIntExtra(KEY_TOPIC_ID, -1)))
-                .commit();
-        final CommentEditFragment editFragment = (CommentEditFragment) getSupportFragmentManager().findFragmentById(R.id.comment_editor);
-        editFragment.hide();
-        editFragment.finishTranslations();
-    }
-
     void backToMain() {
         final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
 
         finish();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setTitle(getIntent().getStringExtra("title"));
+
+        if (Build.VERSION.SDK_INT >= 21)
+            setTaskDescription(
+                    new ActivityManager.TaskDescription(getIntent().getStringExtra("title"))
+            );
+
+//        supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
+
+        setContentView(R.layout.activity_topic);
+
+//        getSupportActionBar().setHideOnContentScrollEnabled(true);
+        //noinspection ConstantConditions
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        ButterKnife.bind(this);
+        getSupportFragmentManager().beginTransaction()
+                .replace(
+                        R.id.content_frame,
+                        topic = TopicFragment.getInstance(getIntent().getIntExtra(KEY_TOPIC_ID, -1))
+                )
+                .commit();
+
+        final CommentEditFragment editFragment = (CommentEditFragment)
+                getSupportFragmentManager().findFragmentById(R.id.comment_editor);
+        topic.setCommentFragment(editFragment);
+
+        final Handler handler = new Handler();
+
+        /* Posting on second looper cycle, after measure() */
+        handler.post(new Runnable() {
+            int cycles;
+
+            @Override
+            public void run() {
+                if (cycles++ < 2) {
+                    handler.post(this);
+                    return;
+                }
+                editFragment.pin();
+                editFragment.hide();
+                editFragment.sync();
+            }
+        });
+    }
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        return super.onCreateView(parent, name, context, attrs);
     }
 
     @Override

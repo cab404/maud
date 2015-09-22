@@ -3,5 +3,9 @@
     <SwitchPreference
         android:defaultValue="false"
         android:key="multitasking"
-        android:title="Открывать посты в отдельных вкладках" />
+        android:title="@string/open_topics_in_separate_windows" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="removeShadow"
+        android:title="@string/remove_actionbar_shadow" />
 </PreferenceScreen>

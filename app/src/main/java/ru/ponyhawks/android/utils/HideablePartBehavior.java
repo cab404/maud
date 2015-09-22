@@ -139,7 +139,9 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
     public void collapse(View view) {
         calculateOffset = true;
-        if (dragHelper == null) return;
+        if (dragHelper == null)
+            init(((ViewGroup) view.getParent()), view);
+
         final int dst = calculateDst(State.COLLAPSED, view);
         if (dragHelper.smoothSlideViewTo(view, view.getLeft(), dst)) {
             if (!animationStarted)
@@ -152,7 +154,9 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
     public void expand(View view) {
         calculateOffset = true;
-        if (dragHelper == null) return;
+        if (dragHelper == null)
+            init(((ViewGroup) view.getParent()), view);
+
         final int dst = calculateDst(State.EXPANDED, view);
         if (dragHelper.smoothSlideViewTo(view, view.getLeft(), dst)) {
             if (!animationStarted)
@@ -165,7 +169,9 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
     public void hide(View view) {
         calculateOffset = true;
-        if (dragHelper == null) return;
+        if (dragHelper == null)
+            init(((ViewGroup) view.getParent()), view);
+
         final int dst = calculateDst(State.HIDDEN, view);
         if (dragHelper.smoothSlideViewTo(view, 0, dst)) {
             if (!animationStarted)

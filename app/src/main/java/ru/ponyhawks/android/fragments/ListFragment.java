@@ -5,6 +5,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.WindowCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +36,7 @@ public class ListFragment extends Fragment {
         return inflater.inflate(getLayoutId(), container, false);
     }
 
-    protected int getLayoutId(){
+    protected int getLayoutId() {
         return R.layout.fragment_list;
     }
 
@@ -42,6 +44,17 @@ public class ListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        //noinspection ConstantConditions
+        if (((AppCompatActivity) getActivity()).getSupportActionBar().isHideOnContentScrollEnabled()) {
+            list.setPadding(
+                    list.getPaddingLeft(),
+                    list.getPaddingTop()
+                            + getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material),
+                    list.getPaddingRight(),
+                    list.getPaddingBottom()
+            );
+            list.setClipToPadding(false);
+        }
     }
 
     @SuppressLint("NewApi")

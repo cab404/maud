@@ -34,5 +34,9 @@ public class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setupTheme();
         super.onCreate(savedInstanceState);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("removeShadow", false))
+            if (getSupportActionBar() != null)
+                getSupportActionBar().setElevation(0);
     }
+
 }

@@ -34,8 +34,6 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     TextView target;
     @Bind(R.id.send)
     ImageView send;
-//    @Bind(R.id.scrim)
-//    View scrim;
     @Bind(R.id.commentFrame)
     RelativeLayout commentFrame;
     @Bind(R.id.root)
@@ -94,13 +92,6 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
             }
         });
 
-//        view.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                behavior.init(root, commentFrame);
-//            }
-//        });
-
     }
 
     boolean collapsed = true;
@@ -153,6 +144,18 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
         return text.getText();
     }
 
+    public void setTarget(CharSequence target) {
+        this.target.setText(target);
+    }
+
+    public void sync() {
+        behavior.syncImmediate(commentFrame);
+    }
+
+    public void pin() {
+        behavior.lockOn(commentFrame);
+    }
+
     public interface SendCallback {
         void onSend(Editable text);
     }
@@ -179,22 +182,6 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
 
     @Override
     public void onExpandCollapse(float state) {
-//        state = 1 - state;
-//        scrim.setBackgroundColor(((int) (160 * state) << 24) + 0x333333);
-//        if (state > 0){
-//            scrim.setOnTouchListener(new View.OnTouchListener() {
-//                @Override
-//                public boolean onTouch(View v, MotionEvent event) {
-//                    return true;
-//                }
-//            });
-//            scrim.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    behavior.collapse(commentFrame);
-//                }
-//            });
-//        }
     }
 
 }

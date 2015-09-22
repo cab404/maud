@@ -9,6 +9,15 @@
     <string name="write_reply">Написать комментарий</string>
     <string name="copy_link">Копировать ссылку</string>
     <string name="add_to_favourites">Добавить в избранное</string>
+    <string name="app">Приложение</string>
+    <string name="theme">Тема</string>
+    <string name="save_comments_state">Сохранять состояние комментариев</string>
+    <string name="select_text">Выделение текста</string>
+    <string name="load_videos">Загружать видео</string>
+    <string name="load_images">Загружать изображения</string>
+    <string name="content">Данные</string>
+    <string name="remove_actionbar_shadow">Убрать тень под заголовком</string>
+    <string name="open_topics_in_separate_windows">Открывать посты в отдельных вкладках</string>
 
     <string-array name="exit">
         <item>Я устал, я ухожу.</item>
@@ -20,5 +29,13 @@
         <item>Пожалуйста</item>
     </string-array>
 
+    <plurals name="comment_num">
+        <item quantity="zero">комментариев</item>
+        <item quantity="one">комментарий</item>
+        <item quantity="two">комментария</item>
+        <item quantity="few">комментария</item>
+        <item quantity="many">комментариев</item>
+        <item quantity="other">комментариев</item>
+    </plurals>
 
 </resources>

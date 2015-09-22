@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Данные" />
+    <PreferenceCategory android:title="@string/content" />
     <SwitchPreference
         android:key="loadImages"
         android:defaultValue="true"
-        android:title="Загружать изображения" />
+        android:title="@string/load_images" />
     <SwitchPreference
         android:key="loadVideos"
-        android:title="Загружать видео" />
+        android:title="@string/load_videos" />
     <SwitchPreference
         android:key="textSelectable"
-        android:title="Выделение текста" />
+        android:title="@string/select_text" />
 
-    <PreferenceCategory android:title="Приложение" />
+    <PreferenceCategory android:title="@string/app" />
     <ListPreference
         android:entries="@array/theme_names"
         android:entryValues="@array/theme_values"
-        android:defaultValue="Dark"
         android:key="theme"
-        android:title="Тема" />
+        android:title="@string/theme" />
     <SwitchPreference
-        android:contentDescription="Выключите при суровом недостатке оперативной памяти"
         android:defaultValue="true"
         android:key="saveCommentState"
-        android:title="Сохранять состояние комментариев" />
+        android:title="@string/save_comments_state" />
 
 </PreferenceScreen>
