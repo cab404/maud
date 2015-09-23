@@ -7,9 +7,9 @@
     tools:context="ru.ponyhawks.android.fragments.CommentEditFragment">
 
     <!--<View-->
-        <!--android:id="@+id/scrim"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" />-->
+    <!--android:id="@+id/scrim"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" />-->
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -22,8 +22,9 @@
         android:animateLayoutChanges="true"
         android:background="?attr/rounded_background"
         android:clickable="true"
-
         android:elevation="8dp"
+
+        app:collapseOffset="52dp"
         app:layout_behavior="ru.ponyhawks.android.utils.HideablePartBehavior"
         tools:ignore="UnusedAttribute,RtlHardcoded,RtlSymmetry">
 

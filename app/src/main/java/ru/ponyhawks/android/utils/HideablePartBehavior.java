@@ -1,6 +1,7 @@
 package ru.ponyhawks.android.utils;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
@@ -11,6 +12,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+
+import ru.ponyhawks.android.R;
 
 /**
  * Stivks view to bottom and handles collapse/expand operations.
@@ -120,7 +123,17 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
     public HideablePartBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
-//        collapsedOffset = attrs.getAttributeIntValue(null, "collapseOffset", -1);
+//        for (int i = 0; i < attrs.getAttributeCount(); i++) {
+//            System.out.println(attrs.getAttributeName(i) + ": " + attrs.);
+//        }
+
+        int[] attrInt = new int[]{
+                R.attr.collapseOffset
+        };
+        TypedArray arr = context.obtainStyledAttributes(attrs, attrInt);
+        lastTop = collapsedOffset = arr.getDimensionPixelOffset(0, -1);
+        arr.recycle();
+        System.out.println(lastTop);
     }
 
     public void init(ViewGroup parent, View child) {
@@ -130,7 +143,8 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void lockOn(View child) {
-        lastTop = collapsedOffset = child.getBottom() - ((View) child.getParent()).getHeight();
+        if (collapsedOffset == -1)
+            lastTop = collapsedOffset = child.getBottom() - ((View) child.getParent()).getHeight();
     }
 
     public void setChangeCallback(ChangeCallback changeCallback) {

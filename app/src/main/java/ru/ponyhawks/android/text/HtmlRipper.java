@@ -1,5 +1,6 @@
 package ru.ponyhawks.android.text;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -7,8 +8,10 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
+import android.support.v4.view.WindowCompat;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
@@ -16,9 +19,11 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.*;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -596,6 +601,13 @@ public class HtmlRipper {
                     iframe.getSettings().setPluginState(WebSettings.PluginState.ON);
                     iframe.loadUrl(src);
                     iframe.setWebChromeClient(new WebChromeClient());
+                    iframe.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            v.setSelected(true);
+                            System.out.println("Click");
+                        }
+                    });
 
                     group.addView(iframe);
 
@@ -611,8 +623,16 @@ public class HtmlRipper {
                     onLayout.add(new Runnable() {
                         @Override
                         public void run() {
-                            iframe.getLayoutParams().height = (int) (group.getWidth() * (2f / 3));
-                            iframe.requestLayout();
+
+                            int nHeight = (int) (group.getWidth() * (2f / 3));
+                            int mHeight = (int) (ctx.getResources().getDisplayMetrics().heightPixels * 0.8f);
+                            nHeight = Math.min(mHeight, nHeight);
+
+                            if (nHeight != iframe.getLayoutParams().height)
+                                iframe.requestLayout();
+
+                            iframe.getLayoutParams().height = nHeight;
+
                         }
                     });
 
