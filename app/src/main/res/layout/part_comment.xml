@@ -17,25 +17,27 @@
 
             <ImageView
                 android:id="@+id/avatar"
-                android:layout_width="@dimen/abc_text_size_medium_material"
-                android:layout_height="@dimen/abc_text_size_medium_material"
-                android:src="#fff" />
+                android:layout_width="@dimen/abc_text_size_small_material"
+                android:layout_height="@dimen/abc_text_size_small_material"
+                android:src="#fff"
+                android:layout_gravity="center_vertical" />
 
             <TextView
                 android:id="@+id/author"
-                style="@android:style/TextAppearance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:text="author"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearance"
+                android:textStyle="bold"
+                android:layout_gravity="center_vertical" />
         </LinearLayout>
 
         <ru.ponyhawks.android.text.StaticWebView
             android:id="@+id/text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:text="testx" />
     </LinearLayout>
 

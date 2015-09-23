@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="UnusedAttribute"
-    package="ru.ponyhawks.android">
+    package="ru.ponyhawks.android"
+    tools:ignore="UnusedAttribute">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".statics.App"
@@ -15,16 +17,13 @@
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="keyboard|orientation|screenSize"
-            android:launchMode="singleTask"
-            >
-        </activity>
+            android:launchMode="singleTask"/>
 
         <activity
             android:name=".activity.SettingsActivity"
             android:configChanges="keyboard|orientation|screenSize"
             android:parentActivityName=".activity.MainActivity"
-            android:theme="?attr/settings_theme"
-            >
+            android:theme="?attr/settings_theme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.ponyhawks.android.activity.MainActivity" />
@@ -49,6 +48,9 @@
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="imgur-api-key"
+            android:value="a2729ecb14b91ba" />
     </application>
 
 </manifest>

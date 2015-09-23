@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.DrawerLayout;
 
@@ -17,10 +16,8 @@ import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.DrawerContentFragment;
 import ru.ponyhawks.android.fragments.LoginFragment;
 import ru.ponyhawks.android.fragments.TopicListFragment;
-import ru.ponyhawks.android.statics.ObscurePreferencesStore;
-import ru.ponyhawks.android.statics.ProfileStore;
-import ru.ponyhawks.android.statics.UserInfoStore;
-import ru.ponyhawks.android.utils.Randomness;
+import ru.ponyhawks.android.statics.Providers;
+import ru.ponyhawks.android.utils.Meow;
 
 public class MainActivity extends BaseActivity implements DrawerContentFragment.DrawerClickCallback {
 
@@ -72,7 +69,7 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
         if (currentSection == id)
             return;
 
-        final CommonInfo info = UserInfoStore.getInstance().getInfo();
+        final CommonInfo info = Providers.UserInfo.getInstance().getInfo();
         if (info == null) {
             startActivity(new Intent(MainActivity.this, SplashActivity.class));
             finish();
@@ -96,7 +93,7 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
             case DrawerContentFragment.ID_EXIT:
                 new AlertDialog.Builder(this)
                         .setMessage("Выйти из аккаунта?")
-                        .setPositiveButton(Randomness.getRandomOf(this, R.array.exit), new DialogInterface.OnClickListener() {
+                        .setPositiveButton(Meow.getRandomOf(this, R.array.exit), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 logout();
@@ -124,11 +121,11 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
     }
 
     protected void logout() {
-        ObscurePreferencesStore.getInstance().get().edit()
+        Providers.Preferences.getInstance().get().edit()
                 .remove(LoginFragment.KEY_USERNAME)
                 .remove(LoginFragment.KEY_PASSWORD)
                 .commit();
-        ProfileStore.getInstance().reset();
+        Providers.Profile.getInstance().reset();
 
         final Intent intent = new Intent(this, SplashActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

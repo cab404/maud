@@ -1,10 +1,8 @@
 package ru.ponyhawks.android.fragments;
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,10 +25,8 @@ import com.cab404.libph.data.Type;
 import com.cab404.libph.pages.BasePage;
 import com.cab404.libph.pages.MainPage;
 import com.cab404.libph.pages.TopicPage;
-import com.cab404.libph.requests.CommentAddRequest;
 import com.cab404.libph.requests.FavRequest;
 import com.cab404.libph.requests.RefreshCommentsRequest;
-import com.cab404.libph.util.PonyhawksProfile;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
 import ru.ponyhawks.android.R;
@@ -39,10 +35,10 @@ import ru.ponyhawks.android.parts.CommentNumPart;
 import ru.ponyhawks.android.parts.LoadingPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
-import ru.ponyhawks.android.statics.ProfileStore;
-import ru.ponyhawks.android.statics.UserInfoStore;
+import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.MidnightSync;
 import ru.ponyhawks.android.utils.CompositeHandler;
+import ru.ponyhawks.android.utils.RequestManager;
 
 /**
  * Well, sorry for no comments here!
@@ -56,10 +52,11 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     public static final String KEY_TOPIC_ID = "topicId";
 
     private ChumrollAdapter adapter;
-    private int topicId;
-    private CommentPart commentPart;
     private MidnightSync sync;
+    private CommentPart commentPart;
+
     private Comment replyingTo = null;
+    private int topicId;
 
 
     private CommentEditFragment commentFragment;
@@ -67,6 +64,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     public void setCommentFragment(CommentEditFragment commentFragment) {
         this.commentFragment = commentFragment;
         commentFragment.setSendCallback(this);
+        commentFragment.setTarget("Отвечаем в топик");
     }
 
     public static TopicFragment getInstance(int id) {
@@ -122,7 +120,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
                                         break;
                                     case MainPage.BLOCK_COMMON_INFO:
-                                        UserInfoStore.getInstance().setInfo((CommonInfo) object);
+                                        Providers.UserInfo.getInstance().setInfo((CommonInfo) object);
                                         break;
                                     case MainPage.BLOCK_COMMENT:
                                         commentPart.register(((Comment) object));
@@ -132,26 +130,39 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                         }
                 )
         );
-        new Thread() {
-            @Override
-            public void run() {
-                PonyhawksProfile profile = ProfileStore.get();
-                try {
-                    page.fetch(profile);
-                    view.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            adapter.removeById(loadingPartId);
-                        }
-                    });
-                    final float dp = view.getResources().getDisplayMetrics().density;
-                    // injecting bottom
-                    sync.inject((int) (68 * dp), spacePart);
-                } catch (Exception e) {
-                    getActivity().finish();
-                }
-            }
-        }.start();
+
+        RequestManager.fromActivity(getActivity())
+                .manage(page)
+                .setCallback(new RequestManager.SimpleRequestCallback<TopicPage>() {
+                    @Override
+                    public void onStart(TopicPage what) {
+
+                    }
+
+                    @Override
+                    public void onError(TopicPage what, Exception e) {
+                        super.onError(what, e);
+                        getActivity().finish();
+                    }
+
+                    @Override
+                    public void onSuccess(TopicPage what) {
+                        final float dp = view.getResources().getDisplayMetrics().density;
+                        sync.inject((int) (68 * dp), spacePart);
+                    }
+
+                    @Override
+                    public void onFinish(TopicPage what) {
+                        view.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.removeById(loadingPartId);
+                            }
+                        });
+                    }
+                })
+                .start();
+
     }
 
     volatile boolean updating = false;
@@ -165,28 +176,27 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         if (updating) return;
         updating = true;
 
-        final RefreshCommentsRequest request
-                = new RefreshCommentsRequest(Type.TOPIC, topicId, commentPart.getLastCommentId()) {
-            @Override
-            protected void handleResponse(String response) {
-                super.handleResponse(response);
 
-                for (Comment cm : comments) {
-                    sync.inject(cm, commentPart, commentPart);
-                    commentPart.register(cm);
-                }
-            }
-        };
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    request.fetch(ProfileStore.get());
-                } finally {
-                    updating = false;
-                }
-            }
-        }.start();
+        final RefreshCommentsRequest request = new RefreshCommentsRequest(
+                Type.TOPIC, topicId, commentPart.getLastCommentId()
+        );
+        RequestManager.fromActivity(getActivity())
+                .manage(request)
+                .setCallback(new RequestManager.SimpleRequestCallback<RefreshCommentsRequest>() {
+                    @Override
+                    public void onSuccess(RefreshCommentsRequest what) {
+                        for (Comment cm : what.comments) {
+                            sync.inject(cm, commentPart, commentPart);
+                            commentPart.register(cm);
+                        }
+                    }
+
+                    @Override
+                    public void onFinish(RefreshCommentsRequest what) {
+                        updating = false;
+                    }
+                })
+                .start();
     }
 
     @Override
@@ -195,16 +205,13 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         commentPart.destroy();
     }
 
-    @SuppressWarnings("deprecation")
-    @SuppressLint("NewApi")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
         switch (id) {
             case R.id.copy_link:
-                final ClipboardManager cbman = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                 final String clip = String.format("http://ponyhawks.ru/blog/%d.html", topicId);
-                cbman.setText(clip);
+                setClipboard(clip);
                 Toast.makeText(getActivity(), "Ссылка на пост скопирована в буфер обмена", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.reply:
@@ -237,39 +244,49 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
     @Override
     public void onFavInvoked(final Comment cm, final Context context) {
-        new Thread() {
-            @Override
-            public void run() {
-                final boolean target_state = !cm.in_favs;
-                final FavRequest request = new FavRequest(Type.COMMENT, cm.id, target_state);
-                final StringBuilder msg = new StringBuilder();
-                try {
-                    request.exec(ProfileStore.get());
-                    if (request.success())
-                        cm.in_favs = target_state;
-                    msg.append(request.msg);
-                } catch (Exception ex) {
-                    msg.append(ex.getLocalizedMessage());
-                } finally {
-                    sync.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-        }.start();
+        final boolean target_state = !cm.in_favs;
+        final FavRequest request = new FavRequest(Type.COMMENT, cm.id, target_state);
+        RequestManager.fromActivity(getActivity())
+                .manage(request)
+                .setCallback(new RequestManager.SimpleRequestCallback<FavRequest>() {
+
+                    @Override
+                    public void onSuccess(FavRequest what) {
+                        if (request.success())
+                            cm.in_favs = target_state;
+                        msg(request.msg);
+                    }
+
+                    @Override
+                    public void onError(FavRequest what, Exception e) {
+                        msg(e.getLocalizedMessage());
+                    }
+
+                    void msg(final String msg) {
+                        sync.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                })
+                .start();
 
     }
 
     @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
+    protected void setClipboard(String to){
+        final ClipboardManager cbman = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        cbman.setText(to);
+    }
+
+
     @Override
     public void onShareInvoked(Comment cm, Context context) {
-        final ClipboardManager cbman = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         final String clip = String.format("http://ponyhawks.ru/blog/%d.html#comment%d", topicId, cm.id);
-        cbman.setText(clip);
+        setClipboard(clip);
         Toast.makeText(getActivity(), "Ссылка на комментарий скопирована в буфер обмена", Toast.LENGTH_SHORT).show();
     }
 

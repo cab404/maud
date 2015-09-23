@@ -18,6 +18,7 @@
     <string name="content">Данные</string>
     <string name="remove_actionbar_shadow">Убрать тень под заголовком</string>
     <string name="open_topics_in_separate_windows">Открывать посты в отдельных вкладках</string>
+    <string name="uploading_image">Загрузка на Imgur...</string>
 
     <string-array name="exit">
         <item>Я устал, я ухожу.</item>

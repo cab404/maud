@@ -2,10 +2,12 @@ package ru.ponyhawks.android.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.Selection;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,16 +19,20 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.cab404.moonlight.parser.Tag;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.utils.HideablePartBehavior;
 import ru.ponyhawks.android.utils.IgnorantCoordinatorLayout;
+import ru.ponyhawks.android.utils.ImageChooser;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CommentEditFragment extends Fragment implements HideablePartBehavior.ChangeCallback {
+public class CommentEditFragment extends Fragment implements HideablePartBehavior.ChangeCallback, ImageChooser.ImageUrlHandler {
 
     @Bind(R.id.text)
     EditText text;
@@ -41,6 +47,7 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
 
     private HideablePartBehavior behavior;
     private SendCallback sendCallback;
+    private ImageChooser chooser;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,6 +60,8 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
         ButterKnife.bind(this, view);
 
         final CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) commentFrame.getLayoutParams();
+
+        chooser = new ImageChooser(this, this);
 
         commentFrame.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -148,10 +157,6 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
         this.target.setText(target);
     }
 
-    public void sync() {
-        behavior.syncImmediate(commentFrame);
-    }
-
     public void pin() {
         behavior.lockOn(commentFrame);
     }
@@ -181,7 +186,37 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     }
 
     @Override
-    public void onExpandCollapse(float state) {
+    public void onExpandCollapse(float state) {}
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        chooser.handleActivityResult(requestCode, resultCode, data);
     }
+
+    @OnClick(R.id.image)
+    public void onImageChooseClick(){
+        chooser.requestImageSelection(false);
+    }
+
+    @Override
+    public void handleImage(final String image) {
+        System.out.println("IMAGE SELECTED !!! " + image);
+        text.post(new Runnable() {
+            @Override
+            public void run() {
+                int cursor = text.getSelectionStart();
+                if (cursor == -1) cursor = 0;
+
+                final Tag tag = new Tag();
+                tag.name = "img";
+                tag.props.put("src", image);
+                tag.type = Tag.Type.STANDALONE;
+                final Editable editable = text.getText();
+                editable.insert(cursor, tag.toString());
+                text.setText(editable);
+            }
+        });
+    }
+
 
 }

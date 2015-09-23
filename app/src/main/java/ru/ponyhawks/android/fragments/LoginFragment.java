@@ -1,13 +1,10 @@
 package ru.ponyhawks.android.fragments;
 
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +13,11 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.cab404.libph.requests.LoginRequest;
-import com.cab404.moonlight.framework.AccessProfile;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.ponyhawks.android.R;
-import ru.ponyhawks.android.statics.ObscurePreferencesStore;
-import ru.ponyhawks.android.statics.ProfileStore;
+import ru.ponyhawks.android.statics.Providers;
 
 /**
  * Login
@@ -79,14 +72,14 @@ public class LoginFragment extends Fragment {
             public void run() {
                 super.run();
                 try {
-                    boolean success = ProfileStore.get().login(usermane, password);
+                    boolean success = Providers.Profile.get().login(usermane, password);
                     if (success) {
                         // Yay
                         if (remember) {
-                            SharedPreferences store = ObscurePreferencesStore.getInstance().get();
+                            SharedPreferences store = Providers.Preferences.getInstance().get();
                             store.edit().putString(KEY_USERNAME, usermane).putString(KEY_PASSWORD, password).apply();
                         }
-                        ProfileStore.getInstance().save();
+                        Providers.Profile.getInstance().save();
                         if (loginCallback != null)
                             loginCallback.onLogin(LoginFragment.this);
                     } else {

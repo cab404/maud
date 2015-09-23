@@ -21,7 +21,7 @@ import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.parts.DrawerEntryPart;
 import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.UserHeaderPart;
-import ru.ponyhawks.android.statics.UserInfoStore;
+import ru.ponyhawks.android.statics.Providers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,20 +57,20 @@ public class DrawerContentFragment extends ListFragment implements Observer {
         super.onAttach(activity);
         if (activity instanceof DrawerClickCallback)
             callback = (DrawerClickCallback) activity;
-        UserInfoStore.getInstance().addObserver(this);
+        Providers.UserInfo.getInstance().addObserver(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         callback = null;
-        UserInfoStore.getInstance().deleteObserver(this);
+        Providers.UserInfo.getInstance().deleteObserver(this);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        update(UserInfoStore.getInstance().getInfo());
+        update(Providers.UserInfo.getInstance().getInfo());
     }
 
     void update(CommonInfo info) {

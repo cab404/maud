@@ -24,6 +24,7 @@ import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.CommentEditFragment;
 import ru.ponyhawks.android.fragments.TopicFragment;
 import ru.ponyhawks.android.utils.HideablePartBehavior;
+import ru.ponyhawks.android.utils.ImageChooser;
 
 public class TopicActivity extends BaseActivity {
 
@@ -35,7 +36,6 @@ public class TopicActivity extends BaseActivity {
     void backToMain() {
         final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-
         finish();
     }
 
@@ -65,9 +65,8 @@ public class TopicActivity extends BaseActivity {
                 )
                 .commit();
 
-        final CommentEditFragment editFragment = (CommentEditFragment)
-                getSupportFragmentManager().findFragmentById(R.id.comment_editor);
-        topic.setCommentFragment(editFragment);
+        ced = (CommentEditFragment) getSupportFragmentManager().findFragmentById(R.id.comment_editor);
+        topic.setCommentFragment(ced);
 
         final Handler handler = new Handler();
 
@@ -81,9 +80,7 @@ public class TopicActivity extends BaseActivity {
                     handler.post(this);
                     return;
                 }
-                editFragment.pin();
-                editFragment.hide();
-                editFragment.sync();
+                ced.pin();
             }
         });
     }
@@ -110,4 +107,5 @@ public class TopicActivity extends BaseActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

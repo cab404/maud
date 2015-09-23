@@ -2,15 +2,12 @@ package ru.ponyhawks.android.activity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.LayoutInflater;
 
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.statics.Providers;
+import ru.ponyhawks.android.utils.RequestManager;
 
 /**
  * Base themed activity
@@ -18,6 +15,8 @@ import ru.ponyhawks.android.R;
  * @author cab404
  */
 public class BaseActivity extends AppCompatActivity {
+
+    RequestManager manager = new RequestManager(Providers.Profile.get());
 
     private void setupTheme() {
         final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
@@ -28,6 +27,16 @@ public class BaseActivity extends AppCompatActivity {
 
         setTheme(id);
 
+    }
+
+    public RequestManager getRequestManager() {
+        return manager;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        manager.cancelAll();
     }
 
     @Override

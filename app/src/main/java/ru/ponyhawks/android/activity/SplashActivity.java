@@ -3,27 +3,20 @@ package ru.ponyhawks.android.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.cab404.libph.pages.BasePage;
-import com.cab404.moonlight.util.SU;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.LoginFragment;
-import ru.ponyhawks.android.statics.ObscurePreferencesStore;
-import ru.ponyhawks.android.statics.ProfileStore;
-import ru.ponyhawks.android.statics.UserInfoStore;
+import ru.ponyhawks.android.statics.Providers;
 
 public class SplashActivity extends BaseActivity implements LoginFragment.LoginCallback {
 
@@ -53,7 +46,7 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
                 msg("attempting connection...");
                 final BasePage basePage = new BasePage();
                 try {
-                    basePage.fetch(ProfileStore.get());
+                    basePage.fetch(Providers.Profile.get());
                 } catch (Exception e) {
                     msg("failure: " + e.getLocalizedMessage());
                     return;
@@ -64,16 +57,16 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
 
                     msg("token is expired or nonexistent");
                     // otherwise trying to login with existing credentials if they are exist
-                    SharedPreferences preferences = ObscurePreferencesStore.getInstance().get();
+                    SharedPreferences preferences = Providers.Preferences.getInstance().get();
                     final String username = preferences.getString(LoginFragment.KEY_USERNAME, null);
                     final String password = preferences.getString(LoginFragment.KEY_PASSWORD, null);
 
                     if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)) {
                         msg("found saved credentials, logging in as " + username);
                         try {
-                            final boolean success = ProfileStore.get().login(username, password);
+                            final boolean success = Providers.Profile.get().login(username, password);
                             if (success) {
-                                ProfileStore.getInstance().save();
+                                Providers.Profile.getInstance().save();
                                 onSuccess();
                             } else {
                                 preferences.edit()
@@ -92,7 +85,7 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
                     }
 
                 } else {
-                    UserInfoStore.getInstance().setInfo(basePage.c_inf);
+                    Providers.UserInfo.getInstance().setInfo(basePage.c_inf);
                     msg("tokens are still valid, proceeding");
                     onSuccess();
                 }
@@ -135,16 +128,16 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
 
     void onSuccess() {
 
-        if (UserInfoStore.getInstance().getInfo() == null) {
+        if (Providers.UserInfo.getInstance().getInfo() == null) {
             msg("logged in, loading data");
             final BasePage data = new BasePage();
             try {
-                data.fetch(ProfileStore.get());
+                data.fetch(Providers.Profile.get());
             } catch (Exception e) {
                 msg("failure: " + e.getLocalizedMessage());
                 return;
             }
-            UserInfoStore.getInstance().setInfo(data.c_inf);
+            Providers.UserInfo.getInstance().setInfo(data.c_inf);
         } else {
             msg("login sequence finished successfully");
         }

@@ -6,18 +6,13 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.chumroll.ViewConverter;
 import com.cab404.libph.data.Comment;
-import com.cab404.libph.data.Type;
-import com.cab404.libph.requests.FavRequest;
-import com.cab404.moonlight.parser.Tag;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -31,7 +26,6 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
-import ru.ponyhawks.android.statics.ProfileStore;
 import ru.ponyhawks.android.text.HtmlRipper;
 import ru.ponyhawks.android.text.StaticWebView;
 import ru.ponyhawks.android.utils.DoubleClickListener;

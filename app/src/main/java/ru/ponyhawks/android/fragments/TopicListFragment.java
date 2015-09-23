@@ -4,16 +4,12 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
@@ -31,7 +27,7 @@ import ru.ponyhawks.android.activity.TopicActivity;
 import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
-import ru.ponyhawks.android.statics.ProfileStore;
+import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.ClearAdapterTask;
 import ru.ponyhawks.android.utils.CompositeHandler;
 import ru.ponyhawks.android.utils.MidnightSync;
@@ -163,7 +159,7 @@ public class TopicListFragment extends ListFragment implements SwipeRefreshLayou
             @Override
             public void run() {
                 try {
-                    PonyhawksProfile profile = ProfileStore.get();
+                    PonyhawksProfile profile = Providers.Profile.get();
                     page.fetch(profile);
                 } catch (final Exception e) {
                     e.printStackTrace();

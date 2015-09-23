@@ -5,8 +5,6 @@ import android.app.Application;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-import ru.ponyhawks.android.R;
-
 /**
  * Well, sorry for no comments here!
  * Still you can send me your question to me@cab404.ru!
@@ -20,12 +18,14 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        ObscurePreferencesStore.getInstance().init(this);
-        ProfileStore.getInstance().init(this);
+        Providers.Preferences.getInstance().init(this);
+        Providers.Profile.getInstance().init(this);
 
         final ImageLoaderConfiguration config =
                 new ImageLoaderConfiguration.Builder(this)
                         .build();
         ImageLoader.getInstance().init(config);
+
+        Providers.ImgurGateway.init(this);
     }
 }
