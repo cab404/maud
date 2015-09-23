@@ -31,6 +31,7 @@ import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.ClearAdapterTask;
 import ru.ponyhawks.android.utils.CompositeHandler;
 import ru.ponyhawks.android.utils.MidnightSync;
+import ru.ponyhawks.android.utils.RequestManager;
 
 /**
  * Well, sorry for no comments here!
@@ -155,35 +156,39 @@ public class TopicListFragment extends ListFragment implements SwipeRefreshLayou
                 )
         );
 
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    PonyhawksProfile profile = Providers.Profile.get();
-                    page.fetch(profile);
-                } catch (final Exception e) {
-                    e.printStackTrace();
-                    sync.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast
-                                    .makeText(
-                                            getActivity(),
-                                            "Не удалось загрузить страницу\n" + e.getLocalizedMessage(),
-                                            Toast.LENGTH_LONG
-                                    ).show();
-                        }
-                    });
-                } finally {
-                    sync.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            swipe.setRefreshing(false);
-                        }
-                    });
-                }
-            }
-        }.start();
+        RequestManager
+                .fromActivity(getActivity())
+                .manage(page)
+                .setCallback(new RequestManager.SimpleRequestCallback<MainPage>() {
+                    @Override
+                    public void onError(MainPage what, final Exception e) {
+                        super.onError(what, e);
+                        sync.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast
+                                        .makeText(
+                                                getActivity(),
+                                                getActivity().getString(R.string.page_loading_failed) + e.getLocalizedMessage(),
+                                                Toast.LENGTH_LONG
+                                        ).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFinish(MainPage what) {
+                        super.onFinish(what);
+                        sync.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                swipe.setRefreshing(false);
+                            }
+                        });
+                    }
+                })
+                .start();
+
     }
 
 }

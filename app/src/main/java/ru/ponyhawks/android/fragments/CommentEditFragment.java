@@ -161,6 +161,10 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
         behavior.lockOn(commentFrame);
     }
 
+    public void clear() {
+        text.setText("");
+    }
+
     public interface SendCallback {
         void onSend(Editable text);
     }

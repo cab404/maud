@@ -87,7 +87,7 @@ public class TopicPart extends MoonlitPart<Topic> {
 
         @SuppressLint("InflateParams") final
         View controls = LayoutInflater.from(ctx)
-                .inflate(R.layout.alert_comment_controls, null, false);
+                .inflate(R.layout.alert_topic_controls, null, false);
 
         final AlertDialog dialog = new AlertDialog
                 .Builder(ctx, theme)
@@ -95,7 +95,6 @@ public class TopicPart extends MoonlitPart<Topic> {
                 .show();
 
         final ImageView fav = (ImageView) controls.findViewById(R.id.fav);
-        final ImageView reply = (ImageView) controls.findViewById(R.id.reply);
         final ImageView share = (ImageView) controls.findViewById(R.id.copy_link);
 
         fav.setImageResource(
@@ -109,15 +108,6 @@ public class TopicPart extends MoonlitPart<Topic> {
             public void onClick(View v) {
                 if (callback != null)
                     callback.onFavInvoked(topic, v.getContext());
-                dialog.dismiss();
-            }
-        });
-
-        reply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (callback != null)
-                    callback.onReplyInvoked(topic, v.getContext());
                 dialog.dismiss();
             }
         });

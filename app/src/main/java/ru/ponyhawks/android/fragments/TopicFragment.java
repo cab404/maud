@@ -1,6 +1,7 @@
 package ru.ponyhawks.android.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.cab404.libph.data.Type;
 import com.cab404.libph.pages.BasePage;
 import com.cab404.libph.pages.MainPage;
 import com.cab404.libph.pages.TopicPage;
+import com.cab404.libph.requests.CommentAddRequest;
 import com.cab404.libph.requests.FavRequest;
 import com.cab404.libph.requests.RefreshCommentsRequest;
 import com.cab404.moonlight.framework.ModularBlockParser;
@@ -55,11 +57,16 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     private MidnightSync sync;
     private CommentPart commentPart;
 
+
     private Comment replyingTo = null;
+
+    private boolean commentsEnabled = false;
+
     private int topicId;
 
 
     private CommentEditFragment commentFragment;
+    private Topic topic;
 
     public void setCommentFragment(CommentEditFragment commentFragment) {
         this.commentFragment = commentFragment;
@@ -116,14 +123,17 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                             public void handle(final Object object, int key) {
                                 switch (key) {
                                     case BasePage.BLOCK_TOPIC_HEADER:
-                                        onTopicAcquired((Topic) object);
-
+                                        topic = (Topic) object;
+                                        commentsEnabled = true;
+                                        getActivity().supportInvalidateOptionsMenu();
                                         break;
                                     case MainPage.BLOCK_COMMON_INFO:
                                         Providers.UserInfo.getInstance().setInfo((CommonInfo) object);
                                         break;
                                     case MainPage.BLOCK_COMMENT:
                                         commentPart.register(((Comment) object));
+                                        break;
+                                    case MainPage.BLOCK_COMMENTS_ENABLED:
                                         break;
                                 }
                             }
@@ -176,7 +186,6 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         if (updating) return;
         updating = true;
 
-
         final RefreshCommentsRequest request = new RefreshCommentsRequest(
                 Type.TOPIC, topicId, commentPart.getLastCommentId()
         );
@@ -221,25 +230,12 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         return super.onOptionsItemSelected(item);
     }
 
-    void onTopicAcquired(final Topic topic) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                if (getActivity() != null) {
-//                    final AppCompatActivity act = (AppCompatActivity) getActivity();
-//                    final ActionBar actionBar = act.getSupportActionBar();
-//                    if (actionBar != null) {
-//                        actionBar.setSubtitle(topic.title);
-//                    }
-                }
-            }
-        });
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        if (topic == null) return;
         inflater.inflate(R.menu.menu_topic, menu);
+        if (!commentsEnabled) menu.removeItem(R.id.reply);
     }
 
     @Override
@@ -277,7 +273,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
     @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
-    protected void setClipboard(String to){
+    protected void setClipboard(String to) {
         final ClipboardManager cbman = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         cbman.setText(to);
     }
@@ -292,6 +288,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
     @Override
     public void onReplyInvoked(Comment cm, Context context) {
+        if (!commentsEnabled) return;
         replyingTo = cm;
         if (cm == null)
             commentFragment.setTarget("Отвечаем в топик");
@@ -302,7 +299,51 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
     @Override
     public void onSend(Editable text) {
+        final ProgressDialog dialog = new ProgressDialog(getActivity());
+        dialog.setCancelable(false);
+        dialog.setMessage("Отправка сообщения...");
+        dialog.show();
 
+        int reply = replyingTo == null ? 0 : replyingTo.id;
+
+        RequestManager
+                .fromActivity(getActivity())
+                .manage(new CommentAddRequest(Type.BLOG, topicId, reply, text.toString()))
+                .setCallback(new RequestManager.SimpleRequestCallback<CommentAddRequest>() {
+                    @Override
+                    public void onSuccess(final CommentAddRequest what) {
+                        super.onSuccess(what);
+                        sync.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity(), what.msg, Toast.LENGTH_SHORT).show();
+                                if (what.success()){
+                                    update();
+                                    commentFragment.hide();
+                                    commentFragment.clear();
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(CommentAddRequest what, final Exception e) {
+                        super.onError(what, e);
+                        sync.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFinish(CommentAddRequest what) {
+                        super.onFinish(what);
+                        dialog.dismiss();
+                    }
+                })
+                .start();
     }
 
 }

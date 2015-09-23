@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="?rounded_background"
+        android:orientation="horizontal"
+        android:showDividers="middle"
+        android:clipChildren="false">
+
+        <ImageView
+            android:id="@+id/fav"
+            style="@style/EditIconPadded"
+            android:layout_width="64dp"
+            android:layout_height="42dp"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:src="@drawable/ic_star_outline"
+            android:tint="?attr/inverse_bg_color" />
+
+        <ImageView
+            android:id="@+id/copy_link"
+            style="@style/EditIconPadded"
+            android:layout_width="64dp"
+            android:layout_height="42dp"
+            android:background="?selectableItemBackground"
+            android:clickable="true"
+            android:src="@drawable/ic_share"
+            android:tint="?attr/inverse_bg_color" />
+
+    </LinearLayout>
+</FrameLayout>

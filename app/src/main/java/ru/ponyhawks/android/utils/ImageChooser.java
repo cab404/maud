@@ -123,6 +123,7 @@ public class ImageChooser {
     void uploadData(Imgur.Upload upload) {
         final ProgressDialog dialog = new ProgressDialog(act);
         dialog.setMessage(act.getString(R.string.uploading_image));
+        dialog.setCancelable(false);
         dialog.show();
         RequestManager
                 .fromActivity(act)

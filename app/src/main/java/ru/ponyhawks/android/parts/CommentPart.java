@@ -259,6 +259,10 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         System.out.println("adding " + newC.id + " parent " + newC.parent);
         List<Comment> nbrs = collectChildren(newC.parent, adapter);
 
+        for (Comment cm : nbrs)
+            if (cm.id == newC.id)
+                return -1;
+
         if (nbrs.size() == 0)
             return newC.parent == 0 ? baseIndex : (adapter.indexOfId(ids.get(newC.parent)) + 1);
 
