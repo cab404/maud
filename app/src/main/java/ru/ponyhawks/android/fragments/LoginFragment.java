@@ -1,6 +1,7 @@
 package ru.ponyhawks.android.fragments;
 
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.statics.Providers;
+import ru.ponyhawks.android.utils.RequestManager;
 
 /**
  * Login
@@ -68,6 +70,7 @@ public class LoginFragment extends Fragment {
         loading.setVisibility(View.VISIBLE);
 
         new Thread() {
+            @SuppressLint("CommitPrefEdits")
             @Override
             public void run() {
                 super.run();
@@ -77,7 +80,10 @@ public class LoginFragment extends Fragment {
                         // Yay
                         if (remember) {
                             SharedPreferences store = Providers.Preferences.getInstance().get();
-                            store.edit().putString(KEY_USERNAME, usermane).putString(KEY_PASSWORD, password).apply();
+                            store.edit()
+                                    .putString(KEY_USERNAME, usermane)
+                                    .putString(KEY_PASSWORD, password)
+                                    .commit();
                         }
                         Providers.Profile.getInstance().save();
                         if (loginCallback != null)

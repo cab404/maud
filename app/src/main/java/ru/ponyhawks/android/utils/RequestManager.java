@@ -3,6 +3,8 @@ package ru.ponyhawks.android.utils;
 import android.app.Activity;
 
 import com.cab404.moonlight.framework.AccessProfile;
+import com.cab404.moonlight.framework.ModularBlockParser;
+import com.cab404.moonlight.framework.Page;
 import com.cab404.moonlight.framework.Request;
 
 import java.util.HashSet;
@@ -40,6 +42,9 @@ public class RequestManager {
         return new RequestBuilder<>(request);
     }
 
+    public <Cls extends Page> PageRequestBuilder<Cls> manage(Cls request) {
+        return new PageRequestBuilder<>(request);
+    }
 
     public void cancelAll() {
         try {
@@ -94,14 +99,13 @@ public class RequestManager {
         }
 
         public void retry(Cls req) {
-            man.manage(req).setCallback(this).start();
+            man.manage(req).setCallback(this).run();
         }
     }
 
-
     public class RequestBuilder<Cls extends Request> extends Thread {
-        private final Cls request;
-        private AccessProfile profile = RequestManager.this.profile;
+        protected final Cls request;
+        protected AccessProfile profile = RequestManager.this.profile;
 
         private RequestCallback<Cls> callback;
 
@@ -116,50 +120,64 @@ public class RequestManager {
 
         public RequestBuilder<Cls> setCallback(RequestCallback<Cls> callback) {
             this.callback = callback;
+            if (callback != null)
+                this.callback.managedBy(RequestManager.this);
             return this;
         }
 
-        public void start() {
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        try {
-                            lock.lock();
-                            requests.add(request);
-                        } finally {
-                            lock.unlock();
-                        }
-                        if (callback != null) {
-                            callback.onStart(request);
-                        }
-                        request.fetch(profile);
-                        if (callback != null) {
-                            callback.onSuccess(request);
-                        }
-                    } catch (Exception e) {
-                        if (request.isCancelled()) {
-                            if (callback != null) {
-                                callback.onCancel(request);
-                            }
-                        } else {
-                            if (callback != null) {
-                                callback.onError(request, e);
-                            }
-                        }
-                    } finally {
-                        if (callback != null) {
-                            callback.onFinish(request);
-                        }
-                        try {
-                            lock.lock();
-                            requests.remove(request);
-                        } finally {
-                            lock.unlock();
-                        }
+        public void run() {
+            try {
+                try {
+                    lock.lock();
+                    requests.add(request);
+                } finally {
+                    lock.unlock();
+                }
+                if (callback != null) {
+                    callback.onStart(request);
+                }
+                request.fetch(profile);
+                if (callback != null) {
+                    callback.onSuccess(request);
+                }
+            } catch (Exception e) {
+                if (request.isCancelled()) {
+                    if (callback != null) {
+                        callback.onCancel(request);
+                    }
+                } else {
+                    if (callback != null) {
+                        callback.onError(request, e);
                     }
                 }
-            }.start();
+            } finally {
+                if (callback != null) {
+                    callback.onFinish(request);
+                }
+                try {
+                    lock.lock();
+                    requests.remove(request);
+                } finally {
+                    lock.unlock();
+                }
+            }
         }
     }
+
+    public class PageRequestBuilder<Cls extends Page> extends RequestBuilder<Cls>{
+
+        public PageRequestBuilder(Cls request) {
+            super(request);
+        }
+
+        public PageRequestBuilder<Cls> setHandlers(ModularBlockParser.ParsedObjectHandler... handlers){
+            if (handlers.length == 1)
+                request.setHandler(handlers[0]);
+            else
+                request.setHandler(new CompositeHandler(handlers));
+            return this;
+        }
+
+    }
+
 }

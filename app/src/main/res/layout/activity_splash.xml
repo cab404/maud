@@ -8,8 +8,8 @@
         android:id="@+id/status"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
-        android:textSize="8dp"
+        android:padding="8dp"
+        android:textSize="6dp"
         android:textAppearance="?android:attr/textAppearance"
         android:typeface="monospace" />
 

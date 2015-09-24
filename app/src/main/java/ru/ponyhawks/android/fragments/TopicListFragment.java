@@ -4,12 +4,10 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,17 +15,14 @@ import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Topic;
 import com.cab404.libph.modules.TopicModule;
 import com.cab404.libph.pages.MainPage;
-import com.cab404.libph.util.PonyhawksProfile;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.activity.TopicActivity;
 import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
-import ru.ponyhawks.android.statics.Providers;
+import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
 import ru.ponyhawks.android.utils.ClearAdapterTask;
 import ru.ponyhawks.android.utils.CompositeHandler;
 import ru.ponyhawks.android.utils.MidnightSync;
@@ -41,12 +36,10 @@ import ru.ponyhawks.android.utils.RequestManager;
  *
  * @author cab404
  */
-public class TopicListFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class TopicListFragment extends RefreshableListFragment {
     public static final String KEY_URL = "url";
     ChumrollAdapter adapter;
 
-    @Bind(R.id.swipe_to_refresh)
-    SwipeRefreshLayout swipe;
     private MidnightSync sync;
     private TopicPart topicPart;
 
@@ -67,14 +60,6 @@ public class TopicListFragment extends ListFragment implements SwipeRefreshLayou
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
-
-        final TypedArray styledAttributes = getActivity().getTheme().obtainStyledAttributes(
-                new int[]{R.attr.colorPrimary, R.attr.inverse_action_bar_color}
-        );
-        swipe.setColorSchemeColors(styledAttributes.getColor(1, 0), styledAttributes.getColor(1, 0));
-        swipe.setProgressBackgroundColorSchemeColor(styledAttributes.getColor(0, 0));
-        swipe.setOnRefreshListener(this);
 
         adapter = new ChumrollAdapter();
         sync = new MidnightSync(adapter);
@@ -90,15 +75,9 @@ public class TopicListFragment extends ListFragment implements SwipeRefreshLayou
 
         adapter.prepareFor(spacePart, topicPart);
         setAdapter(adapter);
+
+        setRefreshing(true);
         onRefresh();
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                // workaround for refresher to show up
-                swipe.measure(swipe.getWidth(), swipe.getHeight());
-                swipe.setRefreshing(true);
-            }
-        });
     }
 
     private void switchToPage(Topic data) {
@@ -152,6 +131,7 @@ public class TopicListFragment extends ListFragment implements SwipeRefreshLayou
         page.setHandler(
                 new CompositeHandler(
                         new ClearAdapterTask(adapter, sync),
+                        new UpdateCommonInfoTask(),
                         sync.bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
                 )
         );
@@ -182,7 +162,7 @@ public class TopicListFragment extends ListFragment implements SwipeRefreshLayou
                         sync.post(new Runnable() {
                             @Override
                             public void run() {
-                                swipe.setRefreshing(false);
+                                swipeToRefresh.setRefreshing(false);
                             }
                         });
                     }

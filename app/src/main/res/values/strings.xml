@@ -18,8 +18,10 @@
     <string name="content">Данные</string>
     <string name="remove_actionbar_shadow">Убрать тень под заголовком</string>
     <string name="open_topics_in_separate_windows">Открывать посты в отдельных вкладках</string>
-    <string name="uploading_image">Загрузка на Imgur...</string>
+    <string name="uploading_image">Загрузка на Imgur…</string>
     <string name="page_loading_failed">Не удалось загрузить страницу\n</string>
+    <string name="logout_promt">Выйти из аккаунта?</string>
+    <string name="not_now">Не сейчас</string>
 
     <string-array name="exit">
         <item>Я устал, я ухожу.</item>

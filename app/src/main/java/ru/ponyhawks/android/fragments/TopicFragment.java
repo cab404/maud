@@ -37,6 +37,7 @@ import ru.ponyhawks.android.parts.CommentNumPart;
 import ru.ponyhawks.android.parts.LoadingPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
+import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
 import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.MidnightSync;
 import ru.ponyhawks.android.utils.CompositeHandler;
@@ -110,14 +111,16 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         final int loadingPartId = adapter.add(LoadingPart.class, null);
         setAdapter(adapter);
 
-        final TopicPage page = new TopicPage(topicId);
         sync = new MidnightSync(adapter);
-        page.setHandler(
-                new CompositeHandler(
+
+        RequestManager.fromActivity(getActivity())
+                .manage(new TopicPage(topicId))
+                .setHandlers(
                         sync
                                 .bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
                                 .bind(MainPage.BLOCK_COMMENT, commentPart)
                                 .bind(MainPage.BLOCK_COMMENT_NUM, commentNumPart),
+                        new UpdateCommonInfoTask(),
                         new ModularBlockParser.ParsedObjectHandler() {
                             @Override
                             public void handle(final Object object, int key) {
@@ -137,17 +140,8 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                                         break;
                                 }
                             }
-                        }
-                )
-        );
-
-        RequestManager.fromActivity(getActivity())
-                .manage(page)
+                        })
                 .setCallback(new RequestManager.SimpleRequestCallback<TopicPage>() {
-                    @Override
-                    public void onStart(TopicPage what) {
-
-                    }
 
                     @Override
                     public void onError(TopicPage what, Exception e) {
@@ -194,10 +188,17 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 .setCallback(new RequestManager.SimpleRequestCallback<RefreshCommentsRequest>() {
                     @Override
                     public void onSuccess(RefreshCommentsRequest what) {
+                        commentPart.clearNew();
                         for (Comment cm : what.comments) {
                             sync.inject(cm, commentPart, commentPart);
                             commentPart.register(cm);
                         }
+                    }
+
+                    @Override
+                    public void onError(RefreshCommentsRequest what, Exception e) {
+                        super.onError(what, e);
+
                     }
 
                     @Override
@@ -218,6 +219,9 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     public boolean onOptionsItemSelected(MenuItem item) {
         final int id = item.getItemId();
         switch (id) {
+            case R.id.refresh:
+                update();
+                return true;
             case R.id.copy_link:
                 final String clip = String.format("http://ponyhawks.ru/blog/%d.html", topicId);
                 setClipboard(clip);
@@ -317,7 +321,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                             @Override
                             public void run() {
                                 Toast.makeText(getActivity(), what.msg, Toast.LENGTH_SHORT).show();
-                                if (what.success()){
+                                if (what.success()) {
                                     update();
                                     commentFragment.hide();
                                     commentFragment.clear();

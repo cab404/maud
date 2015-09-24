@@ -14,6 +14,7 @@ import com.cab404.libph.data.CommonInfo;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.DrawerContentFragment;
+import ru.ponyhawks.android.fragments.LetterListFragment;
 import ru.ponyhawks.android.fragments.LoginFragment;
 import ru.ponyhawks.android.fragments.TopicListFragment;
 import ru.ponyhawks.android.statics.Providers;
@@ -23,6 +24,7 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
 
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +58,7 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         drawerToggle.onOptionsItemSelected(item);
-        int id = item.getItemId();
-
-         return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
     }
 
     int currentSection = -1;
@@ -84,6 +84,9 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
             case DrawerContentFragment.ID_SETTINGS:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
+            case DrawerContentFragment.ID_MESSAGES:
+                use = LetterListFragment.getInstance();
+                break;
             case DrawerContentFragment.ID_FAVOURITES:
                 use = TopicListFragment.getInstance("/profile/" + login + "/favourites/topics");
                 break;
@@ -92,7 +95,7 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
                 break;
             case DrawerContentFragment.ID_EXIT:
                 new AlertDialog.Builder(this)
-                        .setMessage("Выйти из аккаунта?")
+                        .setMessage(R.string.logout_promt)
                         .setPositiveButton(Meow.getRandomOf(this, R.array.exit), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -100,7 +103,7 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
                                 dialog.dismiss();
                             }
                         })
-                        .setNegativeButton("Не сейчас", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.not_now, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -113,7 +116,7 @@ public class MainActivity extends BaseActivity implements DrawerContentFragment.
         if (use != null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.content_frame, use)
+                    .replace(R.id.content_frame, currentFragment = use, "content")
                     .commit();
             drawerLayout.closeDrawer(GravityCompat.START);
             currentSection = id;

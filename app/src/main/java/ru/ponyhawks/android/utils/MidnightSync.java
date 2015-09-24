@@ -40,12 +40,12 @@ public class MidnightSync extends UniteSyncronization implements ModularBlockPar
         return this;
     }
 
-    public <A> MidnightSync bind(Integer id, Class<ViewConverter<A>> converter) {
+    public <A> MidnightSync bind(Integer id, Class<? extends ViewConverter<A>> converter) {
         return bind(id, converter, null);
     }
 
     @SuppressWarnings("unchecked")
-    public <A> MidnightSync bind(Integer id, Class<ViewConverter<A>> converter, InsertionRule<A> rule) {
+    public <A> MidnightSync bind(Integer id, Class<? extends ViewConverter<A>> converter, InsertionRule<A> rule) {
         bindings.put(id, new Binding<>(target.getConverters().getInstance(converter), rule));
         return this;
     }
