@@ -21,7 +21,6 @@
 
         <activity
             android:name=".activity.SettingsActivity"
-            android:configChanges="keyboard|orientation|screenSize"
             android:parentActivityName=".activity.MainActivity"
             android:theme="?attr/settings_theme">
             <meta-data

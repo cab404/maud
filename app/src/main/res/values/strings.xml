@@ -22,6 +22,7 @@
     <string name="page_loading_failed">Не удалось загрузить страницу\n</string>
     <string name="logout_promt">Выйти из аккаунта?</string>
     <string name="not_now">Не сейчас</string>
+    <string name="enter_image_url">Введите url картинки</string>
 
     <string-array name="exit">
         <item>Я устал, я ухожу.</item>

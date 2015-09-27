@@ -4,12 +4,17 @@ import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
+import android.support.v4.view.WindowCompat;
+import android.support.v7.internal.view.menu.MenuBuilder;
+import android.support.v7.internal.view.menu.SubMenuBuilder;
 import android.support.v7.internal.widget.ThemeUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +37,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     boolean set = false;
 
     void set() {
+        if (Build.VERSION.SDK_INT <= 10) return;
         if (set) return;
         set = true;
         final TypedArray id = getTheme().obtainStyledAttributes(new int[]{R.attr.settings_theme});
@@ -44,14 +50,58 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         super.setContentView(layoutResID);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public boolean onPreparePanel(int featureId, View view, Menu menu) {
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Don't. Ask. Why.
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                openOptionsMenu();
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreatePanelMenu(int featureId, Menu menu) {
+        System.out.println("SettingsActivity.onCreatePanelMenu");
+        System.out.println("featureId = [" + featureId + "], menu = [" + menu + "]");
+        set();
+        return super.onCreatePanelMenu(featureId, menu);
+    }
+
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        System.out.println("SettingsActivity.onMenuOpened");
+        System.out.println("featureId = [" + featureId + "], menu = [" + menu + "]");
+        return super.onMenuOpened(featureId, menu);
+    }
+
+    boolean created = false;
+
+    void menu() {
+        if (created) return;
+        created = true;
         addPreferencesFromResource(R.xml.settings);
         if (Build.VERSION.SDK_INT >= 21)
             addPreferencesFromResource(R.xml.settings_v21);
-        getPreferenceManager().findPreference("theme").setOnPreferenceChangeListener(this);
-        return super.onPreparePanel(featureId, view, menu);
+        getPreferenceManager().findPreference("theme").setOnPreferenceChangeListener(SettingsActivity.this);
+    }
+
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean onPreparePanel(int featureId, View view, Menu menu) {
+        System.out.println("SettingsActivity.onPreparePanel");
+        System.out.println("featureId = [" + featureId + "], view = [" + view + "], menu = [" + menu + "]");
+        super.onPreparePanel(featureId, view, menu);
+        menu();
+        return false;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return false;
     }
 
     boolean changedTheme = false;

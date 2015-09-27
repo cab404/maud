@@ -3,6 +3,7 @@ package ru.ponyhawks.android.utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -47,12 +48,12 @@ public class ImageChooser {
             INPUT_URI = 2,
             REQUEST_CODE_TAKE_PHOTO = 9812,
             REQUEST_CODE_CHOOSE_PHOTO = 9814;
-    private Activity act;
-    private Fragment fr;
+    private StartForResultMethod act;
+    private Activity ctx;
 
-    public ImageChooser(Fragment fr, ImageUrlHandler handler) {
-        this.fr = fr;
-        this.act = fr.getActivity();
+    public ImageChooser(StartForResultMethod sfrm, Activity ctx, ImageUrlHandler handler) {
+        this.act = sfrm;
+        this.ctx = ctx;
         this.handler = handler;
     }
 
@@ -63,7 +64,7 @@ public class ImageChooser {
      */
     public void requestImageSelection(final boolean urgent) {
 
-        new AlertDialog.Builder(act)
+        new AlertDialog.Builder(ctx)
                 .setItems(ITEMS, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -72,7 +73,7 @@ public class ImageChooser {
 
 
                                 File store = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                                store = new File(store, act.getPackageName());
+                                store = new File(store, ctx.getPackageName());
                                 try {
                                     if (!store.exists() && !(store.mkdirs() && new File(store, ".nomedia").createNewFile()))
                                         throw new RuntimeException("Cannot create pictures dir");
@@ -85,7 +86,7 @@ public class ImageChooser {
                                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(subtarget));
 
-                                fr.startActivityForResult(takePictureIntent, REQUEST_CODE_TAKE_PHOTO);
+                                act.startActivityForResult(takePictureIntent, REQUEST_CODE_TAKE_PHOTO);
 
                                 break;
 
@@ -93,18 +94,22 @@ public class ImageChooser {
 
                                 Intent choosePhotoIntent = new Intent(Intent.ACTION_GET_CONTENT);
                                 choosePhotoIntent.setType("image/*");
-                                fr.startActivityForResult(choosePhotoIntent, REQUEST_CODE_CHOOSE_PHOTO);
+                                act.startActivityForResult(choosePhotoIntent, REQUEST_CODE_CHOOSE_PHOTO);
 
                                 break;
 
                             case INPUT_URI:
-                                final EditText text = new EditText(act);
-                                new AlertDialog.Builder(act).setView(text).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        handler.handleImage(text.getText().toString());
-                                    }
-                                }).show();
+                                final EditText text = new EditText(ctx);
+                                text.setHint(R.string.enter_image_url);
+                                text.setInputType(INPUT_URI);
+                                new AlertDialog.Builder(ctx)
+                                        .setView(text)
+                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                handler.handleImage(text.getText().toString());
+                                            }
+                                        }).show();
                         }
                     }
                 })
@@ -121,12 +126,12 @@ public class ImageChooser {
     }
 
     void uploadData(Imgur.Upload upload) {
-        final ProgressDialog dialog = new ProgressDialog(act);
-        dialog.setMessage(act.getString(R.string.uploading_image));
+        final ProgressDialog dialog = new ProgressDialog(ctx);
+        dialog.setMessage(ctx.getString(R.string.uploading_image));
         dialog.setCancelable(false);
         dialog.show();
         RequestManager
-                .fromActivity(act)
+                .fromActivity(ctx)
                 .manage(upload)
                 .setProfile(Providers.ImgurGateway.get())
                 .setCallback(new RequestManager.SimpleRequestCallback<Imgur.Upload>() {
@@ -163,7 +168,7 @@ public class ImageChooser {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -180,7 +185,7 @@ public class ImageChooser {
                     break;
                 case REQUEST_CODE_CHOOSE_PHOTO:
                     try {
-                        uploadData(new Imgur.Upload(act.getContentResolver().openInputStream(data.getData())));
+                        uploadData(new Imgur.Upload(ctx.getContentResolver().openInputStream(data.getData())));
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException("", e);
                     }
@@ -190,6 +195,11 @@ public class ImageChooser {
 
     public interface ImageUrlHandler {
         void handleImage(String image);
+    }
+
+    public interface StartForResultMethod {
+        void startActivityForResult(Intent intent, int code);
+        void finish();
     }
 
 }

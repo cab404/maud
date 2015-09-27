@@ -59,8 +59,12 @@ public class ListFragment extends Fragment {
 
     @SuppressLint("NewApi")
     public void setAdapter(ListAdapter adapter) {
-        if (list instanceof ListView || Build.VERSION.SDK_INT > 10)
+        if (Build.VERSION.SDK_INT > 10)
             list.setAdapter(adapter);
+        else
+            // That cast IS VERY IMPORTANT.
+            //noinspection RedundantCast
+            ((ListView) list).setAdapter(adapter);
     }
 
 

@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
-import android.text.Selection;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,23 +14,29 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.cab404.moonlight.parser.Tag;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.text.changers.ImportImageTextChanger;
+import ru.ponyhawks.android.text.changers.SimpleChangers;
+import ru.ponyhawks.android.text.changers.TextChanger;
+import ru.ponyhawks.android.text.changers.TextPrism;
 import ru.ponyhawks.android.utils.HideablePartBehavior;
 import ru.ponyhawks.android.utils.IgnorantCoordinatorLayout;
-import ru.ponyhawks.android.utils.ImageChooser;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CommentEditFragment extends Fragment implements HideablePartBehavior.ChangeCallback, ImageChooser.ImageUrlHandler {
+public class CommentEditFragment extends Fragment implements HideablePartBehavior.ChangeCallback {
 
     @Bind(R.id.text)
     EditText text;
@@ -44,10 +48,34 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     RelativeLayout commentFrame;
     @Bind(R.id.root)
     IgnorantCoordinatorLayout root;
+    @Bind(R.id.instruments)
+    LinearLayout instrumentsLayout;
 
     private HideablePartBehavior behavior;
     private SendCallback sendCallback;
-    private ImageChooser chooser;
+
+    private List<TextChanger> instruments;
+
+    {
+        instruments = new ArrayList<>();
+        instruments.add(new ImportImageTextChanger());
+        instruments.add(SimpleChangers.BOLD);
+        instruments.add(SimpleChangers.ITALIC);
+        instruments.add(SimpleChangers.UNDERLINE);
+        instruments.add(SimpleChangers.STRIKETHROUGH);
+        instruments.add(SimpleChangers.SPAN_LEFT);
+        instruments.add(SimpleChangers.SPAN_CENTER);
+        instruments.add(SimpleChangers.SPAN_RIGHT);
+    }
+
+    private List<TextPrism> postprocessors;
+
+    {
+        postprocessors = new ArrayList<>();
+
+    }
+
+    private int selectedInstrument = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,8 +88,6 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
         ButterKnife.bind(this, view);
 
         final CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) commentFrame.getLayoutParams();
-
-        chooser = new ImageChooser(this, this);
 
         commentFrame.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -85,21 +111,21 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
             }
         });
 
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (sendCallback != null)
-                    sendCallback.onSend(text.getText());
-            }
-        });
+        instrumentsLayout.removeAllViews();
 
-        text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus)
-                    expand();
-            }
-        });
+        LayoutInflater inflater = getLayoutInflater(savedInstanceState);
+        for (final TextChanger changer : instruments) {
+            View button = inflater.inflate(R.layout.include_instrument_button, instrumentsLayout, false);
+            ((ImageView) button.findViewById(R.id.icon)).setImageResource(changer.getImageResource());
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    changer.onSelect(CommentEditFragment.this, text);
+                    selectedInstrument = instruments.indexOf(changer);
+                }
+            });
+            instrumentsLayout.addView(button);
+        }
 
     }
 
@@ -190,37 +216,28 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     }
 
     @Override
-    public void onExpandCollapse(float state) {}
+    public void onExpandCollapse(float state) {
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        chooser.handleActivityResult(requestCode, resultCode, data);
+        instruments.get(selectedInstrument).onActivityResult(requestCode, resultCode, data);
     }
 
-    @OnClick(R.id.image)
-    public void onImageChooseClick(){
-        chooser.requestImageSelection(false);
+    @OnFocusChange(R.id.text)
+    public void onTextFocusChange(boolean hasFocus) {
+        if (hasFocus)
+            expand();
     }
 
-    @Override
-    public void handleImage(final String image) {
-        System.out.println("IMAGE SELECTED !!! " + image);
-        text.post(new Runnable() {
-            @Override
-            public void run() {
-                int cursor = text.getSelectionStart();
-                if (cursor == -1) cursor = 0;
-
-                final Tag tag = new Tag();
-                tag.name = "img";
-                tag.props.put("src", image);
-                tag.type = Tag.Type.STANDALONE;
-                final Editable editable = text.getText();
-                editable.insert(cursor, tag.toString());
-                text.setText(editable);
-            }
-        });
+    @OnClick(R.id.send)
+    public void onSendInvoked() {
+        if (sendCallback != null) {
+            Editable text = this.text.getText();
+            for (TextPrism prism : postprocessors)
+                text = prism.purify(text);
+            sendCallback.onSend(text);
+        }
     }
-
 
 }

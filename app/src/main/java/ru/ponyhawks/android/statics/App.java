@@ -1,9 +1,15 @@
 package ru.ponyhawks.android.statics;
 
 import android.app.Application;
+import android.os.Environment;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 /**
  * Well, sorry for no comments here!
@@ -27,5 +33,21 @@ public class App extends Application {
         ImageLoader.getInstance().init(config);
 
         Providers.ImgurGateway.init(this);
+
+//        final File errsave = new File(Environment.getExternalStorageDirectory(), "pherrlog.txt");
+//        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+//            @Override
+//            public void uncaughtException(Thread thread, Throwable ex) {
+//                try {
+//                    final PrintWriter writer = new PrintWriter(new FileOutputStream(errsave));
+//                    ex.printStackTrace(writer);
+//                    writer.close();
+//                    throw new RuntimeException("Error on main thread", ex);
+//                } catch (FileNotFoundException e) {
+//                    throw new RuntimeException("Error while writing error :/", e);
+//                }
+//
+//            }
+//        });
     }
 }

@@ -2,14 +2,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="@string/content" />
-    <SwitchPreference
+    <CheckBoxPreference
         android:key="loadImages"
         android:defaultValue="true"
         android:title="@string/load_images" />
-    <SwitchPreference
+    <CheckBoxPreference
         android:key="loadVideos"
         android:title="@string/load_videos" />
-    <SwitchPreference
+    <CheckBoxPreference
         android:key="textSelectable"
         android:title="@string/select_text" />
 
@@ -19,7 +19,7 @@
         android:entryValues="@array/theme_values"
         android:key="theme"
         android:title="@string/theme" />
-    <SwitchPreference
+    <CheckBoxPreference
         android:defaultValue="true"
         android:key="saveCommentState"
         android:title="@string/save_comments_state" />

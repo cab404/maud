@@ -26,6 +26,7 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.text.DateUtils;
 import ru.ponyhawks.android.text.HtmlRipper;
 import ru.ponyhawks.android.text.StaticWebView;
 import ru.ponyhawks.android.utils.DoubleClickListener;
@@ -117,6 +118,8 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     StaticWebView text;
     @Bind(R.id.author)
     TextView author;
+    @Bind(R.id.date)
+    TextView date;
     @Bind(R.id.avatar)
     ImageView avatar;
 
@@ -162,6 +165,9 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
         author.setText(cm.author.login);
         avatar.setImageDrawable(null);
+
+        date.setText(DateUtils.formPreciseDate(cm.date));
+
         if (!cm.author.is_system) {
             ImageLoader.getInstance().displayImage(cm.author.small_icon, avatar, IMG_CFG);
         }
@@ -272,8 +278,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
         if (index == nbrs.size() - 1)
             if (newC.parent == 0)
-                // Play dirty!
-                return upfall(adapter, nbrs.get(nbrs.size() - 2)) + 1;
+                return upfall(adapter, nbrs.get(nbrs.size() - 2));
             else
                 // well, shit. Before next parent's neighbour, if exists
                 return downfall(adapter, data.get(newC.parent));

@@ -3,6 +3,7 @@ package ru.ponyhawks.android.utils;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
+import android.os.Build;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
@@ -96,6 +97,8 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
             lastTop = top;
+            if (Build.VERSION.SDK_INT <= 10)
+                ((View) changedView.getParent()).invalidate();
 
             if (calculateOffset && (state == State.EXPANDED || state == State.COLLAPSED)) {
                 int expandLimit = calculateDst(State.EXPANDED, changedView);
@@ -164,6 +167,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
                 changeCallback.onCollapse(view);
             state = State.COLLAPSED;
         }
+        view.postInvalidate();
     }
 
     public void expand(View view) {
@@ -179,6 +183,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
                 changeCallback.onExpand(view);
             state = State.EXPANDED;
         }
+        view.postInvalidate();
     }
 
     public void hide(View view) {
@@ -194,6 +199,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
                 changeCallback.onHide(view);
             state = State.HIDDEN;
         }
+        view.postInvalidate();
     }
 
     public int calculateDst(State state, View view) {

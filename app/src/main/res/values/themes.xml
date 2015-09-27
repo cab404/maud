@@ -85,8 +85,8 @@
         <item>AppThemeLight.Rariteh</item>
     </string-array>
 
-    <style name="SettingsThemeDark" parent="android:Theme.DeviceDefault" tools:targetApi="ice_cream_sandwich" />
+    <style name="SettingsThemeDark" parent="android:Theme" />
 
-    <style name="SettingsThemeLight" parent="android:Theme.DeviceDefault.Light" tools:targetApi="ice_cream_sandwich" />
+    <style name="SettingsThemeLight" parent="android:Theme.Light" />
 
 </resources>
