@@ -225,23 +225,6 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     }
 
     /**
-     * Finds next index to parent's tree
-     */
-    int downfall(ChumrollAdapter adapter, Comment parent) {
-        final List<Comment> parentsNeighbours = collectChildren(parent.parent, adapter);
-        Collections.sort(parentsNeighbours, CC_INST);
-
-        final int index = parentsNeighbours.indexOf(parent);
-        if (index == parentsNeighbours.size() - 1)
-            if (parent.parent == 0)
-                return baseIndex + data.size();
-            else
-                return downfall(adapter, data.get(parent.parent));
-        else
-            return adapter.indexOf(parentsNeighbours.get(index + 1));
-    }
-
-    /**
      * Finds last index in children's tree
      */
     int upfall(ChumrollAdapter adapter, Comment parent) {
@@ -277,11 +260,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         int index = nbrs.indexOf(newC);
 
         if (index == nbrs.size() - 1)
-            if (newC.parent == 0)
-                return upfall(adapter, nbrs.get(nbrs.size() - 2));
-            else
-                // well, shit. Before next parent's neighbour, if exists
-                return downfall(adapter, data.get(newC.parent));
+            return upfall(adapter, nbrs.get(nbrs.size() - 2)) + 1;
         else
             return adapter.indexOfId(ids.get(nbrs.get(index + 1).id));
 
