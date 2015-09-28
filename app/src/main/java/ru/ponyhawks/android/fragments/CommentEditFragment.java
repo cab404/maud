@@ -72,7 +72,6 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
 
     {
         postprocessors = new ArrayList<>();
-
     }
 
     private int selectedInstrument = 0;

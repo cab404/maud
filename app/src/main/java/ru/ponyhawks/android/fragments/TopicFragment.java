@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,8 +42,8 @@ import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
 import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.MidnightSync;
-import ru.ponyhawks.android.utils.CompositeHandler;
 import ru.ponyhawks.android.utils.RequestManager;
+import ru.ponyhawks.android.utils.UpdateDrawable;
 
 /**
  * Well, sorry for no comments here!
@@ -72,7 +74,6 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     public void setCommentFragment(CommentEditFragment commentFragment) {
         this.commentFragment = commentFragment;
         commentFragment.setSendCallback(this);
-        commentFragment.setTarget("Отвечаем в топик");
     }
 
     public static TopicFragment getInstance(int id) {
@@ -167,18 +168,23 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 })
                 .start();
 
+        if (commentFragment != null)
+            commentFragment.setTarget(getActivity().getString(R.string.replying_topic));
+
     }
 
     volatile boolean updating = false;
 
     public void clearNew() {
         commentPart.clearNew();
+        spinningWheel.setNum(0);
         adapter.notifyDataSetChanged();
     }
 
-    public void update() {
+    public void update(final boolean clearNew) {
         if (updating) return;
         updating = true;
+        setUpdating(true);
 
         final RefreshCommentsRequest request = new RefreshCommentsRequest(
                 Type.TOPIC, topicId, commentPart.getLastCommentId()
@@ -188,7 +194,9 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 .setCallback(new RequestManager.SimpleRequestCallback<RefreshCommentsRequest>() {
                     @Override
                     public void onSuccess(RefreshCommentsRequest what) {
-                        commentPart.clearNew();
+                        if (clearNew)
+                            commentPart.clearNew();
+                        spinningWheel.setNum(what.comments.size());
                         for (Comment cm : what.comments) {
                             sync.inject(cm, commentPart, commentPart);
                             commentPart.register(cm);
@@ -198,12 +206,12 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                     @Override
                     public void onError(RefreshCommentsRequest what, Exception e) {
                         super.onError(what, e);
-
                     }
 
                     @Override
                     public void onFinish(RefreshCommentsRequest what) {
                         updating = false;
+                        setUpdating(false);
                     }
                 })
                 .start();
@@ -216,16 +224,16 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         final int id = item.getItemId();
         switch (id) {
             case R.id.refresh:
-                update();
+                update(true);
                 return true;
             case R.id.copy_link:
                 final String clip = String.format("http://ponyhawks.ru/blog/%d.html", topicId);
                 setClipboard(clip);
-                Toast.makeText(getActivity(), "Ссылка на пост скопирована в буфер обмена", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.topic_link_copied, Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.reply:
                 onReplyInvoked(null, getActivity());
@@ -234,11 +242,25 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         return super.onOptionsItemSelected(item);
     }
 
+    MenuItem updateItem;
+    UpdateDrawable spinningWheel;
+    void setUpdating(boolean updating){
+        spinningWheel.setSpinning(updating);
+        if (updating)
+            spinningWheel.setMenuIcon(updateItem, getView());
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         if (topic == null) return;
         inflater.inflate(R.menu.menu_topic, menu);
+
+        spinningWheel = new UpdateDrawable(getActivity());
+        final MenuItem item = menu.findItem(R.id.refresh);
+        updateItem = item;
+        item.setIcon(spinningWheel);
+
         if (!commentsEnabled) menu.removeItem(R.id.reply);
     }
 
@@ -287,7 +309,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     public void onShareInvoked(Comment cm, Context context) {
         final String clip = String.format("http://ponyhawks.ru/blog/%d.html#comment%d", topicId, cm.id);
         setClipboard(clip);
-        Toast.makeText(getActivity(), "Ссылка на комментарий скопирована в буфер обмена", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.comment_link_copied, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -295,9 +317,9 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         if (!commentsEnabled) return;
         replyingTo = cm;
         if (cm == null)
-            commentFragment.setTarget("Отвечаем в топик");
+            commentFragment.setTarget(context.getString(R.string.replying_topic));
         else
-            commentFragment.setTarget("Отвечаем на комментарий " + cm.id + "@" + cm.author.login);
+            commentFragment.setTarget(String.format(context.getString(R.string.replying_comment), cm.id, cm.author.login));
         commentFragment.expand();
     }
 
@@ -305,7 +327,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     public void onSend(Editable text) {
         final ProgressDialog dialog = new ProgressDialog(getActivity());
         dialog.setCancelable(false);
-        dialog.setMessage("Отправка сообщения...");
+        dialog.setMessage(getActivity().getString(R.string.sending_messsge));
         dialog.show();
 
         int reply = replyingTo == null ? 0 : replyingTo.id;
@@ -320,11 +342,13 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                         sync.post(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(getActivity(), what.msg, Toast.LENGTH_SHORT).show();
+                                if (!TextUtils.isEmpty(what.msg))
+                                    Toast.makeText(getActivity(), what.msg, Toast.LENGTH_SHORT).show();
                                 if (what.success()) {
-                                    update();
+                                    update(false);
                                     commentFragment.hide();
                                     commentFragment.clear();
+                                    Toast.makeText(getActivity(), "Сообщение отправлено", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });

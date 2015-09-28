@@ -28,7 +28,7 @@ public class DateUtils {
             return SimpleDateFormat.getTimeInstance(DateFormat.MEDIUM).format(time);
         if (diff < TimeUnit.DAYS.toMillis(30))
             return SimpleDateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(time);
-        return SimpleDateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(time);
+        return SimpleDateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(time);
     }
 
 }

@@ -23,6 +23,11 @@
     <string name="logout_promt">Выйти из аккаунта?</string>
     <string name="not_now">Не сейчас</string>
     <string name="enter_image_url">Введите url картинки</string>
+    <string name="replying_topic">Отвечаем в топик</string>
+    <string name="topic_link_copied">Ссылка на пост скопирована в буфер обмена</string>
+    <string name="comment_link_copied">Ссылка на комментарий скопирована в буфер обмена</string>
+    <string name="sending_messsge">Отправка сообщения…</string>
+    <string name="replying_comment" formatted="false">Отвечаем на комментарий %d@%s</string>
 
     <string-array name="exit">
         <item>Я устал, я ухожу.</item>
