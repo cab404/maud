@@ -59,6 +59,7 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     {
         instruments = new ArrayList<>();
         instruments.add(new ImportImageTextChanger());
+        instruments.add(SimpleChangers.QUOTE);
         instruments.add(SimpleChangers.BOLD);
         instruments.add(SimpleChangers.ITALIC);
         instruments.add(SimpleChangers.UNDERLINE);

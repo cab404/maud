@@ -54,6 +54,7 @@ public class MidnightSync extends UniteSyncronization implements ModularBlockPar
     public void handle(Object object, int key) {
         if (bindings.containsKey(key)) {
             post(new InsertObject(bindings.get(key), object));
+            invalidate = true;
         }
     }
 
@@ -63,6 +64,7 @@ public class MidnightSync extends UniteSyncronization implements ModularBlockPar
 
 
     public <V> void inject(V object, ViewConverter<V> use, InsertionRule<V> rule) {
+        invalidate = true;
         post(new InsertObject(new Binding<>(use, rule), object));
     }
 
@@ -88,6 +90,8 @@ public class MidnightSync extends UniteSyncronization implements ModularBlockPar
         }
     }
 
+    boolean invalidate = false;
+
     private class InsertObject implements Runnable {
         Binding binding;
         Object object;
@@ -109,4 +113,9 @@ public class MidnightSync extends UniteSyncronization implements ModularBlockPar
         int indexFor(V object, ViewConverter<V> converter, ChumrollAdapter adapter);
     }
 
+    @Override
+    protected void onCycleFinish() {
+            if (invalidate)
+                target.notifyDataSetChanged();
+    }
 }

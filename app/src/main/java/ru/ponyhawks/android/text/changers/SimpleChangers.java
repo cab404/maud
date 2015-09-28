@@ -28,5 +28,7 @@ public final class SimpleChangers {
             new WrapTextChanger(R.drawable.ic_format_underline, "<u>", "</u>");
     public static final TextChanger STRIKETHROUGH =
             new WrapTextChanger(R.drawable.ic_format_strikethrough, "<s>", "</s>");
+    public static final TextChanger QUOTE =
+            new WrapTextChanger(R.drawable.ic_format_quote, "<quote>", "</quote>");
 
 }
