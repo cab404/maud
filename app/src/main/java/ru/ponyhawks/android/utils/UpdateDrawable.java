@@ -9,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -47,7 +48,8 @@ public class UpdateDrawable extends Drawable {
 
         final float dp = context.getResources().getDisplayMetrics().density;
         padding = (int) (6 * dp);
-        paint.setTextSize(10 * dp);
+        paint.setTextSize(8 * dp);
+        paint.setTypeface(Typeface.MONOSPACE);
     }
 
     public void setSpinning(boolean spinning) {
@@ -83,7 +85,7 @@ public class UpdateDrawable extends Drawable {
 
         canvas.rotate(spin);
 
-        paint.setColor(num == 0 || spinning ? -1 : 0x88ffffff);
+        paint.setColor(num == 0 || spinning ? -1 : 0x66ffffff);
         dst.set(size);
         dst.right -= padding * 2;
         dst.bottom -= padding * 2;
@@ -93,8 +95,8 @@ public class UpdateDrawable extends Drawable {
 
         if (num == 0) return;
         canvas.rotate(-spin);
-        paint.setColor(spinning ? 0x88ffffff : -1);
-        String nm = num + " ";
+        paint.setColor(spinning ? 0x66ffffff : -1);
+        String nm = num + "";
         paint.getTextBounds(nm, 0, nm.length(), dst);
         canvas.drawText(nm, dst.width() / -2, dst.height() / 2, paint);
 

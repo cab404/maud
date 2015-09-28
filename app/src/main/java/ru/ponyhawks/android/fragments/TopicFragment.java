@@ -49,6 +49,7 @@ import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
 import ru.ponyhawks.android.statics.Providers;
+import ru.ponyhawks.android.utils.HideablePartBehavior;
 import ru.ponyhawks.android.utils.Meow;
 import ru.ponyhawks.android.utils.MidnightSync;
 import ru.ponyhawks.android.utils.RequestManager;
@@ -68,7 +69,6 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     private ChumrollAdapter adapter;
     private MidnightSync sync;
     private CommentPart commentPart;
-
 
     private Comment replyingTo = null;
 
@@ -221,9 +221,10 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 if (Build.VERSION.SDK_INT >= 11)
                     list.smoothScrollToPositionFromTop(index, 0, 200);
                 else
-                    list.setSelection(index);
+                    list.smoothScrollToPosition(index);
 
                 updateSpinnerNum();
+                commentPart.setSelectedId(next);
                 adapter.notifyDataSetChanged();
             }
         });
@@ -246,6 +247,13 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         if (updating) return;
         updating = true;
         setUpdating(true);
+        commentPart.setSelectedId(0);
+        list.post(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        });
 
         final RefreshCommentsRequest request = new RefreshCommentsRequest(
                 Type.TOPIC, topicId, commentPart.getLastCommentId()
@@ -339,6 +347,24 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         item.setIcon(spinningWheel);
 
         if (!commentsEnabled) menu.removeItem(R.id.reply);
+
+        list.post(new Runnable() {
+            @Override
+            public void run() {
+
+                final View refreshView = getActivity().findViewById(R.id.refresh);
+                if (refreshView == null)
+                    return;
+                refreshView
+                        .setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View v) {
+                                update(true);
+                                return true;
+                            }
+                        });
+            }
+        });
     }
 
     @Override
@@ -391,6 +417,10 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
     @Override
     public void onReplyInvoked(Comment cm, Context context) {
+        if (commentFragment.getState() == HideablePartBehavior.State.EXPANDED) {
+            commentFragment.collapse();
+            return;
+        }
         if (!commentsEnabled) return;
         replyingTo = cm;
         if (cm == null)

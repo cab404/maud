@@ -50,6 +50,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
     private int baseIndex = 2;
     public static final DisplayImageOptions IMG_CFG = new DisplayImageOptions.Builder().cacheInMemory(true).build();
+    private int selectedId;
 
     public synchronized void register(Comment comment) {
         data.put(comment.id, comment);
@@ -130,7 +131,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         super.convert(view, cm, index, parent);
         ButterKnife.bind(this, view);
 
-        view.setBackgroundColor(cm.is_new ? 0x40000000 : 0);
+        view.setBackgroundColor(selectedId == cm.id ? 0x80000000 : cm.is_new ? 0x40000000 : 0);
 
         final int lv = (int) (view.getContext().getResources().getDisplayMetrics().density * 16);
         view.setOnClickListener(new DoubleClickListener() {
@@ -179,6 +180,10 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
     public int getIndex(int cid, ChumrollAdapter adapter) {
         return adapter.indexOf(data.get(cid));
+    }
+
+    public void setSelectedId(int selectedId) {
+        this.selectedId = selectedId;
     }
 
     public interface CommentPartCallback {

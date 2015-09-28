@@ -191,6 +191,10 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
         text.setText("");
     }
 
+    public HideablePartBehavior.State getState() {
+        return behavior.getState();
+    }
+
     public interface SendCallback {
         void onSend(Editable text);
     }

@@ -299,7 +299,11 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
         return true;
     }
 
-    enum State {
+    public State getState() {
+        return state;
+    }
+
+    public enum State {
         EXPANDED, COLLAPSED, HIDDEN
     }
 
