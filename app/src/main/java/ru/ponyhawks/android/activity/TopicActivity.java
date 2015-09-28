@@ -68,21 +68,6 @@ public class TopicActivity extends BaseActivity {
         ced = (CommentEditFragment) getSupportFragmentManager().findFragmentById(R.id.comment_editor);
         topic.setCommentFragment(ced);
 
-        final Handler handler = new Handler();
-
-        /* Posting on second looper cycle, after measure() */
-        handler.post(new Runnable() {
-            int cycles;
-
-            @Override
-            public void run() {
-                if (cycles++ < 2) {
-                    handler.post(this);
-                    return;
-                }
-                ced.pin();
-            }
-        });
     }
 
     @Override

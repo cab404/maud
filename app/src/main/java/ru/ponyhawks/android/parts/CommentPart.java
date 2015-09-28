@@ -48,10 +48,10 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     Map<Integer, HtmlRipper> savedStates = new HashMap<>();
     private CommentPart.CommentPartCallback callback;
 
-    private int baseIndex;
+    private int baseID;
     public static final DisplayImageOptions IMG_CFG = new DisplayImageOptions.Builder().cacheInMemory(true).build();
 
-    public void register(Comment comment) {
+    public synchronized void register(Comment comment) {
         data.put(comment.id, comment);
     }
 
@@ -72,8 +72,8 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
      * Sets new base index (where the tree starts).
      * Needed for when you add to empty tree by
      */
-    public void setBaseIndex(int index) {
-        baseIndex = index;
+    public void setBaseID(int index) {
+        baseID = index;
     }
 
     int savedOffset = 0;
@@ -177,6 +177,10 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         this.callback = callback;
     }
 
+    public int getIndex(int cid, ChumrollAdapter adapter) {
+        return adapter.indexOf(data.get(cid));
+    }
+
     public interface CommentPartCallback {
         void onFavInvoked(Comment cm, Context context);
 
@@ -196,7 +200,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
             ripper.destroy();
     }
 
-    private final static CommentComparator CC_INST = new CommentComparator();
+    public final static CommentComparator CC_INST = new CommentComparator();
 
     public void clearNew() {
         for (Comment cm : data.values())
@@ -245,7 +249,6 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     public int indexFor(Comment newC, ViewConverter<Comment> converter, ChumrollAdapter adapter) {
         updateIndexes(adapter);
 
-        System.out.println("adding " + newC.id + " parent " + newC.parent);
         List<Comment> nbrs = collectChildren(newC.parent, adapter);
 
         for (Comment cm : nbrs)
@@ -253,7 +256,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
                 return -1;
 
         if (nbrs.size() == 0)
-            return newC.parent == 0 ? baseIndex : (adapter.indexOfId(ids.get(newC.parent)) + 1);
+            return newC.parent == 0 ? adapter.indexOfId(baseID) : (adapter.indexOfId(ids.get(newC.parent)) + 1);
 
         nbrs.add(newC);
         Collections.sort(nbrs, CC_INST);
@@ -318,4 +321,5 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
             }
         });
     }
+
 }

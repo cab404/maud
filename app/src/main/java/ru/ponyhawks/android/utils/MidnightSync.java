@@ -52,8 +52,9 @@ public class MidnightSync extends UniteSyncronization implements ModularBlockPar
 
     @Override
     public void handle(Object object, int key) {
-        if (bindings.containsKey(key))
+        if (bindings.containsKey(key)) {
             post(new InsertObject(bindings.get(key), object));
+        }
     }
 
     public <V> void inject(V object, ViewConverter<V> use) {

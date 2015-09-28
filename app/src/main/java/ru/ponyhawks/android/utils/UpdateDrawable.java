@@ -33,7 +33,7 @@ public class UpdateDrawable extends Drawable {
     final Rect dst = new Rect();
     int num = 0;
 
-    boolean spinning = true;
+    boolean spinning = false;
     float dps = 360 * 2;
     float spin;
     long last = 0;
@@ -94,10 +94,9 @@ public class UpdateDrawable extends Drawable {
         if (num == 0) return;
         canvas.rotate(-spin);
         paint.setColor(spinning ? 0x88ffffff : -1);
-        String nm = num + "";
+        String nm = num + " ";
         paint.getTextBounds(nm, 0, nm.length(), dst);
-        final float spaceWidth = paint.measureText(" ");
-        canvas.drawText(nm, (dst.width() + spaceWidth) / -2, dst.height() / 2, paint);
+        canvas.drawText(nm, dst.width() / -2, dst.height() / 2, paint);
 
     }
 

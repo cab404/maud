@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -33,6 +34,13 @@ import com.cab404.libph.requests.FavRequest;
 import com.cab404.libph.requests.RefreshCommentsRequest;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.parts.CommentPart;
 import ru.ponyhawks.android.parts.CommentNumPart;
@@ -41,6 +49,7 @@ import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
 import ru.ponyhawks.android.statics.Providers;
+import ru.ponyhawks.android.utils.Meow;
 import ru.ponyhawks.android.utils.MidnightSync;
 import ru.ponyhawks.android.utils.RequestManager;
 import ru.ponyhawks.android.utils.UpdateDrawable;
@@ -148,12 +157,16 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                     public void onError(TopicPage what, Exception e) {
                         super.onError(what, e);
                         getActivity().finish();
+                        e.printStackTrace();
                     }
 
                     @Override
                     public void onSuccess(TopicPage what) {
                         final float dp = view.getResources().getDisplayMetrics().density;
                         sync.inject((int) (68 * dp), spacePart);
+                        for (Comment cm : what.comments)
+                            if (cm.is_new)
+                                newCommentsStack.add(cm.id);
                     }
 
                     @Override
@@ -162,6 +175,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                             @Override
                             public void run() {
                                 adapter.removeById(loadingPartId);
+                                updateSpinnerNum();
                             }
                         });
                     }
@@ -175,10 +189,57 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
     volatile boolean updating = false;
 
+    List<Integer> newCommentsStack = new ArrayList<>();
+    Comparator<Integer> levelIDs = new Comparator<Integer>() {
+        @Override
+        public int compare(Integer lhs, Integer rhs) {
+            return commentPart.getIndex(lhs, adapter) - commentPart.getIndex(rhs, adapter);
+        }
+    };
+
+    public void updateSpinnerNum() {
+        Meow.inMain(new Runnable() {
+            @Override
+            public void run() {
+                spinningWheel.setNum(newCommentsStack.size());
+                spinningWheel.setMenuIcon(updateItem, getView());
+            }
+        });
+    }
+
+    public void nextNew() {
+        Meow.inMain(new Runnable() {
+            @Override
+            public void run() {
+                if (newCommentsStack.isEmpty()) return;
+
+                Collections.sort(newCommentsStack, levelIDs);
+
+                int next = newCommentsStack.remove(0);
+                final int index = commentPart.getIndex(next, adapter);
+
+                if (Build.VERSION.SDK_INT >= 11)
+                    list.smoothScrollToPositionFromTop(index, 0, 200);
+                else
+                    list.setSelection(index);
+
+                updateSpinnerNum();
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+    }
+
     public void clearNew() {
-        commentPart.clearNew();
-        spinningWheel.setNum(0);
-        adapter.notifyDataSetChanged();
+        Meow.inMain(new Runnable() {
+            @Override
+            public void run() {
+                commentPart.clearNew();
+                newCommentsStack.clear();
+                updateSpinnerNum();
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void update(final boolean clearNew) {
@@ -193,14 +254,26 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 .manage(request)
                 .setCallback(new RequestManager.SimpleRequestCallback<RefreshCommentsRequest>() {
                     @Override
-                    public void onSuccess(RefreshCommentsRequest what) {
-                        if (clearNew)
-                            commentPart.clearNew();
-                        spinningWheel.setNum(what.comments.size());
-                        for (Comment cm : what.comments) {
-                            sync.inject(cm, commentPart, commentPart);
-                            commentPart.register(cm);
-                        }
+                    public void onSuccess(final RefreshCommentsRequest what) {
+                        Meow.inMain(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (clearNew) {
+                                    clearNew();
+                                }
+                                for (Comment cm : what.comments) {
+                                    sync.inject(cm, commentPart, commentPart);
+                                    commentPart.register(cm);
+                                    if (cm.is_new) newCommentsStack.add(cm.id);
+                                }
+                                sync.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        updateSpinnerNum();
+                                    }
+                                });
+                            }
+                        });
                     }
 
                     @Override
@@ -228,7 +301,10 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         final int id = item.getItemId();
         switch (id) {
             case R.id.refresh:
-                update(true);
+                if (newCommentsStack.isEmpty())
+                    update(true);
+                else
+                    nextNew();
                 return true;
             case R.id.copy_link:
                 final String clip = String.format("http://ponyhawks.ru/blog/%d.html", topicId);
@@ -244,7 +320,8 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
     MenuItem updateItem;
     UpdateDrawable spinningWheel;
-    void setUpdating(boolean updating){
+
+    void setUpdating(boolean updating) {
         spinningWheel.setSpinning(updating);
         if (updating)
             spinningWheel.setMenuIcon(updateItem, getView());
