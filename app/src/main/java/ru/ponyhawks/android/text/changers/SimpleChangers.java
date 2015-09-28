@@ -29,6 +29,6 @@ public final class SimpleChangers {
     public static final TextChanger STRIKETHROUGH =
             new WrapTextChanger(R.drawable.ic_format_strikethrough, "<s>", "</s>");
     public static final TextChanger QUOTE =
-            new WrapTextChanger(R.drawable.ic_format_quote, "<quote>", "</quote>");
+            new WrapTextChanger(R.drawable.ic_format_quote, "<blockquote>", "</blockquote>");
 
 }
