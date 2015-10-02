@@ -33,8 +33,8 @@ import ru.ponyhawks.android.utils.DoubleClickListener;
 import ru.ponyhawks.android.utils.MidnightSync;
 
 /**
- * Well, sorry for no comments here!
- * Still you can send me your question to me@cab404.ru!
+ * Rated Insane.
+ * <p/>
  * <p/>
  * Created at 00:26 on 14/09/15
  *
@@ -46,7 +46,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
     public boolean saveState = true;
     Map<Integer, HtmlRipper> savedStates = new HashMap<>();
-    private CommentPart.CommentPartCallback callback;
+    private CommentPartCallback callback;
 
     private int baseIndex = 2;
     public static final DisplayImageOptions IMG_CFG = new DisplayImageOptions.Builder().cacheInMemory(true).build();
@@ -91,6 +91,12 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
                 resetOffset(view, data);
             }
         }
+    }
+
+    public void offsetToId(AbsListView parent, int id){
+        final int lv = (int) (parent.getContext().getResources().getDisplayMetrics().density * 16);
+        final int level = levelOf(id) * lv;
+        offset(parent, level);
     }
 
     public int getLastCommentId() {
@@ -186,12 +192,20 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         this.selectedId = selectedId;
     }
 
+    public void invalidateCommentText(int id) {
+        if (saveState) {
+            final HtmlRipper state = savedStates.remove(id);
+            if (state != null)
+                state.destroy();
+        }
+    }
+
     public interface CommentPartCallback {
-        void onFavInvoked(Comment cm, Context context);
+        enum Action {
+            EDIT, FAV, REPLY, SHARE
+        }
 
-        void onShareInvoked(Comment cm, Context context);
-
-        void onReplyInvoked(Comment cm, Context context);
+        void onCommentActionInvoked(Action act, Comment cm, Context context);
 
     }
 
@@ -290,6 +304,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
                 .show();
 
         final ImageView fav = (ImageView) controls.findViewById(R.id.fav);
+        final ImageView edit = (ImageView) controls.findViewById(R.id.edit);
         final ImageView reply = (ImageView) controls.findViewById(R.id.reply);
         final ImageView share = (ImageView) controls.findViewById(R.id.copy_link);
 
@@ -299,32 +314,36 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
                         R.drawable.ic_star_outline
         );
 
-        fav.setOnClickListener(new View.OnClickListener() {
+        final View.OnClickListener acl = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (callback != null)
-                    callback.onFavInvoked(cm, v.getContext());
-                dialog.dismiss();
-            }
-        });
+                CommentPartCallback.Action act;
+                switch (v.getId()) {
+                    case R.id.fav:
+                        act = CommentPartCallback.Action.FAV;
+                        break;
+                    case R.id.edit:
+                        act = CommentPartCallback.Action.EDIT;
+                        break;
+                    case R.id.reply:
+                        act = CommentPartCallback.Action.REPLY;
+                        break;
+                    case R.id.copy_link:
+                        act = CommentPartCallback.Action.SHARE;
+                        break;
+                    default:
+                        act = null;
+                }
 
-        reply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
                 if (callback != null)
-                    callback.onReplyInvoked(cm, v.getContext());
+                    callback.onCommentActionInvoked(act, cm, v.getContext());
                 dialog.dismiss();
             }
-        });
-
-        share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (callback != null)
-                    callback.onShareInvoked(cm, v.getContext());
-                dialog.dismiss();
-            }
-        });
+        };
+        fav.setOnClickListener(acl);
+        edit.setOnClickListener(acl);
+        share.setOnClickListener(acl);
+        reply.setOnClickListener(acl);
     }
 
 }

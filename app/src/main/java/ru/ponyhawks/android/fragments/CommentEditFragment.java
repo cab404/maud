@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,6 +28,7 @@ import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.text.changers.ImportImageTextChanger;
+import ru.ponyhawks.android.text.changers.ShrunkFormattingPrism;
 import ru.ponyhawks.android.text.changers.SimpleChangers;
 import ru.ponyhawks.android.text.changers.TextChanger;
 import ru.ponyhawks.android.text.changers.TextPrism;
@@ -59,6 +61,8 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     {
         instruments = new ArrayList<>();
         instruments.add(new ImportImageTextChanger());
+        instruments.add(SimpleChangers.SPOILER);
+        instruments.add(SimpleChangers.LITESPOILER);
         instruments.add(SimpleChangers.QUOTE);
         instruments.add(SimpleChangers.BOLD);
         instruments.add(SimpleChangers.ITALIC);
@@ -73,6 +77,7 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
 
     {
         postprocessors = new ArrayList<>();
+        postprocessors.add(new ShrunkFormattingPrism());
     }
 
     private int selectedInstrument = 0;
@@ -131,60 +136,36 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
 
     boolean collapsed = true;
 
-    @Override
-    public void onHide(View view) {
-        text.clearFocus();
-    }
-
-    @Override
-    public void onExpand(View view) {
-        if (!collapsed) return;
-        if (getView() == null) return;
-        collapsed = false;
-        ((RelativeLayout.LayoutParams) send.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = 0;
-        ((RelativeLayout.LayoutParams) target.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = R.id.send;
-        ((RelativeLayout.LayoutParams) text.getLayoutParams()).getRules()[RelativeLayout.LEFT_OF] = 0;
-
-        text.setVerticalScrollBarEnabled(true);
-        text.setSingleLine(false);
+    private void showKeyboard() {
         text.requestFocus();
-        text.setMaxLines(5);
-
         final InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.showSoftInput(text, 0);
     }
 
-    @Override
-    public void onCollapse(View view) {
-        if (collapsed) return;
-        if (getView() == null) return;
-        collapsed = true;
-        ((RelativeLayout.LayoutParams) send.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = R.id.text;
-        ((RelativeLayout.LayoutParams) target.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = 0;
-        ((RelativeLayout.LayoutParams) text.getLayoutParams()).getRules()[RelativeLayout.LEFT_OF] = R.id.send;
-
+    private void hideKeyboard() {
         text.clearFocus();
-        text.setSingleLine(true);
-        text.setVerticalScrollBarEnabled(false);
-
         final InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(text.getWindowToken(), 0);
     }
 
-    public void focus() {
-        text.requestFocus();
+    private Editable chainAffect(Editable in) {
+        for (TextPrism prism : postprocessors)
+            in = prism.affect(in);
+        return in;
+    }
+
+    private Editable chainPurify(Editable in) {
+        for (TextPrism prism : postprocessors)
+            in = prism.purify(in);
+        return in;
     }
 
     public Editable getText() {
-        return text.getText();
+        return chainPurify(text.getText());
     }
 
     public void setTarget(CharSequence target) {
         this.target.setText(target);
-    }
-
-    public void pin() {
-        behavior.lockOn(commentFrame);
     }
 
     public void clear() {
@@ -193,6 +174,52 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
 
     public HideablePartBehavior.State getState() {
         return behavior.getState();
+    }
+
+    public void setText(CharSequence text) {
+        this.text.setText(chainAffect(new SpannableStringBuilder(text)));
+    }
+
+    @Override
+    public void onStateChange(View view, HideablePartBehavior.State state) {
+        switch (state) {
+
+            case COLLAPSED:
+                if (collapsed) return;
+                if (getView() == null) return;
+                collapsed = true;
+                ((RelativeLayout.LayoutParams) send.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = R.id.text;
+                ((RelativeLayout.LayoutParams) target.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = 0;
+                ((RelativeLayout.LayoutParams) text.getLayoutParams()).getRules()[RelativeLayout.LEFT_OF] = R.id.send;
+
+                text.clearFocus();
+                text.setSingleLine(true);
+                text.setVerticalScrollBarEnabled(false);
+
+            case HIDDEN:
+                hideKeyboard();
+                break;
+
+            case EXPANDED:
+                if (!collapsed) return;
+                if (getView() == null) return;
+                collapsed = false;
+                ((RelativeLayout.LayoutParams) send.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = 0;
+                ((RelativeLayout.LayoutParams) target.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = R.id.send;
+                ((RelativeLayout.LayoutParams) text.getLayoutParams()).getRules()[RelativeLayout.LEFT_OF] = 0;
+
+                text.setVerticalScrollBarEnabled(true);
+                text.setSingleLine(false);
+                text.setMaxLines(5);
+
+                showKeyboard();
+                break;
+        }
+    }
+
+    @Override
+    public void onStateInterpolation(HideablePartBehavior.State start, HideablePartBehavior.State dst, View view, float progress) {
+
     }
 
     public interface SendCallback {
@@ -204,23 +231,17 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     }
 
     public void hide() {
+        hideKeyboard();
         behavior.hide(commentFrame);
     }
 
     public void collapse() {
+        hideKeyboard();
         behavior.collapse(commentFrame);
     }
 
     public void expand() {
         behavior.expand(commentFrame);
-    }
-
-    public void finishTranslations() {
-        behavior.syncImmediate(commentFrame);
-    }
-
-    @Override
-    public void onExpandCollapse(float state) {
     }
 
     @Override
@@ -237,10 +258,7 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     @OnClick(R.id.send)
     public void onSendInvoked() {
         if (sendCallback != null) {
-            Editable text = this.text.getText();
-            for (TextPrism prism : postprocessors)
-                text = prism.purify(text);
-            sendCallback.onSend(text);
+            sendCallback.onSend(getText());
         }
     }
 

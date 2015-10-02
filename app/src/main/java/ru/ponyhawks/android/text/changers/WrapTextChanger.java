@@ -18,11 +18,19 @@ public class WrapTextChanger extends SimpleTextChanger {
     private final int id;
     private final String start;
     private final String end;
+    private final int ss;
+    private final int sf;
 
     public WrapTextChanger(@DrawableRes int id, String start, String end) {
+        this(id, start, end, -1, -1);
+    }
+
+    public WrapTextChanger(@DrawableRes int id, String start, String end, int ss, int sf) {
         this.id = id;
         this.start = start;
         this.end = end;
+        this.ss = ss;
+        this.sf = sf;
     }
 
     @Override
@@ -32,8 +40,14 @@ public class WrapTextChanger extends SimpleTextChanger {
         editable.insert(start < 0 ? 0 : start, this.start);
         text.setText(editable);
 
-        final int newStart = start + this.start.length();
-        final int newEnd = end + this.start.length();
+        int newStart = start + this.start.length();
+        int newEnd = end + this.start.length();
+
+        if (ss >= 0)
+            newStart = start + ss;
+        if (sf >= 0)
+            newEnd = start + sf;
+
         if (newStart == newEnd)
             text.setSelection(newStart);
         else

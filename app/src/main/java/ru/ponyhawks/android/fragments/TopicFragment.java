@@ -4,13 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -30,7 +27,9 @@ import com.cab404.libph.pages.BasePage;
 import com.cab404.libph.pages.MainPage;
 import com.cab404.libph.pages.TopicPage;
 import com.cab404.libph.requests.CommentAddRequest;
+import com.cab404.libph.requests.CommentEditRequest;
 import com.cab404.libph.requests.FavRequest;
+import com.cab404.libph.requests.LSRequest;
 import com.cab404.libph.requests.RefreshCommentsRequest;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
@@ -38,8 +37,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.parts.CommentPart;
@@ -71,6 +68,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     private CommentPart commentPart;
 
     private Comment replyingTo = null;
+    private boolean editing = false;
 
     private boolean commentsEnabled = false;
 
@@ -201,6 +199,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         Meow.inMain(new Runnable() {
             @Override
             public void run() {
+                if (spinningWheel == null) return;
                 spinningWheel.setNum(newCommentsStack.size());
                 spinningWheel.setMenuIcon(updateItem, getView());
             }
@@ -222,6 +221,8 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                     list.smoothScrollToPositionFromTop(index, 0, 200);
                 else
                     list.smoothScrollToPosition(index);
+
+                commentPart.offsetToId(list, next);
 
                 updateSpinnerNum();
                 commentPart.setSelectedId(next);
@@ -320,7 +321,10 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 Toast.makeText(getActivity(), R.string.topic_link_copied, Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.reply:
-                onReplyInvoked(null, getActivity());
+                if (commentFragment.getState() == HideablePartBehavior.State.EXPANDED) {
+                    commentFragment.collapse();
+                } else
+                    reply(null, getActivity());
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -367,8 +371,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         });
     }
 
-    @Override
-    public void onFavInvoked(final Comment cm, final Context context) {
+    public void fav(final Comment cm, final Context context) {
         final boolean target_state = !cm.in_favs;
         final FavRequest request = new FavRequest(Type.COMMENT, cm.id, target_state);
         RequestManager.fromActivity(getActivity())
@@ -408,21 +411,18 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     }
 
 
-    @Override
-    public void onShareInvoked(Comment cm, Context context) {
+    public void share(Comment cm, Context context) {
         final String clip = String.format("http://ponyhawks.ru/blog/%d.html#comment%d", topicId, cm.id);
         setClipboard(clip);
         Toast.makeText(getActivity(), R.string.comment_link_copied, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onReplyInvoked(Comment cm, Context context) {
-        if (commentFragment.getState() == HideablePartBehavior.State.EXPANDED) {
-            commentFragment.collapse();
-            return;
-        }
+    public void reply(Comment cm, Context context) {
         if (!commentsEnabled) return;
+
         replyingTo = cm;
+        editing = false;
+
         if (cm == null)
             commentFragment.setTarget(context.getString(R.string.replying_topic));
         else
@@ -431,7 +431,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     }
 
     @Override
-    public void onSend(Editable text) {
+    public void onSend(final Editable message) {
         final ProgressDialog dialog = new ProgressDialog(getActivity());
         dialog.setCancelable(false);
         dialog.setMessage(getActivity().getString(R.string.sending_messsge));
@@ -439,30 +439,46 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
         int reply = replyingTo == null ? 0 : replyingTo.id;
 
+        LSRequest req;
+        if (editing)
+            req = new CommentEditRequest(reply, message.toString());
+        else
+            req = new CommentAddRequest(Type.BLOG, topicId, reply, message.toString());
+
         RequestManager
                 .fromActivity(getActivity())
-                .manage(new CommentAddRequest(Type.BLOG, topicId, reply, text.toString()))
-                .setCallback(new RequestManager.SimpleRequestCallback<CommentAddRequest>() {
+                .manage(req)
+                .setCallback(new RequestManager.SimpleRequestCallback<LSRequest>() {
                     @Override
-                    public void onSuccess(final CommentAddRequest what) {
+                    public void onSuccess(final LSRequest what) {
                         super.onSuccess(what);
                         sync.post(new Runnable() {
                             @Override
                             public void run() {
                                 if (!TextUtils.isEmpty(what.msg))
                                     Toast.makeText(getActivity(), what.msg, Toast.LENGTH_SHORT).show();
+
                                 if (what.success()) {
+                                    if (editing) {
+                                        replyingTo.text = message.toString();
+                                        commentPart.invalidateCommentText(replyingTo.id);
+                                    }
                                     update(false);
                                     commentFragment.hide();
                                     commentFragment.clear();
-                                    Toast.makeText(getActivity(), "Сообщение отправлено", Toast.LENGTH_SHORT).show();
+
+                                    if (TextUtils.isEmpty(what.msg))
+                                        Toast.makeText(getActivity(), R.string.message_sent, Toast.LENGTH_SHORT).show();
                                 }
+
+                                if (!what.success() && TextUtils.isEmpty(what.msg))
+                                    Toast.makeText(getActivity(), R.string.undefined_error, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
 
                     @Override
-                    public void onError(CommentAddRequest what, final Exception e) {
+                    public void onError(LSRequest what, final Exception e) {
                         super.onError(what, e);
                         sync.post(new Runnable() {
                             @Override
@@ -473,7 +489,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                     }
 
                     @Override
-                    public void onFinish(CommentAddRequest what) {
+                    public void onFinish(LSRequest what) {
                         super.onFinish(what);
                         dialog.dismiss();
                     }
@@ -481,4 +497,34 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 .start();
     }
 
+    @Override
+    public void onCommentActionInvoked(Action act, Comment cm, Context context) {
+        switch (act) {
+            case REPLY:
+                reply(cm, context);
+                break;
+            case SHARE:
+                share(cm, context);
+                break;
+            case EDIT:
+                edit(cm, context);
+                break;
+            case FAV:
+                fav(cm, context);
+                break;
+        }
+    }
+
+    private void edit(Comment cm, Context context) {
+        if (commentFragment.getState() == HideablePartBehavior.State.EXPANDED) {
+            commentFragment.collapse();
+            return;
+        }
+        commentFragment.setText(cm.text);
+        replyingTo = cm;
+        editing = true;
+
+        commentFragment.setTarget(String.format(context.getString(R.string.editing_comment), cm.id, cm.author.login));
+        commentFragment.expand();
+    }
 }

@@ -3,6 +3,7 @@ package ru.ponyhawks.android.utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,6 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -20,6 +22,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.statics.Providers;
@@ -101,7 +105,25 @@ public class ImageChooser {
                             case INPUT_URI:
                                 final EditText text = new EditText(ctx);
                                 text.setHint(R.string.enter_image_url);
-                                text.setInputType(INPUT_URI);
+                                text.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
+
+                                final ClipboardManager cbm =
+                                        (ClipboardManager)
+                                                ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+
+                                @SuppressWarnings("deprecation")
+                                CharSequence clipboard = cbm.getText();
+
+                                if (clipboard != null) {
+                                    try {
+                                        new URL(clipboard.toString());
+                                    } catch (MalformedURLException e) {
+                                        clipboard = "";
+                                    }
+                                }
+
+                                text.setText(clipboard);
+
                                 new AlertDialog.Builder(ctx)
                                         .setView(text)
                                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -163,7 +185,7 @@ public class ImageChooser {
 
     }
 
-    void msg(final String msg){
+    void msg(final String msg) {
         //noinspection ConstantConditions
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
@@ -199,6 +221,7 @@ public class ImageChooser {
 
     public interface StartForResultMethod {
         void startActivityForResult(Intent intent, int code);
+
         void finish();
     }
 

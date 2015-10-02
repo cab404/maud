@@ -57,11 +57,10 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
         @Override
         public void onViewReleased(View view, float xvel, float yvel) {
             super.onViewReleased(view, xvel, yvel);
-            final int height = ((View) view.getParent()).getHeight();
-            int dst;
+
+            int dst = calculateDst(state, view);
             switch (state) {
                 case EXPANDED:
-                    dst = (height - view.getHeight()) / 2;
                     if (lastTop - dst > view.getHeight() - yvel) {
                         calculateOffset = true;
                         collapse(view);
@@ -70,14 +69,12 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
                     expand(view);
                     break;
                 case COLLAPSED:
-                    dst = height - view.getHeight() + collapsedOffset;
                     int delta = lastTop - dst;
                     if (delta > 0)
                         if (delta > view.getHeight() - yvel) {
                             hide(view);
                             break;
                         }
-
                     if (delta < 0)
                         if (-delta > view.getHeight() + yvel) {
                             calculateOffset = true;
@@ -106,7 +103,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
                 if (top <= collapseLimit && top >= expandLimit) {
                     float interpolation = (float) (top - expandLimit) / (collapseLimit - expandLimit);
-                    changeCallback.onExpandCollapse(interpolation);
+                    changeCallback.onStateInterpolation(State.EXPANDED, State.COLLAPSED, changedView, interpolation);
                 }
             }
 
@@ -155,51 +152,32 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void collapse(View view) {
-        calculateOffset = true;
-        if (dragHelper == null)
-            init(((ViewGroup) view.getParent()), view);
-
-        final int dst = calculateDst(State.COLLAPSED, view);
-        if (dragHelper.smoothSlideViewTo(view, view.getLeft(), dst)) {
-            if (!animationStarted)
-                ViewCompat.postOnAnimation(view, new SettleRunnable(view));
-            if (state != State.COLLAPSED && changeCallback != null)
-                changeCallback.onCollapse(view);
-            state = State.COLLAPSED;
-        }
-        view.postInvalidate();
+        move(view, State.COLLAPSED);
     }
 
     public void expand(View view) {
-        calculateOffset = true;
-        if (dragHelper == null)
-            init(((ViewGroup) view.getParent()), view);
-
-        final int dst = calculateDst(State.EXPANDED, view);
-        if (dragHelper.smoothSlideViewTo(view, view.getLeft(), dst)) {
-            if (!animationStarted)
-                ViewCompat.postOnAnimation(view, new SettleRunnable(view));
-            if (state != State.EXPANDED && changeCallback != null)
-                changeCallback.onExpand(view);
-            state = State.EXPANDED;
-        }
-        view.postInvalidate();
+        move(view, State.EXPANDED);
     }
 
     public void hide(View view) {
+        move(view, State.HIDDEN);
+    }
+
+    private void move(View view, State state) {
         calculateOffset = true;
         if (dragHelper == null)
             init(((ViewGroup) view.getParent()), view);
 
-        final int dst = calculateDst(State.HIDDEN, view);
-        if (dragHelper.smoothSlideViewTo(view, 0, dst)) {
+        final int dst = calculateDst(state, view);
+        if (dragHelper.smoothSlideViewTo(view, view.getLeft(), dst)) {
             if (!animationStarted)
                 ViewCompat.postOnAnimation(view, new SettleRunnable(view));
-            if (state != State.HIDDEN && changeCallback != null)
-                changeCallback.onHide(view);
-            state = State.HIDDEN;
+            if (this.state != state && changeCallback != null)
+                changeCallback.onStateChange(view, state);
+            this.state = state;
         }
-        view.postInvalidate();
+
+        ((View) view.getParent()).postInvalidate();
     }
 
     public int calculateDst(State state, View view) {
@@ -222,18 +200,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void sync(View child) {
-        calculateOffset = true;
-        switch (state) {
-            case HIDDEN:
-                hide(child);
-                break;
-            case COLLAPSED:
-                collapse(child);
-                break;
-            case EXPANDED:
-                expand(child);
-                break;
-        }
+        move(child, state);
     }
 
     @Override
@@ -308,13 +275,9 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public interface ChangeCallback {
-        void onHide(View view);
+        void onStateChange(View view, State state);
 
-        void onExpand(View view);
-
-        void onCollapse(View view);
-
-        void onExpandCollapse(float state);
+        void onStateInterpolation(State start, State dst, View view, float progress);
     }
 
     class SettleRunnable implements Runnable {

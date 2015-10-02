@@ -28,6 +28,9 @@
     <string name="comment_link_copied">Ссылка на комментарий скопирована в буфер обмена</string>
     <string name="sending_messsge">Отправка сообщения…</string>
     <string name="replying_comment" formatted="false">Отвечаем на комментарий %d@%s</string>
+    <string name="editing_comment" formatted="false">Редактируем комментарий %d@%s</string>
+    <string name="message_sent">Сообщение отправлено</string>
+    <string name="undefined_error">Неизвестная ошибка</string>
 
     <string-array name="exit">
         <item>Я устал, я ухожу.</item>

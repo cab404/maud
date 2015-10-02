@@ -15,20 +15,25 @@ public final class SimpleChangers {
     }
 
     public static final TextChanger SPAN_LEFT =
-            new WrapTextChanger(R.drawable.ic_format_align_left, "<span align=\"left\">", "</span>");
+            new WrapTextChanger(R.drawable.ic_format_align_left, "<left>", "</left>");
     public static final TextChanger SPAN_RIGHT =
-            new WrapTextChanger(R.drawable.ic_format_align_right, "<span align=\"right\">", "</span>");
+            new WrapTextChanger(R.drawable.ic_format_align_right, "<right>", "</right>");
     public static final TextChanger SPAN_CENTER =
-            new WrapTextChanger(R.drawable.ic_format_align_center, "<span align=\"center\">", "</span>");
+            new WrapTextChanger(R.drawable.ic_format_align_center, "<center>", "</center>");
     public static final TextChanger ITALIC =
             new WrapTextChanger(R.drawable.ic_format_italic, "<i>", "</i>");
     public static final TextChanger BOLD =
-            new WrapTextChanger(R.drawable.ic_format_bold, "<strong>", "</strong>");
+            new WrapTextChanger(R.drawable.ic_format_bold, "<b>", "</b>");
     public static final TextChanger UNDERLINE =
             new WrapTextChanger(R.drawable.ic_format_underline, "<u>", "</u>");
     public static final TextChanger STRIKETHROUGH =
             new WrapTextChanger(R.drawable.ic_format_strikethrough, "<s>", "</s>");
     public static final TextChanger QUOTE =
-            new WrapTextChanger(R.drawable.ic_format_quote, "<blockquote>", "</blockquote>");
+            new WrapTextChanger(R.drawable.ic_format_quote, "<quote>", "</quote>");
+    public static final TextChanger LITESPOILER =
+            new WrapTextChanger(R.drawable.ic_litespoiler, "<ls>", "</ls>");
+    public static final TextChanger SPOILER =
+            new WrapTextChanger(R.drawable.ic_spoiler, "<spoiler>Спойлер<end-title/>", "</spoiler>", 9, 16);
+
 
 }

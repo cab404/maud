@@ -42,6 +42,7 @@ public class TopicListFragment extends RefreshableListFragment {
 
     private MidnightSync sync;
     private TopicPart topicPart;
+    private String url;
 
 
     public static TopicListFragment getInstance(String pageUrl) {
@@ -60,6 +61,7 @@ public class TopicListFragment extends RefreshableListFragment {
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        url = getArguments().getString(KEY_URL);
 
         adapter = new ChumrollAdapter();
         sync = new MidnightSync(adapter);
@@ -118,7 +120,7 @@ public class TopicListFragment extends RefreshableListFragment {
         final MainPage page = new MainPage() {
             @Override
             public String getURL() {
-                return getArguments().getString(KEY_URL);
+                return url;
             }
 
             @Override
