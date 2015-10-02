@@ -18,8 +18,10 @@ public class UpdateCommonInfoTask implements ModularBlockParser.ParsedObjectHand
 
     @Override
     public void handle(Object object, int key) {
-        if (MainPage.BLOCK_COMMON_INFO == key)
+        if (MainPage.BLOCK_COMMON_INFO == key) {
             Providers.UserInfo.getInstance().setInfo(((CommonInfo) object));
+            System.out.println("gotit " + ((CommonInfo) object).new_messages);
+        }
     }
 
 }

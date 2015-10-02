@@ -44,10 +44,15 @@ public class LetterLabelPart extends MoonlitPart<LetterLabel> {
         super.convert(view, data, index, parent);
         ButterKnife.bind(this, view);
         title.setText(data.title);
+
+        view.setBackgroundColor(data.is_new ? 0x40000000 : 0);
+
         commentNum.setText(data.comments + "");
         newComments.setVisibility(data.comments_new > 0 ? View.VISIBLE : View.GONE);
         newComments.setText("+" + data.comments_new);
+
         recipients.setText(TextUtils.join(", ", data.recipients));
+
         date.setText(
                 SimpleDateFormat.getDateInstance(
                         DateFormat.LONG

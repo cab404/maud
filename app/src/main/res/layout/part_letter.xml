@@ -4,23 +4,15 @@
     android:layout_height="wrap_content"
     android:padding="8dp">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Заголовок"
-            android:id="@+id/title" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Заголовок"
+        android:id="@+id/title" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingTop="2dp">
@@ -39,28 +31,12 @@
             android:layout_marginLeft="8dp"
             android:text="author"
             android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="at 21:10"
-            android:id="@+id/date"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_marginLeft="4dp" />
-
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="42+4"
-        android:id="@+id/comment_num"
-        android:textAppearance="?android:textAppearanceSmall" />
 
     <ru.ponyhawks.android.text.StaticWebView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:text="Текст"
         android:id="@+id/text" />
-
 </LinearLayout>

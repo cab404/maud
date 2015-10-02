@@ -39,7 +39,7 @@ public class UserHeaderPart extends MoonlitPart<CommonInfo> {
         Profile profile = new Profile();
         profile.mid_icon = data.avatar;
         profile.fillImages();
-        ImageLoader.getInstance().displayImage(profile.big_icon, avatar);
+        ImageLoader.getInstance().displayImage(profile.big_icon, avatar, CommentPart.AVATARS_CFG);
     }
 
     @Override

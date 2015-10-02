@@ -49,7 +49,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     private CommentPartCallback callback;
 
     private int baseIndex = 2;
-    public static final DisplayImageOptions IMG_CFG = new DisplayImageOptions.Builder().cacheInMemory(true).build();
+    public static final DisplayImageOptions AVATARS_CFG = new DisplayImageOptions.Builder().cacheInMemory(true).build();
     private int selectedId;
 
     public synchronized void register(Comment comment) {
@@ -176,7 +176,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         date.setText(DateUtils.formPreciseDate(cm.date));
 
         if (!cm.author.is_system) {
-            ImageLoader.getInstance().displayImage(cm.author.small_icon, avatar, IMG_CFG);
+            ImageLoader.getInstance().displayImage(cm.author.small_icon, avatar, AVATARS_CFG);
         }
     }
 

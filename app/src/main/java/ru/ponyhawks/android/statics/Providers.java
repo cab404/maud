@@ -174,6 +174,7 @@ public class Providers {
         public synchronized void setInfo(CommonInfo info) {
             if (info == null)
                 return;
+            setChanged();
             this.info = info;
             notifyObservers(info);
         }

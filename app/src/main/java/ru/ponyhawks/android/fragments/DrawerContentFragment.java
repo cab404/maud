@@ -57,14 +57,24 @@ public class DrawerContentFragment extends ListFragment implements Observer {
         super.onAttach(activity);
         if (activity instanceof DrawerClickCallback)
             callback = (DrawerClickCallback) activity;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         Providers.UserInfo.getInstance().addObserver(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Providers.UserInfo.getInstance().deleteObserver(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         callback = null;
-        Providers.UserInfo.getInstance().deleteObserver(this);
     }
 
     @Override
@@ -99,9 +109,14 @@ public class DrawerContentFragment extends ListFragment implements Observer {
     }
 
     @Override
-    public void update(Observable observable, Object data) {
-        if (isAdded())
-            update((CommonInfo) data);
+    public void update(Observable observable, final Object data) {
+        if (getView() != null)
+            getView().post(new Runnable() {
+                @Override
+                public void run() {
+                    update((CommonInfo) data);
+                }
+            });
     }
 
     public interface DrawerClickCallback {

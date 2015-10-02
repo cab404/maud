@@ -16,6 +16,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.text.DateUtils;
 import ru.ponyhawks.android.text.StaticWebView;
 
 /**
@@ -38,6 +39,12 @@ public class TopicPart extends MoonlitPart<Topic> {
     TextView author;
     @Bind(R.id.avatar)
     ImageView avatar;
+    @Bind(R.id.comment_num)
+    TextView comments;
+    @Bind(R.id.date)
+    TextView date;
+
+
     private TopicPartCallback callback;
 
     @Override
@@ -54,6 +61,17 @@ public class TopicPart extends MoonlitPart<Topic> {
                 return true;
             }
         });
+
+        String cc = data.comments > 0 ? data.comments + " " : "";
+        cc += data.comments_new > 0 ? "+" + data.comments_new + " ": "";
+        cc += view.getResources().getQuantityString(
+                R.plurals.comment_num,
+                data.comments_new > 0 ? data.comments_new : data.comments
+        );
+        comments.setVisibility(cc.isEmpty() ? View.GONE : View.VISIBLE);
+        comments.setText(cc);
+
+        date.setText(DateUtils.formPreciseDate(data.date));
 
         author.setText(data.author.login);
         avatar.setImageDrawable(null);

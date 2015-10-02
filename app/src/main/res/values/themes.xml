@@ -44,6 +44,8 @@
     <style name="AppThemeLight.Rariteh">
         <item name="colorPrimary">#5e50a1</item>
         <item name="colorPrimaryDark">#4c4589</item>
+
+        <item name="colorAccent">#4c4589</item>
     </style>
 
     <style name="Theme.AppCompat.Dialog.Alert.NoBG">
