@@ -74,7 +74,7 @@ public class DrawerContentFragment extends ListFragment implements Observer {
     }
 
     void update(CommonInfo info) {
-        if (info == null){
+        if (info == null) {
             return;
         }
         setAdapter(null);

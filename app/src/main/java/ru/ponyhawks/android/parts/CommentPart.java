@@ -93,7 +93,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         }
     }
 
-    public void offsetToId(AbsListView parent, int id){
+    public void offsetToId(AbsListView parent, int id) {
         final int lv = (int) (parent.getContext().getResources().getDisplayMetrics().density * 16);
         final int level = levelOf(id) * lv;
         offset(parent, level);

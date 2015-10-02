@@ -1,15 +1,9 @@
 package ru.ponyhawks.android.statics;
 
 import android.app.Application;
-import android.os.Environment;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
 
 /**
  * Well, sorry for no comments here!

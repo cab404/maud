@@ -12,7 +12,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.widget.EditText;
 import android.widget.Toast;

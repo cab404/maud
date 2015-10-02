@@ -39,8 +39,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import ru.ponyhawks.android.R;
-import ru.ponyhawks.android.parts.CommentPart;
 import ru.ponyhawks.android.parts.CommentNumPart;
+import ru.ponyhawks.android.parts.CommentPart;
 import ru.ponyhawks.android.parts.LoadingPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;

@@ -17,7 +17,7 @@ import com.cab404.chumroll.ViewConverter;
  */
 public class MoonlitPart<A> implements ViewConverter<A> {
 
-    public interface OnDataClickListener<A>{
+    public interface OnDataClickListener<A> {
         void onClick(A data, View view);
     }
 
@@ -32,7 +32,7 @@ public class MoonlitPart<A> implements ViewConverter<A> {
     }
 
     @LayoutRes
-    public int getLayoutId(){
+    public int getLayoutId() {
         return -1;
     }
 

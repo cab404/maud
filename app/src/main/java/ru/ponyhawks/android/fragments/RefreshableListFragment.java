@@ -64,6 +64,7 @@ public class RefreshableListFragment extends ListFragment implements SwipeRefres
     }
 
     @Override
-    public void onRefresh() {}
+    public void onRefresh() {
+    }
 
 }

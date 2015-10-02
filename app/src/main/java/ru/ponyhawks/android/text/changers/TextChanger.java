@@ -1,10 +1,8 @@
 package ru.ponyhawks.android.text.changers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
 import android.widget.EditText;
 
 /**

@@ -53,7 +53,7 @@ public class CommentListFragment extends RefreshableListFragment {
         adapter = new ChumrollAdapter();
         sync = new MidnightSync(adapter);
 
-        MainPage comments = new MainPage(){
+        MainPage comments = new MainPage() {
 
             @Override
             public String getURL() {

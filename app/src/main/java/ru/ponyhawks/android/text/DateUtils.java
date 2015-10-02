@@ -18,7 +18,7 @@ public class DateUtils {
 
 //    private final static
 
-    public static String formPreciseDate(Calendar date){
+    public static String formPreciseDate(Calendar date) {
         if (date == null) return "BAD-WOLF";
         Date current = Calendar.getInstance().getTime();
         Date time = date.getTime();

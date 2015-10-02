@@ -12,5 +12,6 @@ import android.text.Editable;
  */
 public interface TextPrism {
     Editable affect(Editable input);
+
     Editable purify(Editable input);
 }

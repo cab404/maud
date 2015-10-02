@@ -6,12 +6,9 @@ import android.text.SpannableStringBuilder;
 import com.cab404.moonlight.parser.HTMLTree;
 import com.cab404.moonlight.parser.Tag;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Well, sorry for no comments here!
@@ -64,7 +61,7 @@ public class ShrunkFormattingPrism implements TextPrism {
                     tag.name = "ls";
 
                 final String align = tag.get("align");
-                if (ALIGNS.contains(align)){
+                if (ALIGNS.contains(align)) {
                     Tag closing = tree.get(tree.getClosingTag(tag));
                     tag.name = align;
                     tag.props.clear();

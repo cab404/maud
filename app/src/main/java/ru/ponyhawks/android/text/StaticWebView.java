@@ -62,4 +62,5 @@ public class StaticWebView extends LinearLayout {
         boundRipper.destroy();
         super.finalize();
     }
+
 }

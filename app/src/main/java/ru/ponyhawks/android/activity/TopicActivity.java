@@ -4,27 +4,15 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.SwipeDismissBehavior;
-import android.support.v4.view.WindowCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.FrameLayout;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.CommentEditFragment;
 import ru.ponyhawks.android.fragments.TopicFragment;
-import ru.ponyhawks.android.utils.HideablePartBehavior;
-import ru.ponyhawks.android.utils.ImageChooser;
 
 public class TopicActivity extends BaseActivity {
 

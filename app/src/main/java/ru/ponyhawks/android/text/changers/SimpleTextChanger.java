@@ -3,7 +3,6 @@ package ru.ponyhawks.android.text.changers;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
 import android.widget.EditText;
 
 /**
@@ -24,7 +23,8 @@ public abstract class SimpleTextChanger implements TextChanger {
     public abstract void change(int start, int end, EditText editable);
 
     @Override
-    public void onConfigure(Context ctx) {}
+    public void onConfigure(Context ctx) {
+    }
 
     @Override
     public boolean configurable() {
@@ -32,5 +32,6 @@ public abstract class SimpleTextChanger implements TextChanger {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {}
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    }
 }

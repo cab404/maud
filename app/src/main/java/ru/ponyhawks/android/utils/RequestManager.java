@@ -164,13 +164,13 @@ public class RequestManager {
         }
     }
 
-    public class PageRequestBuilder<Cls extends Page> extends RequestBuilder<Cls>{
+    public class PageRequestBuilder<Cls extends Page> extends RequestBuilder<Cls> {
 
         public PageRequestBuilder(Cls request) {
             super(request);
         }
 
-        public PageRequestBuilder<Cls> setHandlers(ModularBlockParser.ParsedObjectHandler... handlers){
+        public PageRequestBuilder<Cls> setHandlers(ModularBlockParser.ParsedObjectHandler... handlers) {
             if (handlers.length == 1)
                 request.setHandler(handlers[0]);
             else

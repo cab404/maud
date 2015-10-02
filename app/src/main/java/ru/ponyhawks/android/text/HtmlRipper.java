@@ -1,6 +1,5 @@
 package ru.ponyhawks.android.text;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,22 +7,27 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.view.WindowCompat;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.text.style.*;
+import android.text.style.AlignmentSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StrikethroughSpan;
+import android.text.style.StyleSpan;
+import android.text.style.URLSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -37,7 +41,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.text.spans.BaselineJumpSpan;
@@ -529,7 +535,7 @@ public class HtmlRipper {
     }
 
     private TextView form(String text, Context context) {
-        TextView view = new TextView(context);
+        TextView view = new SpanIgnoringTextView(context);
         view.setTextAppearance(
                 context,
                 context
@@ -786,4 +792,18 @@ public class HtmlRipper {
     }
 
 
+    private static class SpanIgnoringTextView extends TextView {
+
+        public SpanIgnoringTextView(Context context) {
+            super(context);
+        }
+
+        @Override
+        public boolean onTouchEvent(@NonNull MotionEvent event) {
+            final boolean b = super.onTouchEvent(event);
+            if (Build.VERSION.SDK_INT >= 11 && isTextSelectable())
+                return b;
+            return getSelectionStart() != -1 && b;
+        }
+    }
 }

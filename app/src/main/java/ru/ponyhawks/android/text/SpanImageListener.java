@@ -1,14 +1,12 @@
 package ru.ponyhawks.android.text;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.view.View;
 import android.widget.TextView;
 
-import com.cab404.moonlight.parser.Tag;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 

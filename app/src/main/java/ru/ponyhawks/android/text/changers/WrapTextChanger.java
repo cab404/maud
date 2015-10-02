@@ -2,7 +2,6 @@ package ru.ponyhawks.android.text.changers;
 
 import android.support.annotation.DrawableRes;
 import android.text.Editable;
-import android.text.Selection;
 import android.widget.EditText;
 
 /**

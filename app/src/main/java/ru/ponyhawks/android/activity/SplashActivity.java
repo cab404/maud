@@ -3,20 +3,17 @@ package ru.ponyhawks.android.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.FragmentTransaction;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.TextView;
 
 import com.cab404.libph.pages.BasePage;
 import com.cab404.libph.requests.LSRequest;
 import com.cab404.libph.requests.LoginRequest;
-import com.cab404.libph.util.PonyhawksProfile;
 import com.cab404.moonlight.framework.Request;
-
-import java.util.concurrent.Semaphore;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

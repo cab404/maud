@@ -1,6 +1,5 @@
 package ru.ponyhawks.android.parts;
 
-import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import com.cab404.libph.data.LetterLabel;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

@@ -10,23 +10,24 @@ import android.view.View;
  */
 
 public abstract class DoubleClickableSpan extends ClickableSpan {
-	/**
-	 * Максимальная задержка двойного тапа.
-	 */
-	public int delay = 1000;
-	private long last_click;
+    /**
+     * Максимальная задержка двойного тапа.
+     */
+    public int delay = 1000;
+    private long last_click;
 
-	@Override public final void onClick(View widget) {
-		if (last_click == 0) last_click = System.currentTimeMillis();
-		else {
-			if (System.currentTimeMillis() - last_click < delay) {
-				onDoubleClick(widget);
-			}
-			last_click = 0;
-		}
-	}
+    @Override
+    public final void onClick(View widget) {
+        if (last_click == 0) last_click = System.currentTimeMillis();
+        else {
+            if (System.currentTimeMillis() - last_click < delay) {
+                onDoubleClick(widget);
+            }
+            last_click = 0;
+        }
+    }
 
-	public abstract void onDoubleClick(View widget);
+    public abstract void onDoubleClick(View widget);
 
 
 }

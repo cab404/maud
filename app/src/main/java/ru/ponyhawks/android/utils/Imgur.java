@@ -2,6 +2,7 @@ package ru.ponyhawks.android.utils;
 
 import com.cab404.moonlight.framework.AccessProfile;
 import com.cab404.moonlight.framework.ShortRequest;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -10,7 +11,10 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  * Simple imgur uploader

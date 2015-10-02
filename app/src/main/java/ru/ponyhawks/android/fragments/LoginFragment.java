@@ -19,7 +19,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.statics.Providers;
-import ru.ponyhawks.android.utils.RequestManager;
 
 /**
  * Login

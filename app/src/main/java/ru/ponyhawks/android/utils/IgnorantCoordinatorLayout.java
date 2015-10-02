@@ -3,10 +3,8 @@ package ru.ponyhawks.android.utils;
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
-import android.view.View;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Well, sorry for no comments here!

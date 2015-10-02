@@ -1,17 +1,11 @@
 package ru.ponyhawks.android.utils;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.chumroll.ViewConverter;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Binds Moonlight and Chumroll in a fast way
@@ -115,7 +109,7 @@ public class MidnightSync extends UniteSyncronization implements ModularBlockPar
 
     @Override
     protected void onCycleFinish() {
-            if (invalidate)
-                target.notifyDataSetChanged();
+        if (invalidate)
+            target.notifyDataSetChanged();
     }
 }
