@@ -29,6 +29,7 @@ public class UpdateDrawable extends Drawable {
     final Bitmap upd;
     final Rect size;
     final Rect dst = new Rect();
+    private final Context context;
     int num = 0;
 
     boolean spinning = false;
@@ -40,13 +41,15 @@ public class UpdateDrawable extends Drawable {
 
     @SuppressWarnings("ConstantConditions")
     public UpdateDrawable(Context context) {
+        this.context = context;
+        final float dp = context.getResources().getDisplayMetrics().density;
+        padding = (int) (8 * dp);
+        paint.setTextSize(8 * dp);
+        paint.setTypeface(Typeface.MONOSPACE);
+
         upd = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_refresh);
         size = new Rect(0, 0, upd.getWidth(), upd.getHeight());
 
-        final float dp = context.getResources().getDisplayMetrics().density;
-        padding = (int) (6 * dp);
-        paint.setTextSize(8 * dp);
-        paint.setTypeface(Typeface.MONOSPACE);
     }
 
     public void setSpinning(boolean spinning) {
@@ -83,12 +86,13 @@ public class UpdateDrawable extends Drawable {
         canvas.rotate(spin);
 
         paint.setColor(num == 0 || spinning ? -1 : 0x66ffffff);
-        dst.set(size);
+        final int side = Math.min(canvas.getWidth(), canvas.getHeight());
+
+        dst.set(0, 0, side, side);
         dst.right -= padding * 2;
         dst.bottom -= padding * 2;
         dst.offset(dst.width() / -2, dst.height() / -2);
         canvas.drawBitmap(upd, size, dst, paint);
-
 
         if (num == 0) return;
         canvas.rotate(-spin);
