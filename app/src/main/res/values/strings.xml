@@ -1,54 +1,66 @@
 <resources>
 
-    <string name="navigation_drawer_open">Открыть боковое меню</string>
-    <string name="navigation_drawer_close">Закрыть боковое меню</string>
+    <string name="navigation_drawer_open">Open drawer</string>
+    <string name="navigation_drawer_close">Close drawer</string>
 
     <string name="app_name">Ponyhawks</string>
-    <string name="favorites">Избранное</string>
-    <string name="refresh">Обновить</string>
-    <string name="write_reply">Написать комментарий</string>
-    <string name="copy_link">Копировать ссылку</string>
-    <string name="add_to_favourites">Добавить в избранное</string>
-    <string name="app">Приложение</string>
-    <string name="theme">Тема</string>
-    <string name="save_comments_state">Сохранять состояние комментариев</string>
-    <string name="select_text">Выделение текста</string>
-    <string name="load_videos">Загружать видео</string>
-    <string name="load_images">Загружать изображения</string>
-    <string name="content">Данные</string>
-    <string name="remove_actionbar_shadow">Убрать тень под заголовком</string>
-    <string name="open_topics_in_separate_windows">Открывать посты в отдельных вкладках</string>
-    <string name="uploading_image">Загрузка на Imgur…</string>
-    <string name="page_loading_failed">Не удалось загрузить страницу\n</string>
-    <string name="logout_promt">Выйти из аккаунта?</string>
-    <string name="not_now">Не сейчас</string>
-    <string name="enter_image_url">Введите url картинки</string>
-    <string name="replying_topic">Отвечаем в топик</string>
-    <string name="topic_link_copied">Ссылка на пост скопирована в буфер обмена</string>
-    <string name="comment_link_copied">Ссылка на комментарий скопирована в буфер обмена</string>
-    <string name="sending_messsge">Отправка сообщения…</string>
-    <string name="replying_comment" formatted="false">Отвечаем на комментарий %d@%s</string>
-    <string name="editing_comment" formatted="false">Редактируем комментарий %d@%s</string>
-    <string name="message_sent">Сообщение отправлено</string>
-    <string name="undefined_error">Неизвестная ошибка</string>
+    <string name="favourites">Favourites</string>
+    <string name="refresh">Refresh</string>
+    <string name="write_reply">Reply</string>
+    <string name="copy_link">Copy link</string>
+    <string name="add_to_favourites">Add to favourites</string>
+    <string name="app">App</string>
+    <string name="theme">Theme</string>
+    <string name="save_comments_state">Save comment states</string>
+    <string name="select_text">Selectable text</string>
+    <string name="load_videos">Display videos</string>
+    <string name="load_images">Load images</string>
+    <string name="content">Content</string>
+    <string name="remove_actionbar_shadow">Remove actionbar shadow</string>
+    <string name="open_topics_in_separate_windows">Open topics in separate windows</string>
+    <string name="uploading_image">Uploading to Imgur…</string>
+    <string name="page_loading_failed">Failed to load page\n</string>
+    <string name="logout_promt">Log out?</string>
+    <string name="not_now">Not now</string>
+    <string name="enter_image_url">Enter image url</string>
+    <string name="replying_topic">Replying to topic</string>
+    <string name="topic_link_copied">Topic link copied to clipboads</string>
+    <string name="comment_link_copied">Comment link copied to clipboads</string>
+    <string name="sending_messsge">Sending…</string>
+    <string name="replying_comment" formatted="false">Replying to %d@%s</string>
+    <string name="editing_comment" formatted="false">Editing %d@%s</string>
+    <string name="message_sent">Message sent successfully</string>
+    <string name="undefined_error">Unknown error happened</string>
+    <string name="main_page_label">Main</string>
+    <string name="messages_label">Messages</string>
+    <string name="publications_label">Publications</string>
+    <string name="settings_label">Settings</string>
+    <string name="logout_label">Log out</string>
 
     <string-array name="exit">
-        <item>Я устал, я ухожу.</item>
-        <item>Beam me up, Scotty!</item>
-        <item>Хоуки уже не торт.</item>
-        <item>Да</item>
-        <item>Я хочу сойти</item>
-        <item>Выпустите</item>
-        <item>Пожалуйста</item>
+        <item>Yes</item>
+    </string-array>
+
+    <string-array name="image_chooser_entries">
+        <item>Take a photo</item>
+        <item>Choose from existing</item>
+        <item>Enter image link</item>
+    </string-array>
+
+    <string-array name="theme_names">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Green</item>
+        <item>Marshmallow</item>
     </string-array>
 
     <plurals name="comment_num">
-        <item quantity="zero">комментариев</item>
-        <item quantity="one">комментарий</item>
-        <item quantity="two">комментария</item>
-        <item quantity="few">комментария</item>
-        <item quantity="many">комментариев</item>
-        <item quantity="other">комментариев</item>
+        <item quantity="zero">comments</item>
+        <item quantity="one">comment</item>
+        <item quantity="two">comments</item>
+        <item quantity="few">comments</item>
+        <item quantity="many">comments</item>
+        <item quantity="other">comments</item>
     </plurals>
 
 </resources>

@@ -2,14 +2,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <declare-styleable name="AppTheme">
+        <attr name="inverse_bg_color" format="color" />
+        <attr name="new_background" format="reference" />
+        <attr name="settings_theme" format="reference" />
         <attr name="main_background_color" format="color" />
         <attr name="main_foreground_color" format="color" />
-        <attr name="inverse_bg_color" format="color" />
-        <attr name="inverse_action_bar_color" format="color" />
-        <attr name="new_background" format="reference" />
         <attr name="rounded_background" format="reference" />
-        <attr name="settings_theme" format="reference" />
+        <attr name="inverse_action_bar_color" format="color" />
         <attr name="alert_dialog_nobg_theme" format="reference" />
+        <attr name="best_pony" format="reference" />
     </declare-styleable>
 
     <style name="AppThemeDark" parent="Theme.AppCompat">
@@ -22,6 +23,7 @@
         <item name="rounded_background">@drawable/rounded_background_dark</item>
         <item name="settings_theme">@style/SettingsThemeDark</item>
         <item name="alert_dialog_nobg_theme">@style/Theme.AppCompat.Dialog.Alert.NoBG</item>
+        <item name="best_pony">@drawable/anim_luna</item>
     </style>
 
     <style name="AppThemeLight" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -34,6 +36,7 @@
         <item name="rounded_background">@drawable/rounded_background_light</item>
         <item name="settings_theme">@style/SettingsThemeLight</item>
         <item name="alert_dialog_nobg_theme">@style/Theme.AppCompat.Light.Dialog.Alert.NoBG</item>
+        <item name="best_pony">@drawable/anim_luna</item>
     </style>
 
     <style name="AppThemeDark.Green">
@@ -44,7 +47,7 @@
     <style name="AppThemeLight.Rariteh">
         <item name="colorPrimary">#5e50a1</item>
         <item name="colorPrimaryDark">#4c4589</item>
-
+        <item name="best_pony">@drawable/anim_rarity</item>
         <item name="colorAccent">#4c4589</item>
     </style>
 
@@ -72,13 +75,6 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
     </style>
-
-    <string-array name="theme_names">
-        <item>Светлая</item>
-        <item>Тёмная</item>
-        <item>Зелёная</item>
-        <item>Зефирка</item>
-    </string-array>
 
     <string-array name="theme_values">
         <item>AppThemeLight</item>

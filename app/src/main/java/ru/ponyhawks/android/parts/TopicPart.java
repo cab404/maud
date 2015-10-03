@@ -64,11 +64,14 @@ public class TopicPart extends MoonlitPart<Topic> {
 
         String cc = data.comments > 0 ? data.comments + " " : "";
         cc += data.comments_new > 0 ? "+" + data.comments_new + " ": "";
+
+        comments.setVisibility(cc.isEmpty() ? View.GONE : View.VISIBLE);
+
         cc += view.getResources().getQuantityString(
                 R.plurals.comment_num,
                 data.comments_new > 0 ? data.comments_new : data.comments
         );
-        comments.setVisibility(cc.isEmpty() ? View.GONE : View.VISIBLE);
+
         comments.setText(cc);
 
         date.setText(DateUtils.formPreciseDate(data.date));

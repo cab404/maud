@@ -1,0 +1,74 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="navigation_drawer_open">Открыть боковое меню</string>
+    <string name="navigation_drawer_close">Закрыть боковое меню</string>
+
+    <string name="app_name">Ponyhawks</string>
+    <string name="favourites">Избранное</string>
+    <string name="refresh">Обновить</string>
+    <string name="write_reply">Написать комментарий</string>
+    <string name="copy_link">Копировать ссылку</string>
+    <string name="add_to_favourites">Добавить в избранное</string>
+    <string name="app">Приложение</string>
+    <string name="theme">Тема</string>
+    <string name="save_comments_state">Сохранять состояние комментариев</string>
+    <string name="select_text">Выделение текста</string>
+    <string name="load_videos">Загружать видео</string>
+    <string name="load_images">Загружать изображения</string>
+    <string name="content">Данные</string>
+    <string name="remove_actionbar_shadow">Убрать тень под заголовком</string>
+    <string name="open_topics_in_separate_windows">Открывать посты в отдельных вкладках</string>
+    <string name="uploading_image">Загрузка на Imgur…</string>
+    <string name="page_loading_failed">Не удалось загрузить страницу\n</string>
+    <string name="logout_promt">Выйти из аккаунта?</string>
+    <string name="not_now">Не сейчас</string>
+    <string name="enter_image_url">Введите url картинки</string>
+    <string name="replying_topic">Отвечаем в топик</string>
+    <string name="topic_link_copied">Ссылка на пост скопирована в буфер обмена</string>
+    <string name="comment_link_copied">Ссылка на комментарий скопирована в буфер обмена</string>
+    <string name="sending_messsge">Отправка сообщения…</string>
+    <string name="replying_comment" formatted="false">Отвечаем на комментарий %d@%s</string>
+    <string name="editing_comment" formatted="false">Редактируем комментарий %d@%s</string>
+    <string name="message_sent">Сообщение отправлено</string>
+    <string name="undefined_error">Неизвестная ошибка</string>
+
+    <string name="main_page_label">Главная</string>
+    <string name="messages_label">Сообщения</string>
+    <string name="publications_label">Публикации</string>
+    <string name="settings_label">Настройки</string>
+    <string name="logout_label">Выход</string>
+
+    <string-array name="exit">
+        <item>Я устал, я ухожу.</item>
+        <item>Beam me up, Scotty!</item>
+        <item>Хоуки уже не торт.</item>
+        <item>Да</item>
+        <item>Я хочу сойти</item>
+        <item>Выпустите</item>
+        <item>Пожалуйста</item>
+    </string-array>
+
+    <plurals name="comment_num" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">комментариев</item>
+        <item quantity="one">комментарий</item>
+        <item quantity="two">комментария</item>
+        <item quantity="few">комментария</item>
+        <item quantity="many">комментариев</item>
+        <item quantity="other">комментариев</item>
+    </plurals>
+
+
+    <string-array name="theme_names">
+        <item>Светлая</item>
+        <item>Тёмная</item>
+        <item>Зелёная</item>
+        <item>Зефирка</item>
+    </string-array>
+
+    <string-array name="image_chooser_entries">
+        <item>Сфотографировать</item>
+        <item>Выбрать из галереи</item>
+        <item>Ввести ссылку</item>
+    </string-array>
+
+</resources>

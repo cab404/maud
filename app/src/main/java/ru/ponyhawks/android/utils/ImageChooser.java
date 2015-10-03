@@ -39,7 +39,7 @@ public class ImageChooser {
 
     ImageUrlHandler handler;
 
-    private final static String[] ITEMS = new String[]{
+    private String[] ITEMS = new String[]{
             "Сфотографировать",
             "Выбрать из галереи",
             "Ввести ссылку",
@@ -58,6 +58,7 @@ public class ImageChooser {
         this.act = sfrm;
         this.ctx = ctx;
         this.handler = handler;
+        ITEMS = ctx.getResources().getStringArray(R.array.image_chooser_entries);
     }
 
     File subtarget;

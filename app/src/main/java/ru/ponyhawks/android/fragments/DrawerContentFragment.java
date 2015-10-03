@@ -92,12 +92,12 @@ public class DrawerContentFragment extends ListFragment implements Observer {
 
         adapter.add(UserHeaderPart.class, info);
         List<DrawerEntryPart.Data> points = new ArrayList<>();
-        points.add(new DrawerEntryPart.Data("Главная", ID_MAIN));
-        points.add(new DrawerEntryPart.Data("Сообщения", ID_MESSAGES, info.new_messages));
-        points.add(new DrawerEntryPart.Data("Публикации", ID_PUBLICATIONS));
-        points.add(new DrawerEntryPart.Data("Избранное", ID_FAVOURITES));
-        points.add(new DrawerEntryPart.Data("Настройки", ID_SETTINGS));
-        points.add(new DrawerEntryPart.Data("Выход", ID_EXIT));
+        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.main_page_label), ID_MAIN));
+        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.messages_label), ID_MESSAGES, info.new_messages));
+        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.publications_label), ID_PUBLICATIONS));
+        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.favourites), ID_FAVOURITES));
+        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.settings_label), ID_SETTINGS));
+        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.logout_label), ID_EXIT));
         adapter.addAll(DrawerEntryPart.class, points);
 
         setAdapter(adapter);
