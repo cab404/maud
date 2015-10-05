@@ -14,7 +14,7 @@ import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.CommentEditFragment;
 import ru.ponyhawks.android.fragments.LetterFragment;
 
-public class LetterActivity extends BaseActivity {
+public class LetterActivity extends LoginDependentActivity {
 
     public static final String KEY_LETTER_ID = "letterId";
 

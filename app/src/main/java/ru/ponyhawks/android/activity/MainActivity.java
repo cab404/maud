@@ -20,7 +20,7 @@ import ru.ponyhawks.android.fragments.TopicListFragment;
 import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.Meow;
 
-public class MainActivity extends BaseActivity implements DrawerContentFragment.DrawerClickCallback {
+public class MainActivity extends LoginDependentActivity implements DrawerContentFragment.DrawerClickCallback {
 
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;

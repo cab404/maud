@@ -14,7 +14,7 @@ import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.CommentEditFragment;
 import ru.ponyhawks.android.fragments.TopicFragment;
 
-public class TopicActivity extends BaseActivity {
+public class TopicActivity extends LoginDependentActivity {
 
     public static final String KEY_TOPIC_ID = "topicId";
 
@@ -65,7 +65,10 @@ public class TopicActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        backToMain();
+        if (ced.isExpanded())
+            ced.collapse();
+        else
+            backToMain();
     }
 
     @Override

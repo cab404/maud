@@ -25,6 +25,31 @@ import ru.ponyhawks.android.utils.RequestManager;
 
 public class SplashActivity extends BaseActivity implements LoginFragment.LoginCallback {
 
+    public static final String HAWK = "             :+?7   77?:  \n" +
+            "           I     ?    ? 7~\n" +
+            "          =     7?    , 7?\n" +
+            "         =         7?I  77\n" +
+            "         I               I\n" +
+            "        +777+7777777=   I \n" +
+            "       : 7 :I     7+      \n" +
+            "       =777 777777 ?      \n" +
+            "       777~~77777777      \n" +
+            "      ,777,+77777777,     \n" +
+            "      =  ? 77?777777      \n" +
+            "      ?7 :~,   777 =      \n" +
+            "      I   ,  :77777,      \n" +
+            "       7+ +? ?7777:       \n" +
+            "     , 7~ 7= 7777?        \n" +
+            "     ~ 7 ?7 +777+         \n" +
+            "     + =~ :,77 :          \n" +
+            "     ? :+7 +77=           \n" +
+            "    ,7?:7,:7I             \n" +
+            "    :7~+? +I              \n" +
+            "    I?,? ,                \n" +
+            "   =? +                   \n" +
+            "   I,,:                   \n" +
+            "  +                       \n" +
+            " ,,                       \n";
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Bind(R.id.status)
@@ -36,31 +61,7 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
 
-        msg("             :+?7   77?:  \n" +
-                "           I     ?    ? 7~\n" +
-                "          =     7?    , 7?\n" +
-                "         =         7?I  77\n" +
-                "         I               I\n" +
-                "        +777+7777777=   I \n" +
-                "       : 7 :I     7+      \n" +
-                "       =777 777777 ?      \n" +
-                "       777~~77777777      \n" +
-                "      ,777,+77777777,     \n" +
-                "      =  ? 77?777777      \n" +
-                "      ?7 :~,   777 =      \n" +
-                "      I   ,  :77777,      \n" +
-                "       7+ +? ?7777:       \n" +
-                "     , 7~ 7= 7777?        \n" +
-                "     ~ 7 ?7 +777+         \n" +
-                "     + =~ :,77 :          \n" +
-                "     ? :+7 +77=           \n" +
-                "    ,7?:7,:7I             \n" +
-                "    :7~+? +I              \n" +
-                "    I?,? ,                \n" +
-                "   =? +                   \n" +
-                "   I,,:                   \n" +
-                "  +                       \n" +
-                " ,,                       \n");
+        msg(HAWK);
 
         try {
             msg("phclient v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
@@ -199,10 +200,16 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
     void onSuccess() {
         preFlightCheck();
         msg("everything is ready to go");
+        if (getIntent().hasExtra("returnTo"))
+            msg("returning back to caller");
+
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                Intent returnTo = new Intent(SplashActivity.this, MainActivity.class);
+                if (getIntent().getParcelableExtra("returnTo") != null)
+                    returnTo = getIntent().getParcelableExtra("returnTo");
+                startActivity(returnTo);
                 finish();
             }
         }, 1500);
