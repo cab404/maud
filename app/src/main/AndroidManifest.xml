@@ -5,8 +5,9 @@
     tools:ignore="UnusedAttribute">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".statics.App"
@@ -48,12 +49,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.ponyhawks.android.activity.MainActivity" />
-            <intent-filter>
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <action android:name="android.intent.action.VIEW" />
-                <data android:scheme="http" android:host="ponyhawks.ru" android:pathPrefix="/blog" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -63,12 +58,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.ponyhawks.android.activity.MainActivity" />
-            <intent-filter>
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <action android:name="android.intent.action.VIEW" />
-                <data android:scheme="http" android:host="ponyhawks.ru" android:pathPrefix="/talk" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -79,6 +68,24 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".activity.ResolverActivity">
+
+            <intent-filter>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="http" android:host="ponyhawks.ru" android:pathPrefix="/talk" />
+            </intent-filter>
+
+            <intent-filter>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="http" android:host="ponyhawks.ru" android:pathPrefix="/blog" />
+            </intent-filter>
+
         </activity>
 
         <meta-data

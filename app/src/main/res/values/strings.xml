@@ -54,6 +54,11 @@
         <item>Marshmallow</item>
     </string-array>
 
+    <string-array name="pub_pager_titles">
+        <item>Topics</item>
+        <item>Comments</item>
+    </string-array>
+
     <plurals name="comment_num">
         <item quantity="zero">comments</item>
         <item quantity="one">comment</item>

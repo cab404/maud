@@ -136,6 +136,12 @@ public class LetterFragment extends ListFragment implements CommentEditFragment.
                                 switch (key) {
                                     case BasePage.BLOCK_LETTER_HEADER:
                                         letter = (Letter) object;
+                                        view.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                getActivity().setTitle(((Letter) object).title);
+                                            }
+                                        });
                                         getActivity().supportInvalidateOptionsMenu();
                                         break;
                                     case MainPage.BLOCK_COMMON_INFO:
@@ -316,7 +322,7 @@ public class LetterFragment extends ListFragment implements CommentEditFragment.
                     nextNew();
                 return true;
             case R.id.copy_link:
-                final String clip = String.format("http://ponyhawks.ru/blog/%d.html", letterId);
+                final String clip = String.format("http://ponyhawks.ru/talk/%d.html", letterId);
                 setClipboard(clip);
                 Toast.makeText(getActivity(), R.string.topic_link_copied, Toast.LENGTH_SHORT).show();
                 return true;
@@ -410,7 +416,7 @@ public class LetterFragment extends ListFragment implements CommentEditFragment.
 
 
     public void share(Comment cm, Context context) {
-        final String clip = String.format("http://ponyhawks.ru/blog/%d.html#comment%d", letterId, cm.id);
+        final String clip = String.format("http://ponyhawks.ru/talk/%d.html#comment%d", letterId, cm.id);
         setClipboard(clip);
         Toast.makeText(getActivity(), R.string.comment_link_copied, Toast.LENGTH_SHORT).show();
     }
@@ -505,6 +511,9 @@ public class LetterFragment extends ListFragment implements CommentEditFragment.
             case FAV:
                 fav(cm, context);
                 break;
+            case EDIT:
+                edit(cm, context);
+                break;
         }
     }
 
@@ -519,5 +528,10 @@ public class LetterFragment extends ListFragment implements CommentEditFragment.
 
         commentFragment.setTarget(String.format(context.getString(R.string.editing_comment), cm.id, cm.author.login));
         commentFragment.expand();
+    }
+
+    public void moveToComment(int value) {
+        commentPart.setSelectedId(value);
+        list.setSelection(commentPart.getIndex(value, adapter));
     }
 }

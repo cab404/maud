@@ -14,8 +14,10 @@ import com.cab404.libph.data.CommonInfo;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.DrawerContentFragment;
+import ru.ponyhawks.android.fragments.FavouritesFragment;
 import ru.ponyhawks.android.fragments.LetterListFragment;
 import ru.ponyhawks.android.fragments.LoginFragment;
+import ru.ponyhawks.android.fragments.PublicationsFragment;
 import ru.ponyhawks.android.fragments.TopicListFragment;
 import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.Meow;
@@ -24,11 +26,15 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
 
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
-    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getIntent().getData() != null) {
+            onNewIntent(getIntent());
+            finish();
+            return;
+        }
         setContentView(R.layout.activity_main);
 
         //noinspection ConstantConditions
@@ -88,10 +94,10 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
                 use = LetterListFragment.getInstance();
                 break;
             case DrawerContentFragment.ID_FAVOURITES:
-                use = TopicListFragment.getInstance("/profile/" + login + "/favourites/topics");
+                use = new FavouritesFragment();
                 break;
             case DrawerContentFragment.ID_PUBLICATIONS:
-                use = TopicListFragment.getInstance("/profile/" + login + "/created/topics");
+                use = new PublicationsFragment();
                 break;
             case DrawerContentFragment.ID_EXIT:
                 new AlertDialog.Builder(this)
@@ -116,7 +122,7 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
         if (use != null) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.content_frame, currentFragment = use, "content")
+                    .replace(R.id.content_frame, use, "content")
                     .commit();
             drawerLayout.closeDrawer(GravityCompat.START);
             currentSection = id;
@@ -136,4 +142,6 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
         finish();
 
     }
+
+
 }

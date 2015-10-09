@@ -1,8 +1,6 @@
 package ru.ponyhawks.android.fragments;
 
 import android.app.ActivityManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,18 +11,21 @@ import android.widget.Toast;
 
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Topic;
+import com.cab404.libph.modules.CommentModule;
 import com.cab404.libph.modules.TopicModule;
 import com.cab404.libph.pages.MainPage;
 import com.cab404.moonlight.framework.ModularBlockParser;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.activity.TopicActivity;
+import ru.ponyhawks.android.parts.CommentPart;
 import ru.ponyhawks.android.parts.MoonlitPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
 import ru.ponyhawks.android.utils.ClearAdapterTask;
 import ru.ponyhawks.android.utils.CompositeHandler;
+import ru.ponyhawks.android.utils.Meow;
 import ru.ponyhawks.android.utils.MidnightSync;
 import ru.ponyhawks.android.utils.RequestManager;
 
@@ -43,6 +44,7 @@ public class TopicListFragment extends RefreshableListFragment {
     private MidnightSync sync;
     private TopicPart topicPart;
     private String url;
+    private CommentPart commentPart;
 
 
     public static TopicListFragment getInstance(String pageUrl) {
@@ -66,6 +68,7 @@ public class TopicListFragment extends RefreshableListFragment {
         adapter = new ChumrollAdapter();
         sync = new MidnightSync(adapter);
         topicPart = new TopicPart();
+        commentPart = new CommentPart();
         SpacePart spacePart = new SpacePart();
 
         topicPart.setOnDataClickListener(new MoonlitPart.OnDataClickListener<Topic>() {
@@ -75,7 +78,7 @@ public class TopicListFragment extends RefreshableListFragment {
             }
         });
 
-        adapter.prepareFor(spacePart, topicPart);
+        adapter.prepareFor(spacePart, topicPart, commentPart);
         setAdapter(adapter);
 
         setRefreshing(true);
@@ -84,7 +87,7 @@ public class TopicListFragment extends RefreshableListFragment {
 
     private void switchToPage(Topic data) {
         Intent startTopicActivity = new Intent(getActivity(), TopicActivity.class);
-        startTopicActivity.putExtra(TopicActivity.KEY_TOPIC_ID, data.id);
+        startTopicActivity.putExtra(TopicActivity.KEY_ID, data.id);
         startTopicActivity.putExtra("title", data.title);
         boolean useMultitasking =
                 PreferenceManager.getDefaultSharedPreferences(getActivity())
@@ -92,17 +95,11 @@ public class TopicListFragment extends RefreshableListFragment {
 
         if (useMultitasking && Build.VERSION.SDK_INT >= 21) {
             /* Restarting activity if exists in background */
-            ActivityManager man = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
-            final ComponentName topicActivityComponent = new ComponentName(getActivity(), TopicActivity.class);
-            for (ActivityManager.AppTask task : man.getAppTasks()) {
-                final ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
-
-                if (topicActivityComponent.equals(taskInfo.baseIntent.getComponent())) {
-                    final Intent running = taskInfo.baseIntent;
-                    if (running.getIntExtra(TopicActivity.KEY_TOPIC_ID, -1) == data.id) {
-                        task.moveToFront();
-                        return;
-                    }
+            for (ActivityManager.AppTask task : Meow.getTaskList(getActivity(), TopicActivity.class)) {
+                final Intent running = task.getTaskInfo().baseIntent;
+                if (running.getIntExtra(TopicActivity.KEY_ID, -1) == data.id) {
+                    task.moveToFront();
+                    return;
                 }
             }
             /* Otherwise just adding things to intent. */
@@ -127,6 +124,7 @@ public class TopicListFragment extends RefreshableListFragment {
             protected void bindParsers(ModularBlockParser base) {
                 super.bindParsers(base);
                 base.bind(new TopicModule(TopicModule.Mode.LIST), BLOCK_TOPIC_HEADER);
+                base.bind(new CommentModule(CommentModule.Mode.LIST), BLOCK_COMMENT);
             }
         };
 
@@ -134,7 +132,9 @@ public class TopicListFragment extends RefreshableListFragment {
                 new CompositeHandler(
                         new ClearAdapterTask(adapter, sync),
                         new UpdateCommonInfoTask(),
-                        sync.bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
+                        sync
+                                .bind(MainPage.BLOCK_TOPIC_HEADER, TopicPart.class)
+                                .bind(MainPage.BLOCK_COMMENT, CommentPart.class)
                 )
         );
 
@@ -156,6 +156,7 @@ public class TopicListFragment extends RefreshableListFragment {
                                         ).show();
                             }
                         });
+                        e.printStackTrace();
                     }
 
                     @Override

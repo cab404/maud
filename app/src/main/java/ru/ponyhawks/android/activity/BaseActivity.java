@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.RequestManager;
@@ -16,6 +19,7 @@ import ru.ponyhawks.android.utils.RequestManager;
  */
 public class BaseActivity extends AppCompatActivity {
 
+    static final LinkedList<BaseActivity> running = new LinkedList<>();
     RequestManager manager = new RequestManager(Providers.Profile.get());
 
     private void setupTheme() {
@@ -36,12 +40,23 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        running.remove(this);
         manager.cancelAll();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <A extends BaseActivity> List<A> getRunning(Class<A> type){
+        List<A> retturn = new LinkedList<>();
+        for (BaseActivity activity : running)
+            if (activity.getClass().isAssignableFrom(type))
+                retturn.add((A) activity);
+        return retturn;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setupTheme();
+        running.add(this);
         super.onCreate(savedInstanceState);
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("removeShadow", false))
             if (getSupportActionBar() != null)

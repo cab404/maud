@@ -65,6 +65,11 @@
         <item>Зефирка</item>
     </string-array>
 
+    <string-array name="pub_pager_titles">
+        <item>Посты</item>
+        <item>Комментарии</item>
+    </string-array>
+
     <string-array name="image_chooser_entries">
         <item>Сфотографировать</item>
         <item>Выбрать из галереи</item>

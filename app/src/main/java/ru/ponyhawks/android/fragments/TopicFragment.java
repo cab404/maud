@@ -1,6 +1,7 @@
 package ru.ponyhawks.android.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -136,6 +137,14 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                                     case BasePage.BLOCK_TOPIC_HEADER:
                                         topic = (Topic) object;
                                         commentsEnabled = true;
+                                        view.post(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                getActivity().setTitle(((Topic) object).title);
+                                                if (Build.VERSION.SDK_INT >= 21)
+                                                    getActivity().setTaskDescription(new ActivityManager.TaskDescription(((Topic) object).title));
+                                            }
+                                        });
                                         getActivity().supportInvalidateOptionsMenu();
                                         break;
                                     case MainPage.BLOCK_COMMON_INFO:
@@ -154,6 +163,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                     @Override
                     public void onError(TopicPage what, Exception e) {
                         super.onError(what, e);
+                        if (getActivity() == null) return;
                         getActivity().finish();
                         e.printStackTrace();
                     }
@@ -526,5 +536,11 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
         commentFragment.setTarget(String.format(context.getString(R.string.editing_comment), cm.id, cm.author.login));
         commentFragment.expand();
+    }
+
+    public void moveToComment(int value) {
+        commentPart.setSelectedId(value);
+        adapter.notifyDataSetChanged();
+        list.setSelection(commentPart.getIndex(value, adapter));
     }
 }
