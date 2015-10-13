@@ -44,6 +44,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.parts.CommentNumPart;
 import ru.ponyhawks.android.parts.CommentPart;
@@ -388,6 +389,12 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
             update(true);
         else
             nextNew();
+    }
+
+    @OnLongClick(R.id.colorful_button)
+    boolean onRefreshForced(){
+        update(true);
+        return true;
     }
 
     @Bind(R.id.colorful_button)
