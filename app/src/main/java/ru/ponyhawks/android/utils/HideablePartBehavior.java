@@ -35,6 +35,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
 
     ViewDragHelper dragHelper;
     int collapsedOffset = -1;
+    int savedLeft = -1;
     int lastTop;
 
     Rect tmp = new Rect();
@@ -45,6 +46,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
             calculateOffset = true;
             if (collapsedOffset == -1)
                 lockOn(child);
+
             return true;
         }
 
@@ -142,8 +144,10 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
     }
 
     public void lockOn(View child) {
-        if (collapsedOffset == -1)
+        if (collapsedOffset == -1) {
             lastTop = collapsedOffset = child.getBottom() - ((View) child.getParent()).getHeight();
+            savedLeft = child.getLeft();
+        }
     }
 
     public void setChangeCallback(ChangeCallback changeCallback) {
@@ -297,7 +301,7 @@ public class HideablePartBehavior<V extends View> extends CoordinatorLayout.Beha
             }
             animationStarted = true;
             if (startHeight != view.getHeight()) {
-                dragHelper.smoothSlideViewTo(view, 0, calculateDst(state, view));
+                dragHelper.smoothSlideViewTo(view, view.getLeft(), calculateDst(state, view));
                 startHeight = view.getHeight();
             }
             if (dragHelper.continueSettling(true)) {

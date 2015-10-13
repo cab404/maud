@@ -40,6 +40,9 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
+import com.nostra13.universalimageloader.core.assist.ViewScaleType;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.NonViewAware;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -498,26 +501,33 @@ public class HtmlRipper {
                                     Spanned.SPAN_INCLUSIVE_EXCLUSIVE
                             );
 
-                            if (loadImages) {
-                                int width, height;
-                                if (tag.get("width").isEmpty())
-                                    width = 400;
-                                else
-                                    width = Integer.parseInt(tag.get("width"));
+                            int width, height;
+                            if (tag.get("width").isEmpty())
+                                width = 400;
+                            else
+                                width = Integer.parseInt(tag.get("width"));
 
-                                if (tag.get("height").isEmpty())
-                                    height = 200;
-                                else
-                                    height = Integer.parseInt(tag.get("height"));
+                            if (tag.get("height").isEmpty())
+                                height = 200;
+                            else
+                                height = Integer.parseInt(tag.get("height"));
 
-                                final SpanImageListener imageAware = new SpanImageListener(target, replacer, builder);
-                                ImageSize size = new ImageSize(width, height);
-                                DisplayImageOptions opt = new DisplayImageOptions.Builder()
-                                        .cacheInMemory(true)
-                                        .cacheOnDisk(true)
-                                        .imageScaleType(ImageScaleType.EXACTLY).build();
+                            final SpanImageListener imageAware = new SpanImageListener(target, replacer, builder);
+                            ImageSize size = new ImageSize(width, height);
+                            DisplayImageOptions opt = new DisplayImageOptions.Builder()
+                                    .cacheInMemory(true)
+                                    .cacheOnDisk(true)
+                                    .imageScaleType(ImageScaleType.EXACTLY).build();
+
+                            if (loadImages)
                                 ImageLoader.getInstance().loadImage(src, size, opt, imageAware);
-                            }
+                            else
+                                ImageLoader.getInstance().displayImage(
+                                        src,
+                                        new NonViewAware(src, size, ViewScaleType.FIT_INSIDE),
+                                        opt,
+                                        imageAware
+                                );
 
                             off += repl.length();
                             break;

@@ -18,7 +18,7 @@ import ru.ponyhawks.android.fragments.FavouritesFragment;
 import ru.ponyhawks.android.fragments.LetterListFragment;
 import ru.ponyhawks.android.fragments.LoginFragment;
 import ru.ponyhawks.android.fragments.PublicationsFragment;
-import ru.ponyhawks.android.fragments.TopicListFragment;
+import ru.ponyhawks.android.fragments.PublicationsListFragment;
 import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.Meow;
 
@@ -85,7 +85,7 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
 
         switch (id) {
             case DrawerContentFragment.ID_MAIN:
-                use = TopicListFragment.getInstance("/");
+                use = PublicationsListFragment.getInstance("/");
                 break;
             case DrawerContentFragment.ID_SETTINGS:
                 startActivity(new Intent(this, SettingsActivity.class));

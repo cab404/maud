@@ -37,6 +37,7 @@
     <string name="publications_label">Публикации</string>
     <string name="settings_label">Настройки</string>
     <string name="logout_label">Выход</string>
+    <string name="to_the_bottom">На дно</string>
 
     <string-array name="exit">
         <item>Я устал, я ухожу.</item>

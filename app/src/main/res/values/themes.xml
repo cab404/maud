@@ -42,6 +42,7 @@
     <style name="AppThemeDark.Green">
         <item name="colorPrimary">#42787e</item>
         <item name="colorPrimaryDark">#37686e</item>
+        <item name="colorAccent">#42787e</item>
     </style>
 
     <style name="AppThemeLight.Rariteh">

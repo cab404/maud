@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,7 @@ import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.CommentEditFragment;
 import ru.ponyhawks.android.fragments.TopicFragment;
 import ru.ponyhawks.android.utils.Meow;
+import ru.ponyhawks.android.utils.UpdateDrawable;
 
 public class TopicActivity extends LoginDependentActivity {
 
@@ -58,9 +60,7 @@ public class TopicActivity extends LoginDependentActivity {
             }
             id = path.getKey();
             getIntent().putExtra(KEY_ID, id);
-        } else
-
-        if (Build.VERSION.SDK_INT >= 21)
+        } else if (Build.VERSION.SDK_INT >= 21)
             setTaskDescription(
                     new ActivityManager.TaskDescription(getIntent().getStringExtra("title"))
             );
@@ -107,6 +107,7 @@ public class TopicActivity extends LoginDependentActivity {
 
         ced = (CommentEditFragment) getSupportFragmentManager().findFragmentById(R.id.comment_editor);
         topic.setCommentFragment(ced);
+        ced.collapse();
 
     }
 

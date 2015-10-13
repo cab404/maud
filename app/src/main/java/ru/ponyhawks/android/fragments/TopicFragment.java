@@ -8,7 +8,9 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -39,6 +41,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.parts.CommentNumPart;
 import ru.ponyhawks.android.parts.CommentPart;
@@ -62,7 +67,7 @@ import ru.ponyhawks.android.utils.UpdateDrawable;
  * @author cab404
  */
 public class TopicFragment extends ListFragment implements CommentEditFragment.SendCallback, CommentPart.CommentPartCallback {
-    public static final String KEY_TOPIC_ID = "topicId";
+    public static final String KEY_ID = "id";
 
     private ChumrollAdapter adapter;
     private MidnightSync sync;
@@ -75,9 +80,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
     private int topicId;
 
-
     private CommentEditFragment commentFragment;
-    private Topic topic;
 
     public void setCommentFragment(CommentEditFragment commentFragment) {
         this.commentFragment = commentFragment;
@@ -88,23 +91,30 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         final TopicFragment topicFragment = new TopicFragment();
         final Bundle args = new Bundle();
 
-        args.putInt(KEY_TOPIC_ID, id);
+        args.putInt(KEY_ID, id);
 
         topicFragment.setArguments(args);
         return topicFragment;
     }
 
     @Override
+    protected int getLayoutId() {
+        return R.layout.fragment_topic;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        return super.onCreateView(inflater, container, savedInstanceState);
+        final View view = super.onCreateView(inflater, container, savedInstanceState);
+        ButterKnife.bind(this, view);
+        return view;
     }
 
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        topicId = getArguments().getInt(KEY_TOPIC_ID, -1);
+        topicId = getArguments().getInt(KEY_ID, -1);
 
         adapter = new ChumrollAdapter();
         final TopicPart topicPart = new TopicPart();
@@ -122,31 +132,22 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
         sync = new MidnightSync(adapter);
 
+        spinningWheel = new UpdateDrawable(getActivity());
+        updateButton.setImageDrawable(spinningWheel);
+
+        bindModules(sync);
         RequestManager.fromActivity(getActivity())
                 .manage(new TopicPage(topicId))
                 .setHandlers(
                         sync
-                                .bind(MainPage.BLOCK_TOPIC_HEADER, topicPart)
                                 .bind(MainPage.BLOCK_COMMENT, commentPart)
                                 .bind(MainPage.BLOCK_COMMENT_NUM, commentNumPart),
                         new UpdateCommonInfoTask(),
                         new ModularBlockParser.ParsedObjectHandler() {
                             @Override
                             public void handle(final Object object, int key) {
+                                handleInitialLoad(object, key);
                                 switch (key) {
-                                    case BasePage.BLOCK_TOPIC_HEADER:
-                                        topic = (Topic) object;
-                                        commentsEnabled = true;
-                                        view.post(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                getActivity().setTitle(((Topic) object).title);
-                                                if (Build.VERSION.SDK_INT >= 21)
-                                                    getActivity().setTaskDescription(new ActivityManager.TaskDescription(((Topic) object).title));
-                                            }
-                                        });
-                                        getActivity().supportInvalidateOptionsMenu();
-                                        break;
                                     case MainPage.BLOCK_COMMON_INFO:
                                         Providers.UserInfo.getInstance().setInfo((CommonInfo) object);
                                         break;
@@ -161,10 +162,17 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 .setCallback(new RequestManager.SimpleRequestCallback<TopicPage>() {
 
                     @Override
-                    public void onError(TopicPage what, Exception e) {
+                    public void onError(TopicPage what, final Exception e) {
                         super.onError(what, e);
                         if (getActivity() == null) return;
                         getActivity().finish();
+                        final Runnable runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        };
+                        Meow.inMain(runnable);
                         e.printStackTrace();
                     }
 
@@ -179,11 +187,11 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
                     @Override
                     public void onFinish(TopicPage what) {
-                        view.post(new Runnable() {
+                        sync.post(new Runnable() {
                             @Override
                             public void run() {
                                 adapter.removeById(loadingPartId);
-                                updateSpinnerNum();
+                                spinningWheel.setNum(newCommentsStack.size());
                             }
                         });
                     }
@@ -193,6 +201,26 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         if (commentFragment != null)
             commentFragment.setTarget(getActivity().getString(R.string.replying_topic));
 
+    }
+
+    private void bindModules(MidnightSync sync) {
+        sync.bind(MainPage.BLOCK_TOPIC_HEADER, TopicPart.class);
+    }
+
+    public void handleInitialLoad(final Object object, int key) {
+        switch (key) {
+            case BasePage.BLOCK_TOPIC_HEADER:
+                commentsEnabled = true;
+                Meow.inMain(new Runnable() {
+                    @Override
+                    public void run() {
+                        getActivity().setTitle(((Topic) object).title);
+                        if (Build.VERSION.SDK_INT >= 21)
+                            getActivity().setTaskDescription(new ActivityManager.TaskDescription(((Topic) object).title));
+                    }
+                });
+                break;
+        }
     }
 
     volatile boolean updating = false;
@@ -205,17 +233,6 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
         }
     };
 
-    public void updateSpinnerNum() {
-        Meow.inMain(new Runnable() {
-            @Override
-            public void run() {
-                if (spinningWheel == null) return;
-                spinningWheel.setNum(newCommentsStack.size());
-                spinningWheel.setMenuIcon(updateItem, getView());
-            }
-        });
-    }
-
     public void nextNew() {
         Meow.inMain(new Runnable() {
             @Override
@@ -227,14 +244,16 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 int next = newCommentsStack.remove(0);
                 final int index = commentPart.getIndex(next, adapter);
 
-                if (Build.VERSION.SDK_INT >= 11)
-                    list.smoothScrollToPositionFromTop(index, 0, 200);
-                else
-                    list.smoothScrollToPosition(index);
+                list.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        list.setSelection(index);
+                    }
+                });
 
                 commentPart.offsetToId(list, next);
 
-                updateSpinnerNum();
+                spinningWheel.setNum(newCommentsStack.size());
                 commentPart.setSelectedId(next);
                 adapter.notifyDataSetChanged();
             }
@@ -248,13 +267,13 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
             public void run() {
                 commentPart.clearNew();
                 newCommentsStack.clear();
-                updateSpinnerNum();
+                spinningWheel.setNum(newCommentsStack.size());
                 adapter.notifyDataSetChanged();
             }
         });
     }
 
-    public void update(final boolean clearNew) {
+    public void update(final boolean clearNew, int selfCommentId) {
         if (updating) return;
         updating = true;
         setUpdating(true);
@@ -266,15 +285,20 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
             }
         });
 
-        final RefreshCommentsRequest request = new RefreshCommentsRequest(
-                Type.TOPIC, topicId, commentPart.getLastCommentId()
-        );
+        final RefreshCommentsRequest request = getRefreshRequest();
+        request.setSelfIdComment(selfCommentId);
+
         RequestManager.fromActivity(getActivity())
                 .manage(request)
                 .setCallback(new RequestManager.SimpleRequestCallback<RefreshCommentsRequest>() {
                     @Override
+                    public void onStart(RefreshCommentsRequest what) {
+                        super.onStart(what);
+                    }
+
+                    @Override
                     public void onSuccess(final RefreshCommentsRequest what) {
-                        Meow.inMain(new Runnable() {
+                        list.post(new Runnable() {
                             @Override
                             public void run() {
                                 if (clearNew) {
@@ -283,21 +307,24 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                                 for (Comment cm : what.comments) {
                                     sync.inject(cm, commentPart, commentPart);
                                     commentPart.register(cm);
-                                    if (cm.is_new) newCommentsStack.add(cm.id);
+                                    if (cm.is_new)
+                                        newCommentsStack.add(cm.id);
                                 }
-                                sync.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        updateSpinnerNum();
-                                    }
-                                });
+                                spinningWheel.setNum(newCommentsStack.size());
                             }
                         });
                     }
 
                     @Override
-                    public void onError(RefreshCommentsRequest what, Exception e) {
+                    public void onError(RefreshCommentsRequest what, final Exception e) {
                         super.onError(what, e);
+                        e.printStackTrace();
+                        Meow.inMain(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                            }
+                        });
                     }
 
                     @Override
@@ -307,6 +334,20 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                     }
                 })
                 .start();
+    }
+
+    @NonNull
+    private RefreshCommentsRequest getRefreshRequest() {
+        System.out.println("lkid:" + commentPart.getLastCommentId());
+        return new RefreshCommentsRequest(
+                Type.TOPIC, topicId, commentPart.getLastCommentId()
+        ) {
+            @Override
+            protected void handleResponse(String response) {
+                System.out.println(response);
+                super.handleResponse(response);
+            }
+        };
     }
 
     @Override
@@ -319,12 +360,6 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
     public boolean onOptionsItemSelected(final MenuItem item) {
         final int id = item.getItemId();
         switch (id) {
-            case R.id.refresh:
-                if (newCommentsStack.isEmpty())
-                    update(true);
-                else
-                    nextNew();
-                return true;
             case R.id.copy_link:
                 final String clip = String.format("http://ponyhawks.ru/blog/%d.html", topicId);
                 setClipboard(clip);
@@ -336,49 +371,37 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                 } else
                     reply(null, getActivity());
                 return true;
+            case R.id.to_the_bottom:
+                list.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        list.setSelection(adapter.getCount() - 1);
+                    }
+                });
         }
         return super.onOptionsItemSelected(item);
     }
 
-    MenuItem updateItem;
+    @OnClick(R.id.colorful_button)
+    void onRefreshClicked() {
+        if (newCommentsStack.isEmpty())
+            update(true);
+        else
+            nextNew();
+    }
+
+    @Bind(R.id.colorful_button)
+    FloatingActionButton updateButton;
     UpdateDrawable spinningWheel;
 
     void setUpdating(boolean updating) {
         spinningWheel.setSpinning(updating);
-        if (updating)
-            spinningWheel.setMenuIcon(updateItem, getView());
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (topic == null) return;
         inflater.inflate(R.menu.menu_topic, menu);
-
-        spinningWheel = new UpdateDrawable(getActivity());
-        final MenuItem item = menu.findItem(R.id.refresh);
-        updateItem = item;
-        item.setIcon(spinningWheel);
-
-        if (!commentsEnabled) menu.removeItem(R.id.reply);
-
-        list.post(new Runnable() {
-            @Override
-            public void run() {
-
-                final View refreshView = getActivity().findViewById(R.id.refresh);
-                if (refreshView == null)
-                    return;
-                refreshView
-                        .setOnLongClickListener(new View.OnLongClickListener() {
-                            @Override
-                            public boolean onLongClick(View v) {
-                                update(true);
-                                return true;
-                            }
-                        });
-            }
-        });
     }
 
     public void fav(final Comment cm, final Context context) {
@@ -401,7 +424,7 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                     }
 
                     void msg(final String msg) {
-                        sync.post(new Runnable() {
+                        Meow.inMain(new Runnable() {
                             @Override
                             public void run() {
                                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
@@ -451,9 +474,9 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
 
         LSRequest req;
         if (editing)
-            req = new CommentEditRequest(reply, message.toString());
+            req = getCommentEditRequest(message, reply);
         else
-            req = new CommentAddRequest(Type.BLOG, topicId, reply, message.toString());
+            req = getCommentAddRequest(message, reply);
 
         RequestManager
                 .fromActivity(getActivity())
@@ -473,7 +496,12 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                                         replyingTo.text = message.toString();
                                         commentPart.invalidateCommentText(replyingTo.id);
                                     }
-                                    update(false);
+
+                                    if (what instanceof CommentAddRequest)
+                                        update(false, ((CommentAddRequest) what).id);
+                                    else
+                                        update(false);
+
                                     commentFragment.hide();
                                     commentFragment.clear();
 
@@ -505,6 +533,20 @@ public class TopicFragment extends ListFragment implements CommentEditFragment.S
                     }
                 })
                 .start();
+    }
+
+    private void update(boolean reset) {
+        update(reset, 0);
+    }
+
+    @NonNull
+    private CommentAddRequest getCommentAddRequest(Editable message, int reply) {
+        return new CommentAddRequest(Type.BLOG, topicId, reply, message.toString());
+    }
+
+    @NonNull
+    private CommentEditRequest getCommentEditRequest(Editable message, int reply) {
+        return new CommentEditRequest(reply, message.toString());
     }
 
     @Override

@@ -149,13 +149,14 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
             }
         });
 
-        view.setOnLongClickListener(new View.OnLongClickListener() {
+        final View.OnClickListener showControls = new View.OnClickListener() {
             @Override
-            public boolean onLongClick(final View v) {
+            public void onClick(final View v) {
                 showActionDialog(cm, v.getContext());
-                return true;
             }
-        });
+        };
+        avatar.setOnClickListener(showControls);
+        author.setOnClickListener(showControls);
 
         resetOffset(view, cm);
 

@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.ViewCompat;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -25,10 +26,13 @@ import ru.ponyhawks.android.R;
  * @author cab404
  */
 public class UpdateDrawable extends Drawable {
+    public static final int TINT = 0x66ffffff;
     final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FAKE_BOLD_TEXT_FLAG);
     final Bitmap upd;
     final Rect size;
     final Rect dst = new Rect();
+    final Rect txt = new Rect();
+
     private final Context context;
     int num = 0;
 
@@ -69,6 +73,7 @@ public class UpdateDrawable extends Drawable {
 
     public void setNum(int num) {
         this.num = num;
+        invalidateSelf();
     }
 
     @Override
@@ -83,24 +88,28 @@ public class UpdateDrawable extends Drawable {
             last = ctime;
         } else last = 0;
 
-        canvas.rotate(spin);
+        canvas.save();
 
-        paint.setColor(num == 0 || spinning ? -1 : 0x66ffffff);
-        final int side = Math.min(canvas.getWidth(), canvas.getHeight());
+        int side = upd.getHeight() - padding * 2;
+        Gravity.apply(Gravity.CENTER, side, side, getBounds(), dst);
 
-        dst.set(0, 0, side, side);
-        dst.right -= padding * 2;
-        dst.bottom -= padding * 2;
-        dst.offset(dst.width() / -2, dst.height() / -2);
-        canvas.drawBitmap(upd, size, dst, paint);
+        paint.setColor(num == 0 || spinning ? -1 : TINT);
+
+        canvas.rotate(spin, dst.centerX(), dst.centerY());
+
+        canvas.drawBitmap(upd, null, dst, paint);
+        canvas.restore();
 
         if (num == 0) return;
-        canvas.rotate(-spin);
-        paint.setColor(spinning ? 0x66ffffff : -1);
+        paint.setColor(spinning ? TINT : -1);
         String nm = num + "";
-        paint.getTextBounds(nm, 0, nm.length(), dst);
-        canvas.drawText(nm, dst.width() / -2, dst.height() / 2, paint);
+        paint.getTextBounds(nm, 0, nm.length(), txt);
+        canvas.drawText(nm, dst.centerX() - txt.width() / 2, dst.centerY() + txt.height() / 2, paint);
 
+    }
+
+    public void setPadding(int padding) {
+        this.padding = padding;
     }
 
     @Override

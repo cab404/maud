@@ -48,13 +48,19 @@ public class PublicationsFragment extends Fragment {
         commentsUrl = "/profile/" + login + "/created/comments";
 
         pager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
+
+            private PublicationsListFragment comments;
+            private PublicationsListFragment topics;
+
             @Override
             public Fragment getItem(int position) {
                 switch (position) {
                     case 0:
-                        return TopicListFragment.getInstance(topicsUrl);
+                        topics = PublicationsListFragment.getInstance(topicsUrl);
+                        return topics;
                     case 1:
-                        return TopicListFragment.getInstance(commentsUrl);
+                        comments = PublicationsListFragment.getInstance(commentsUrl);
+                        return comments;
                     default:
                         return null;
                 }
@@ -70,6 +76,7 @@ public class PublicationsFragment extends Fragment {
                 return 2;
             }
         });
+
     }
 
     @Override

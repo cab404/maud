@@ -2,14 +2,19 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "22.0.1"
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
 
     defaultConfig {
         applicationId "ru.ponyhawks.android"
         minSdkVersion 10
         targetSdkVersion 22
         versionCode 1
-        versionName "0.42"
+        versionName "0.81"
     }
     buildTypes {
         release {
@@ -19,13 +24,14 @@ android {
     }
 }
 
+String support_v = '22.2.1'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'], exclude: ['*-sources.jar'])
     compile project(':chumroll')
 
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:support-v4:22.2.1'
-    compile 'com.android.support:design:22.2.1'
+    compile 'com.android.support:appcompat-v7:' + support_v
+    compile 'com.android.support:support-v4:' + support_v
+    compile 'com.android.support:design:' + support_v
 
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
     compile 'com.jakewharton:butterknife:7.0.1'

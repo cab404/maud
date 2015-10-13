@@ -315,12 +315,6 @@ public class LetterFragment extends ListFragment implements CommentEditFragment.
     public boolean onOptionsItemSelected(final MenuItem item) {
         final int id = item.getItemId();
         switch (id) {
-            case R.id.refresh:
-                if (newCommentsStack.isEmpty())
-                    update(true);
-                else
-                    nextNew();
-                return true;
             case R.id.copy_link:
                 final String clip = String.format("http://ponyhawks.ru/talk/%d.html", letterId);
                 setClipboard(clip);
@@ -352,27 +346,7 @@ public class LetterFragment extends ListFragment implements CommentEditFragment.
         inflater.inflate(R.menu.menu_topic, menu);
 
         spinningWheel = new UpdateDrawable(getActivity());
-        final MenuItem item = menu.findItem(R.id.refresh);
-        updateItem = item;
-        item.setIcon(spinningWheel);
 
-        list.post(new Runnable() {
-            @Override
-            public void run() {
-
-                final View refreshView = getActivity().findViewById(R.id.refresh);
-                if (refreshView == null)
-                    return;
-                refreshView
-                        .setOnLongClickListener(new View.OnLongClickListener() {
-                            @Override
-                            public boolean onLongClick(View v) {
-                                update(true);
-                                return true;
-                            }
-                        });
-            }
-        });
     }
 
     public void fav(final Comment cm, final Context context) {

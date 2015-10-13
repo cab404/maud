@@ -46,11 +46,11 @@ public class BaseActivity extends AppCompatActivity {
 
     @SuppressWarnings("unchecked")
     public static <A extends BaseActivity> List<A> getRunning(Class<A> type){
-        List<A> retturn = new LinkedList<>();
+        List<A> running_activities = new LinkedList<>();
         for (BaseActivity activity : running)
             if (activity.getClass().isAssignableFrom(type))
-                retturn.add((A) activity);
-        return retturn;
+                running_activities.add((A) activity);
+        return running_activities;
     }
 
     @Override

@@ -36,6 +36,7 @@
     <string name="publications_label">Publications</string>
     <string name="settings_label">Settings</string>
     <string name="logout_label">Log out</string>
+    <string name="to_the_bottom">To the bottom</string>
 
     <string-array name="exit">
         <item>Yes</item>

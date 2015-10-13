@@ -192,6 +192,10 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
                 ((RelativeLayout.LayoutParams) target.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = 0;
                 ((RelativeLayout.LayoutParams) text.getLayoutParams()).getRules()[RelativeLayout.LEFT_OF] = R.id.send;
 
+                ((CoordinatorLayout.LayoutParams) commentFrame.getLayoutParams()).rightMargin =
+                        (int) (getView().getResources().getDisplayMetrics().density * 59);
+
+                root.invalidate();
                 text.clearFocus();
                 text.setSingleLine(true);
                 text.setVerticalScrollBarEnabled(false);
@@ -208,6 +212,9 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
                 ((RelativeLayout.LayoutParams) target.getLayoutParams()).getRules()[RelativeLayout.ALIGN_BOTTOM] = R.id.send;
                 ((RelativeLayout.LayoutParams) text.getLayoutParams()).getRules()[RelativeLayout.LEFT_OF] = 0;
 
+                ((CoordinatorLayout.LayoutParams) commentFrame.getLayoutParams()).rightMargin =
+                                0;
+                root.invalidate();
                 text.setVerticalScrollBarEnabled(true);
                 text.setSingleLine(false);
                 text.setMaxLines(5);

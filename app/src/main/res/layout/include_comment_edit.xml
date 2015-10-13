@@ -8,6 +8,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:layout_marginBottom="-52dp"
+    android:layout_marginRight="59dp"
 
     android:animateLayoutChanges="true"
     android:background="?attr/rounded_background"

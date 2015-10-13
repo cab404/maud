@@ -37,7 +37,7 @@ import ru.ponyhawks.android.utils.RequestManager;
  *
  * @author cab404
  */
-public class TopicListFragment extends RefreshableListFragment {
+public class PublicationsListFragment extends RefreshableListFragment {
     public static final String KEY_URL = "url";
     ChumrollAdapter adapter;
 
@@ -47,8 +47,8 @@ public class TopicListFragment extends RefreshableListFragment {
     private CommentPart commentPart;
 
 
-    public static TopicListFragment getInstance(String pageUrl) {
-        final TopicListFragment fragment = new TopicListFragment();
+    public static PublicationsListFragment getInstance(String pageUrl) {
+        final PublicationsListFragment fragment = new PublicationsListFragment();
         Bundle args = new Bundle();
         args.putString(KEY_URL, pageUrl);
         fragment.setArguments(args);
