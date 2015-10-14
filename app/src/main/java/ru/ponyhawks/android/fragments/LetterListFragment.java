@@ -82,7 +82,7 @@ public class LetterListFragment extends RefreshableListFragment {
 
     private void switchToPage(LetterLabel data) {
         Intent startTopicActivity = new Intent(getActivity(), LetterActivity.class);
-        startTopicActivity.putExtra(LetterActivity.KEY_ID, data.id);
+        startTopicActivity.putExtra(PublicationFragment.KEY_ID, data.id);
         startTopicActivity.putExtra("title", data.title);
         boolean useMultitasking =
                 PreferenceManager.getDefaultSharedPreferences(getActivity())
@@ -92,7 +92,7 @@ public class LetterListFragment extends RefreshableListFragment {
             /* Restarting activity if exists in background */
             for (ActivityManager.AppTask task : Meow.getTaskList(getActivity(), LetterActivity.class)) {
                 final Intent running = task.getTaskInfo().baseIntent;
-                if (running.getIntExtra(LetterFragment.KEY_LETTER_ID, -1) == data.id) {
+                if (running.getIntExtra(PublicationFragment.KEY_ID, -1) == data.id) {
                     task.moveToFront();
                     return;
                 }

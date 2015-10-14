@@ -17,6 +17,7 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.CommentEditFragment;
+import ru.ponyhawks.android.fragments.PublicationFragment;
 import ru.ponyhawks.android.fragments.TopicFragment;
 import ru.ponyhawks.android.utils.Meow;
 import ru.ponyhawks.android.utils.UpdateDrawable;
@@ -26,8 +27,8 @@ public class TopicActivity extends LoginDependentActivity {
     public static final String KEY_ID = "id";
     public static final String KEY_TITLE = "title";
 
+    PublicationFragment topic;
     CommentEditFragment ced;
-    TopicFragment topic;
     private int id;
 
     public int getId() {

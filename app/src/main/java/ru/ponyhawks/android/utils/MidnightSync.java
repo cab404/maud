@@ -52,6 +52,9 @@ public class MidnightSync extends UniteSyncronization implements ModularBlockPar
         }
     }
 
+    /**
+     * Injects view into adapter. All views are being injected in order
+     */
     public <V> void inject(V object, ViewConverter<V> use) {
         inject(object, use, null);
     }

@@ -85,7 +85,7 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
 
         switch (id) {
             case DrawerContentFragment.ID_MAIN:
-                use = PublicationsListFragment.getInstance("/");
+                use = PublicationsListFragment.getInstance("/blog/good");
                 break;
             case DrawerContentFragment.ID_SETTINGS:
                 startActivity(new Intent(this, SettingsActivity.class));

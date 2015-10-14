@@ -21,6 +21,7 @@ public class CompositeHandler implements ModularBlockParser.ParsedObjectHandler 
     @Override
     public void handle(Object object, int key) {
         for (ModularBlockParser.ParsedObjectHandler h : handlers)
-            h.handle(object, key);
+            if (h != null)
+                h.handle(object, key);
     }
 }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
@@ -13,14 +14,18 @@ import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Topic;
 import com.cab404.libph.modules.CommentModule;
 import com.cab404.libph.modules.TopicModule;
+import com.cab404.libph.pages.BasePage;
 import com.cab404.libph.pages.MainPage;
 import com.cab404.moonlight.framework.ModularBlockParser;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.activity.TopicActivity;
 import ru.ponyhawks.android.parts.CommentPart;
+import ru.ponyhawks.android.parts.ContinuationPart;
+import ru.ponyhawks.android.parts.LoadingPart;
 import ru.ponyhawks.android.parts.MoonlitPart;
-import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
 import ru.ponyhawks.android.utils.ClearAdapterTask;
@@ -42,14 +47,15 @@ public class PublicationsListFragment extends RefreshableListFragment {
     ChumrollAdapter adapter;
 
     private MidnightSync sync;
-    private TopicPart topicPart;
     private String url;
-    private CommentPart commentPart;
 
+    int cPage = 1;
+    private ContinuationPart continuationPart;
 
     public static PublicationsListFragment getInstance(String pageUrl) {
         final PublicationsListFragment fragment = new PublicationsListFragment();
         Bundle args = new Bundle();
+
         args.putString(KEY_URL, pageUrl);
         fragment.setArguments(args);
         return fragment;
@@ -60,6 +66,10 @@ public class PublicationsListFragment extends RefreshableListFragment {
         return R.layout.fragment_refreshable_list;
     }
 
+    protected String getUrl() {
+        return url + (cPage > 0 ? "/page" + cPage : "");
+    }
+
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -67,9 +77,16 @@ public class PublicationsListFragment extends RefreshableListFragment {
 
         adapter = new ChumrollAdapter();
         sync = new MidnightSync(adapter);
-        topicPart = new TopicPart();
-        commentPart = new CommentPart();
-        SpacePart spacePart = new SpacePart();
+        TopicPart topicPart = new TopicPart();
+        CommentPart commentPart = new CommentPart();
+
+        continuationPart = new ContinuationPart(adapter) {
+            @Override
+            public void onEndReached() {
+                cPage++;
+                loadPage(false);
+            }
+        };
 
         topicPart.setOnDataClickListener(new MoonlitPart.OnDataClickListener<Topic>() {
             @Override
@@ -78,7 +95,7 @@ public class PublicationsListFragment extends RefreshableListFragment {
             }
         });
 
-        adapter.prepareFor(spacePart, topicPart, commentPart);
+        adapter.prepareFor(topicPart, commentPart, continuationPart);
         setAdapter(adapter);
 
         setRefreshing(true);
@@ -113,11 +130,80 @@ public class PublicationsListFragment extends RefreshableListFragment {
 
     @Override
     public void onRefresh() {
+        loadPage(true);
+    }
 
-        final MainPage page = new MainPage() {
+    void loadPage(boolean clear) {
+
+        setRefreshing(true);
+
+        final MainPage page = getPage();
+
+        if (!clear)
+            adapter.add(LoadingPart.class, null);
+
+        final AtomicInteger count = new AtomicInteger(0);
+        RequestManager
+                .fromActivity(getActivity())
+                .manage(page)
+                .setHandlers(
+                        new CompositeHandler(
+                                clear ? new ClearAdapterTask(adapter, sync) : null,
+                                new UpdateCommonInfoTask(),
+                                sync
+                                        .bind(MainPage.BLOCK_TOPIC_HEADER, TopicPart.class)
+                                        .bind(MainPage.BLOCK_COMMENT, CommentPart.class),
+                                new ModularBlockParser.ParsedObjectHandler() {
+                                    @Override
+                                    public void handle(Object object, int key) {
+                                        switch (key) {
+                                            case BasePage.BLOCK_COMMENT:
+                                            case BasePage.BLOCK_TOPIC_HEADER:
+                                                count.incrementAndGet();
+                                        }
+                                    }
+                                }
+                        )
+                ).setCallback(new RequestManager.SimpleRequestCallback<MainPage>() {
+            @Override
+            public void onError(MainPage what, final Exception e) {
+                super.onError(what, e);
+                sync.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast
+                                .makeText(
+                                        getActivity(),
+                                        getActivity().getString(R.string.page_loading_failed) + e.getLocalizedMessage(),
+                                        Toast.LENGTH_LONG
+                                ).show();
+                    }
+                });
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onFinish(MainPage what) {
+                super.onFinish(what);
+                sync.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeToRefresh.setRefreshing(false);
+                    }
+                });
+                if (count.get() > 0)
+                    sync.inject(null, continuationPart);
+            }
+        }).start();
+    }
+
+    @NonNull
+    private MainPage getPage() {
+        return new MainPage() {
             @Override
             public String getURL() {
-                return url;
+                System.out.println(cPage);
+                return getUrl();
             }
 
             @Override
@@ -127,51 +213,6 @@ public class PublicationsListFragment extends RefreshableListFragment {
                 base.bind(new CommentModule(CommentModule.Mode.LIST), BLOCK_COMMENT);
             }
         };
-
-        page.setHandler(
-                new CompositeHandler(
-                        new ClearAdapterTask(adapter, sync),
-                        new UpdateCommonInfoTask(),
-                        sync
-                                .bind(MainPage.BLOCK_TOPIC_HEADER, TopicPart.class)
-                                .bind(MainPage.BLOCK_COMMENT, CommentPart.class)
-                )
-        );
-
-        RequestManager
-                .fromActivity(getActivity())
-                .manage(page)
-                .setCallback(new RequestManager.SimpleRequestCallback<MainPage>() {
-                    @Override
-                    public void onError(MainPage what, final Exception e) {
-                        super.onError(what, e);
-                        sync.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast
-                                        .makeText(
-                                                getActivity(),
-                                                getActivity().getString(R.string.page_loading_failed) + e.getLocalizedMessage(),
-                                                Toast.LENGTH_LONG
-                                        ).show();
-                            }
-                        });
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onFinish(MainPage what) {
-                        super.onFinish(what);
-                        sync.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                swipeToRefresh.setRefreshing(false);
-                            }
-                        });
-                    }
-                })
-                .start();
-
     }
 
 }

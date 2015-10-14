@@ -17,6 +17,8 @@ import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.CommentEditFragment;
 import ru.ponyhawks.android.fragments.LetterFragment;
+import ru.ponyhawks.android.fragments.PublicationFragment;
+import ru.ponyhawks.android.fragments.TopicFragment;
 import ru.ponyhawks.android.utils.Meow;
 
 public class LetterActivity extends LoginDependentActivity {
@@ -24,8 +26,8 @@ public class LetterActivity extends LoginDependentActivity {
     public static final String KEY_ID = "id";
     public static final String KEY_TITLE = "title";
 
+    PublicationFragment topic;
     CommentEditFragment ced;
-    LetterFragment letter;
     private int id;
 
     public int getId() {
@@ -35,7 +37,6 @@ public class LetterActivity extends LoginDependentActivity {
     void backToMain() {
         final Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-
         finish();
     }
 
@@ -44,6 +45,11 @@ public class LetterActivity extends LoginDependentActivity {
         super.onCreate(savedInstanceState);
         setTitle(getIntent().getStringExtra(KEY_TITLE));
         id = -1;
+
+        System.out.println(getIntent().getData());
+
+        if (getIntent().getData() != null)
+            System.out.println(getIntent().getData().getLastPathSegment());
 
         final Uri uri = getIntent().getData();
         final Map.Entry<Integer, Integer> path = Meow.resolvePostUrl(uri);
@@ -54,19 +60,18 @@ public class LetterActivity extends LoginDependentActivity {
             }
             id = path.getKey();
             getIntent().putExtra(KEY_ID, id);
-        }
-
-        if (Build.VERSION.SDK_INT >= 21)
+        } else if (Build.VERSION.SDK_INT >= 21)
             setTaskDescription(
                     new ActivityManager.TaskDescription(getIntent().getStringExtra("title"))
             );
+
+        id = getIntent().getIntExtra(KEY_ID, id);
 
         boolean useMultitasking =
                 PreferenceManager.getDefaultSharedPreferences(this)
                         .getBoolean("multitasking", false);
 
         if (useMultitasking && Build.VERSION.SDK_INT >= 21) {
-            /* Restarting activity if exists in background */
             for (ActivityManager.AppTask task : Meow.getTaskList(this, LetterActivity.class)) {
                 final Intent running = task.getTaskInfo().baseIntent;
                 final Map.Entry<Integer, Integer> resolveUrl = Meow.resolvePostUrl(running.getData());
@@ -77,6 +82,7 @@ public class LetterActivity extends LoginDependentActivity {
                     return;
                 }
             }
+
         }
 
         setContentView(R.layout.activity_topic);
@@ -88,19 +94,29 @@ public class LetterActivity extends LoginDependentActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(
                         R.id.content_frame,
-                        letter = LetterFragment.getInstance(getIntent().getIntExtra(KEY_ID, id))
+                        topic = LetterFragment.getInstance(id)
                 )
                 .commit();
 
         ced = (CommentEditFragment) getSupportFragmentManager().findFragmentById(R.id.comment_editor);
-        letter.setCommentFragment(ced);
+        topic.setCommentFragment(ced);
+        ced.collapse();
 
     }
 
     @Override
-    public void onBackPressed() {
-        backToMain();
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        return super.onCreateView(parent, name, context, attrs);
     }
+
+    @Override
+    public void onBackPressed() {
+        if (ced.isExpanded())
+            ced.collapse();
+        else
+            backToMain();
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -116,6 +132,5 @@ public class LetterActivity extends LoginDependentActivity {
     }
 
     public void moveToComment(int value) {
-        letter.moveToComment(value);
-    }
-}
+        topic.moveToComment(value);
+    }}
