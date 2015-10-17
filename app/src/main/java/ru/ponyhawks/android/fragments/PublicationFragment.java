@@ -6,7 +6,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Comment;
-import com.cab404.libph.data.CommonInfo;
 import com.cab404.libph.data.Type;
 import com.cab404.libph.pages.MainPage;
 import com.cab404.libph.requests.CommentAddRequest;
@@ -42,12 +40,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
 import ru.ponyhawks.android.R;
+import ru.ponyhawks.android.activity.RefreshRatePickerDialog;
 import ru.ponyhawks.android.parts.CommentNumPart;
 import ru.ponyhawks.android.parts.CommentPart;
 import ru.ponyhawks.android.parts.LoadingPart;
 import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
-import ru.ponyhawks.android.statics.Providers;
 import ru.ponyhawks.android.utils.HideablePartBehavior;
 import ru.ponyhawks.android.utils.Meow;
 import ru.ponyhawks.android.utils.MidnightSync;
@@ -62,7 +60,10 @@ import ru.ponyhawks.android.utils.UpdateDrawable;
  *
  * @author cab404
  */
-public abstract class PublicationFragment extends ListFragment implements CommentEditFragment.SendCallback, CommentPart.CommentPartCallback {
+public abstract class PublicationFragment extends ListFragment implements
+        CommentEditFragment.SendCallback,
+        CommentPart.CommentPartCallback,
+        RefreshRatePickerDialog.RefreshPickedListener {
     public static final String KEY_ID = "id";
 
     private ChumrollAdapter adapter;
@@ -305,10 +306,18 @@ public abstract class PublicationFragment extends ListFragment implements Commen
         return commentPart;
     }
 
+    RefreshRatePickerDialog.SavedRefreshState refreshState = new RefreshRatePickerDialog.SavedRefreshState();
+
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         final int id = item.getItemId();
         switch (id) {
+            case R.id.continuous_refresh:
+                final RefreshRatePickerDialog dialog = new RefreshRatePickerDialog(getActivity());
+                dialog.setListener(this);
+                dialog.setState(refreshState);
+                dialog.show();
+                break;
             case R.id.copy_link:
                 setClipboard(getLink());
                 Toast.makeText(getActivity(), R.string.topic_link_copied, Toast.LENGTH_SHORT).show();
@@ -351,12 +360,13 @@ public abstract class PublicationFragment extends ListFragment implements Commen
 
     void setUpdating(boolean updating) {
         spinningWheel.setSpinning(updating);
+        spinningWheel.invalidateSelf();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_topic, menu);
+        inflater.inflate(R.menu.menu_publication, menu);
     }
 
     public void fav(final Comment cm, final Context context) {
@@ -529,6 +539,23 @@ public abstract class PublicationFragment extends ListFragment implements Commen
         list.setSelection(commentPart.getIndex(value, adapter));
     }
 
+
+    long refreshRateMs = 0;
+    Runnable updateCycle = new Runnable() {
+        @Override
+        public void run() {
+            if (isDetached()) return;
+            update(false);
+            list.postDelayed(this, refreshRateMs);
+        }
+    };
+
+    @Override
+    public void onRefreshRatePicked(boolean enabled, long rate_ms) {
+        list.removeCallbacks(updateCycle);
+        if (enabled) list.postDelayed(updateCycle, refreshRateMs = rate_ms);
+    }
+
     protected abstract Page getPageRequest();
 
     protected abstract void bindModules(MidnightSync sync);
@@ -542,5 +569,6 @@ public abstract class PublicationFragment extends ListFragment implements Commen
     protected abstract CommentAddRequest getCommentAddRequest(Editable message, int reply);
 
     protected abstract CommentEditRequest getCommentEditRequest(Editable message, int reply);
+
 
 }

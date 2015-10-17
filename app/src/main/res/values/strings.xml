@@ -38,6 +38,21 @@
     <string name="logout_label">Log out</string>
     <string name="to_the_bottom">To the bottom</string>
 
+    <string name="continuous_refresh">Autorefresh</string>
+
+    <string name="interval_5_seconds">Every 5 seconds</string>
+    <string name="interval_10_seconds">Slightly more frequenly, than sometimes</string>
+    <string name="interval_13_seconds">Every 13 seconds</string>
+    <string name="interval_15_seconds">Sometimes</string>
+    <string name="interval_30_seconds">Twice a minute</string>
+    <string name="interval_42_seconds">Every 42 seconds</string>
+    <string name="interval_1_minute">Every minute</string>
+    <string name="interval_413_seconds">3V3RY 413 S3CONDS</string>
+    <string name="interval_1_day">Every day</string>
+    <string name="interval_1000_years">Approx. every millenia</string>
+    <string name="interval_65536_ms">Every 1000000000000000₂ milliseconds</string>
+    <string name="interval_9000_ms">Every 9000 milliseconds</string>
+
     <string-array name="exit">
         <item>Yes</item>
     </string-array>

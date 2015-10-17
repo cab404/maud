@@ -95,7 +95,7 @@ public class PublicationsListFragment extends RefreshableListFragment {
             }
         });
 
-        adapter.prepareFor(topicPart, commentPart, continuationPart);
+        adapter.prepareFor(topicPart, commentPart, continuationPart, new LoadingPart());
         setAdapter(adapter);
 
         setRefreshing(true);
@@ -141,6 +141,8 @@ public class PublicationsListFragment extends RefreshableListFragment {
 
         if (!clear)
             adapter.add(LoadingPart.class, null);
+        else
+            cPage = 1;
 
         final AtomicInteger count = new AtomicInteger(0);
         RequestManager

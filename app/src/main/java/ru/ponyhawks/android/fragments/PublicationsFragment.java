@@ -46,20 +46,23 @@ public class PublicationsFragment extends Fragment {
         final String login = Providers.UserInfo.getInstance().getInfo().username;
         topicsUrl = "/profile/" + login + "/created/topics";
         commentsUrl = "/profile/" + login + "/created/comments";
+        view.setBackgroundColor(getClass().hashCode());
 
         pager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
 
-            private PublicationsListFragment comments;
-            private PublicationsListFragment topics;
+            private Fragment comments;
+            private Fragment topics;
 
             @Override
             public Fragment getItem(int position) {
                 switch (position) {
                     case 0:
-                        topics = PublicationsListFragment.getInstance(topicsUrl);
+                        if (topics == null)
+                            topics = new RefreshableListFragment();
                         return topics;
                     case 1:
-                        comments = PublicationsListFragment.getInstance(commentsUrl);
+                        if (comments == null)
+                            comments = new RefreshableListFragment();
                         return comments;
                     default:
                         return null;
@@ -70,6 +73,7 @@ public class PublicationsFragment extends Fragment {
             public CharSequence getPageTitle(int position) {
                 return getActivity().getResources().getStringArray(R.array.pub_pager_titles)[position];
             }
+
 
             @Override
             public int getCount() {
@@ -101,3 +105,4 @@ public class PublicationsFragment extends Fragment {
         sab.setElevation(elevation);
     }
 }
+

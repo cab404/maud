@@ -129,6 +129,8 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     TextView date;
     @Bind(R.id.avatar)
     ImageView avatar;
+    @Bind(R.id.userspace)
+    View userspace;
 
     @Override
     public void convert(View view, final Comment cm, int index, final ViewGroup parent) {
@@ -155,8 +157,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
                 showActionDialog(cm, v.getContext());
             }
         };
-        avatar.setOnClickListener(showControls);
-        author.setOnClickListener(showControls);
+        userspace.setOnClickListener(showControls);
 
         resetOffset(view, cm);
 

@@ -35,7 +35,7 @@ public abstract class ContinuationPart implements ViewConverter<Void> {
     @Override
     public View createView(ViewGroup parent, LayoutInflater inflater) {
         final View view = new View(parent.getContext());
-        view.setLayoutParams(new AbsListView.LayoutParams(1,1));
+        view.setLayoutParams(new AbsListView.LayoutParams(1,100));
         return view;
     }
 

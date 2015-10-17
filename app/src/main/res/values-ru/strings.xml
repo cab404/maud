@@ -76,5 +76,18 @@
         <item>Выбрать из галереи</item>
         <item>Ввести ссылку</item>
     </string-array>
+    <string name="continuous_refresh">Автообновление</string>
+    <string name="interval_1000_years">Примерно каждую тысячу лет</string>
+    <string name="interval_10_seconds">Чуть чаще, чем иногда</string>
+    <string name="interval_13_seconds">Каждые 13 секунд</string>
+    <string name="interval_15_seconds">Иногда</string>
+    <string name="interval_1_day">Каждый день</string>
+    <string name="interval_1_minute">Каждую минуту</string>
+    <string name="interval_30_seconds">Дважды в минуту</string>
+    <string name="interval_413_seconds">К4ЖДЫ3 413 С3КУНД</string>
+    <string name="interval_42_seconds">Каждые 42 секунды</string>
+    <string name="interval_5_seconds">Каждые пять секунд</string>
+    <string name="interval_65536_ms">Каждые 1000000000000000₂ миллисекунд</string>
+    <string name="interval_9000_ms">Каждые 9000 секунд</string>
 
 </resources>

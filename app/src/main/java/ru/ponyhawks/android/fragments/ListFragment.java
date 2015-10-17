@@ -53,6 +53,7 @@ public class ListFragment extends Fragment {
                     list.getPaddingBottom()
             );
             list.setClipToPadding(false);
+            ((ListView) list).setDividerHeight((int) (getResources().getDisplayMetrics().density));
         }
     }
 
