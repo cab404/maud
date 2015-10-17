@@ -89,5 +89,6 @@
     <string name="interval_5_seconds">Каждые пять секунд</string>
     <string name="interval_65536_ms">Каждые 1000000000000000₂ миллисекунд</string>
     <string name="interval_9000_ms">Каждые 9000 секунд</string>
+    <string name="show_delimiters">Разделять комментарии</string>
 
 </resources>

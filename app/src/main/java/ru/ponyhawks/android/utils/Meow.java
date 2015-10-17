@@ -10,6 +10,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.ArrayRes;
 import android.support.annotation.NonNull;
+import android.text.Editable;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -89,7 +92,75 @@ public class Meow {
         return new AbstractMap.SimpleEntry<>(topicId, target);
     }
 
-    public static void configureDocument(){
+    private static class TagColoring extends ForegroundColorSpan {
+        public TagColoring(int color) {
+            super(color);
+        }
+    }
+
+    private static final int
+            P_ST_IN_TEXT = 0,
+            P_ST_IN_TAG = 1,
+            P_ST_IN_PARAM = 2;
+
+    public static void tintTags(Editable editable) {
+        int p_state = P_ST_IN_TEXT;
+        int startTag = 0;
+        char paramType = 0;
+        final int tagColor = 0xff888888;
+
+        for (TagColoring c : editable.getSpans(0, editable.length(), TagColoring.class))
+            editable.removeSpan(c);
+
+        for (int i = 0; i < editable.length(); i++) {
+            final char cChr = editable.charAt(i);
+            switch (cChr) {
+                case '<':
+                    switch (p_state) {
+                        case P_ST_IN_TEXT:
+                            p_state = P_ST_IN_TAG;
+                            startTag = i;
+                            break;
+                    }
+                    break;
+                case '>':
+                    switch (p_state) {
+                        case P_ST_IN_TAG:
+                            p_state = P_ST_IN_TEXT;
+                            editable.setSpan(
+                                    new TagColoring(tagColor),
+                                    startTag,
+                                    i + 1,
+                                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                            );
+                            break;
+                    }
+                    break;
+                case '\'':
+                case '\"':
+                    switch (p_state) {
+                        case P_ST_IN_PARAM:
+                            if (paramType != cChr) continue;
+                            p_state = P_ST_IN_TAG;
+                            break;
+                        case P_ST_IN_TAG:
+                            paramType = cChr;
+                            p_state = P_ST_IN_PARAM;
+                            break;
+                    }
+                    break;
+            }
+
+        }
+
+        if (p_state == P_ST_IN_TAG){
+            editable.setSpan(
+                    new TagColoring(tagColor),
+                    startTag,
+                    editable.length(),
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+            );
+        }
 
     }
 

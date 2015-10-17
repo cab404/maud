@@ -66,8 +66,11 @@ public class ImportImageTextChanger implements TextChanger, ImageChooser.ImageUr
                 tag.props.put("src", image);
                 tag.type = Tag.Type.STANDALONE;
                 final Editable editable = text.getText();
-                editable.insert(cursor, tag.toString());
+                final String img = tag.toString();
+                editable.insert(cursor, img);
+
                 text.setText(editable);
+                text.setSelection(cursor, cursor + img.length());
             }
         });
     }

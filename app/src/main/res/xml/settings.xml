@@ -23,5 +23,8 @@
         android:defaultValue="true"
         android:key="saveCommentState"
         android:title="@string/save_comments_state" />
+    <CheckBoxPreference
+        android:key="showDelimiter"
+        android:title="@string/show_delimiters" />
 
 </PreferenceScreen>

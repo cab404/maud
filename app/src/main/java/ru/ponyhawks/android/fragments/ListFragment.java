@@ -1,6 +1,7 @@
 package ru.ponyhawks.android.fragments;
 
 import android.annotation.SuppressLint;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -53,7 +54,6 @@ public class ListFragment extends Fragment {
                     list.getPaddingBottom()
             );
             list.setClipToPadding(false);
-            ((ListView) list).setDividerHeight((int) (getResources().getDisplayMetrics().density));
         }
     }
 

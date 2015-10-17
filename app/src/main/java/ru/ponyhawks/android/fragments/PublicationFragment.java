@@ -360,7 +360,6 @@ public abstract class PublicationFragment extends ListFragment implements
 
     void setUpdating(boolean updating) {
         spinningWheel.setSpinning(updating);
-        spinningWheel.invalidateSelf();
     }
 
     @Override

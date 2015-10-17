@@ -26,6 +26,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
+import butterknife.OnTextChanged;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.text.changers.ImportImageTextChanger;
 import ru.ponyhawks.android.text.changers.ShrunkFormattingPrism;
@@ -34,6 +35,7 @@ import ru.ponyhawks.android.text.changers.TextChanger;
 import ru.ponyhawks.android.text.changers.TextPrism;
 import ru.ponyhawks.android.utils.HideablePartBehavior;
 import ru.ponyhawks.android.utils.IgnorantCoordinatorLayout;
+import ru.ponyhawks.android.utils.Meow;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -261,16 +263,21 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
     }
 
     @OnFocusChange(R.id.text)
-    public void onTextFocusChange(boolean hasFocus) {
+    void onTextFocusChange(boolean hasFocus) {
         if (hasFocus)
             expand();
     }
 
     @OnClick(R.id.send)
-    public void onSendInvoked() {
+    void onSendInvoked() {
         if (sendCallback != null) {
             sendCallback.onSend(getText());
         }
+    }
+
+    @OnTextChanged(R.id.text)
+    void textChanged(CharSequence text){
+        Meow.tintTags((Editable) text);
     }
 
 }

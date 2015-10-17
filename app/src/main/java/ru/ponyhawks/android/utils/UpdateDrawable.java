@@ -31,9 +31,8 @@ public class UpdateDrawable extends Drawable {
     final Bitmap upd;
     final Rect size;
     final Rect dst = new Rect();
-    final Rect txt = new Rect();
+    final Rect dst2 = new Rect();
 
-    private final Context context;
     int num = 0;
 
     boolean spinning = false;
@@ -45,7 +44,7 @@ public class UpdateDrawable extends Drawable {
 
     @SuppressWarnings("ConstantConditions")
     public UpdateDrawable(Context context) {
-        this.context = context;
+        Context context1 = context;
         final float dp = context.getResources().getDisplayMetrics().density;
         padding = (int) (8 * dp);
         paint.setTextSize(8 * dp);
@@ -58,6 +57,12 @@ public class UpdateDrawable extends Drawable {
 
     public void setSpinning(boolean spinning) {
         this.spinning = spinning;
+        Meow.inMain(new Runnable() {
+            @Override
+            public void run() {
+                invalidateSelf();
+            }
+        });
     }
 
     public void setMenuIcon(final MenuItem item, final View contentFrame) {
@@ -103,8 +108,8 @@ public class UpdateDrawable extends Drawable {
         if (num == 0) return;
         paint.setColor(spinning ? TINT : -1);
         String nm = num + "";
-        paint.getTextBounds(nm, 0, nm.length(), txt);
-        canvas.drawText(nm, dst.centerX() - txt.width() / 2, dst.centerY() + txt.height() / 2, paint);
+        paint.getTextBounds(nm, 0, nm.length(), dst2);
+        canvas.drawText(nm, dst.centerX() - dst2.width() / 2, dst.centerY() + dst2.height() / 2, paint);
 
     }
 

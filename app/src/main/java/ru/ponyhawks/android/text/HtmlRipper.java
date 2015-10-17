@@ -519,7 +519,7 @@ public class HtmlRipper {
                                     .cacheOnDisk(true)
                                     .imageScaleType(ImageScaleType.EXACTLY).build();
 
-                            if (loadImages)
+                            if (loadImages && ImageLoader.getInstance().getDiskCache().get(src) == null)
                                 ImageLoader.getInstance().loadImage(src, size, opt, imageAware);
                             else
                                 ImageLoader.getInstance().displayImage(

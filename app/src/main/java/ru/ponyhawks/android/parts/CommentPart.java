@@ -2,6 +2,7 @@ package ru.ponyhawks.android.parts;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -131,6 +132,8 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     ImageView avatar;
     @Bind(R.id.userspace)
     View userspace;
+    @Bind(R.id.delimiter)
+    View delimeter;
 
     @Override
     public void convert(View view, final Comment cm, int index, final ViewGroup parent) {
@@ -140,6 +143,11 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         ButterKnife.bind(this, view);
 
         view.setBackgroundColor(selectedId == cm.id ? 0x80000000 : cm.is_new ? 0x40000000 : 0);
+
+        boolean showDelimeters = PreferenceManager
+                .getDefaultSharedPreferences(view.getContext())
+                .getBoolean("showDelimiters", false);
+        delimeter.setVisibility(showDelimeters ? View.VISIBLE : View.GONE);
 
         final int lv = (int) (view.getContext().getResources().getDisplayMetrics().density * 16);
         view.setOnClickListener(new DoubleClickListener() {

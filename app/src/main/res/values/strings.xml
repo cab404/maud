@@ -49,9 +49,10 @@
     <string name="interval_1_minute">Every minute</string>
     <string name="interval_413_seconds">3V3RY 413 S3CONDS</string>
     <string name="interval_1_day">Every day</string>
-    <string name="interval_1000_years">Approx. every millenia</string>
+    <string name="interval_1000_years">Approx. every thousand years</string>
     <string name="interval_65536_ms">Every 1000000000000000₂ milliseconds</string>
     <string name="interval_9000_ms">Every 9000 milliseconds</string>
+    <string name="show_delimiters">Show comment delimiters</string>
 
     <string-array name="exit">
         <item>Yes</item>
