@@ -24,7 +24,7 @@
         android:key="saveCommentState"
         android:title="@string/save_comments_state" />
     <CheckBoxPreference
-        android:key="showDelimiter"
+        android:key="showDelimiters"
         android:title="@string/show_delimiters" />
 
 </PreferenceScreen>
