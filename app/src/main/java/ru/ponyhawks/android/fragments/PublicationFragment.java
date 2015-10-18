@@ -365,7 +365,7 @@ public abstract class PublicationFragment extends ListFragment implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_publication, menu);
+        inflater.inflate(R.menu.publication, menu);
     }
 
     public void fav(final Comment cm, final Context context) {

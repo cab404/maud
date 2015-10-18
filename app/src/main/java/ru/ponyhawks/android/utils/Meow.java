@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.widget.Toast;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -40,6 +41,15 @@ public class Meow {
             runnable.run();
         else
             handler.post(runnable);
+    }
+
+    public static void msg(final Context ctx, final CharSequence what, final int duration){
+        inMain(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ctx, what, duration).show();
+            }
+        });
     }
 
 

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/reply" android:title="Ответить"/>
-    <item android:id="@+id/edit" android:title="Редактировать"/>
-    <item android:id="@+id/favs" android:title="Добавить в избранное"/>
-</menu>

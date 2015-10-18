@@ -14,6 +14,9 @@
         android:title="@string/select_text" />
 
     <PreferenceCategory android:title="@string/app" />
+    <CheckBoxPreference
+        android:key="forceRussian"
+        android:title="@string/force_russian" />
     <ListPreference
         android:entries="@array/theme_names"
         android:entryValues="@array/theme_values"

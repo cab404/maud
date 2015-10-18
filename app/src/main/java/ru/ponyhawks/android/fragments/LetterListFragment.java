@@ -7,12 +7,17 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.Toast;
 
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.LetterLabel;
 import com.cab404.libph.pages.LetterTablePage;
 import com.cab404.libph.pages.MainPage;
+import com.cab404.libph.requests.LetterListRequest;
 
+import java.util.Set;
+
+import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.activity.LetterActivity;
 import ru.ponyhawks.android.parts.LetterLabelPart;
 import ru.ponyhawks.android.parts.MoonlitPart;
@@ -34,6 +39,7 @@ public class LetterListFragment extends RefreshableListFragment {
 
     private ChumrollAdapter adapter;
     private MidnightSync sync;
+    private LetterLabelPart letterPart;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -41,10 +47,10 @@ public class LetterListFragment extends RefreshableListFragment {
 
         adapter = new ChumrollAdapter();
         sync = new MidnightSync(adapter);
-        final LetterLabelPart letterLabelPart = new LetterLabelPart();
-        adapter.prepareFor(letterLabelPart);
+        letterPart = new LetterLabelPart(this);
+        adapter.prepareFor(letterPart);
 
-        letterLabelPart.setOnDataClickListener(new MoonlitPart.OnDataClickListener<LetterLabel>() {
+        letterPart.setOnDataClickListener(new MoonlitPart.OnDataClickListener<LetterLabel>() {
             @Override
             public void onClick(LetterLabel data, View view) {
                 switchToPage(data);
@@ -59,6 +65,7 @@ public class LetterListFragment extends RefreshableListFragment {
 
     @Override
     public void onRefresh() {
+        setRefreshing(true);
         RequestManager
                 .fromActivity(getActivity())
                 .manage(new LetterTablePage())
@@ -78,6 +85,12 @@ public class LetterListFragment extends RefreshableListFragment {
 
     public static LetterListFragment getInstance() {
         return new LetterListFragment();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        letterPart.disconnect();
     }
 
     private void switchToPage(LetterLabel data) {
@@ -107,4 +120,75 @@ public class LetterListFragment extends RefreshableListFragment {
         startActivity(startTopicActivity);
     }
 
+    public void delete(final Set<Integer> ids) {
+        final LetterListRequest lreq = new LetterListRequest(LetterListRequest.Action.DELETE, ids.toArray(new Integer[ids.size()]));
+        setRefreshing(true);
+        RequestManager
+                .fromActivity(getActivity())
+                .manage(lreq)
+                .setCallback(new RequestManager.SimpleRequestCallback<LetterListRequest>() {
+                    @Override
+                    public void onSuccess(LetterListRequest what) {
+                        super.onSuccess(what);
+                        Meow.msg(getActivity(),
+                                ids.size()
+                                        + " "
+                                        + getResources().getQuantityString(R.plurals.letter_num, ids.size())
+                                        + " "
+                                        + getResources().getString(R.string.deleted)
+                                , Toast.LENGTH_LONG);
+                        onRefresh();
+                    }
+
+                    @Override
+                    public void onError(LetterListRequest what, Exception e) {
+                        super.onError(what, e);
+                        Meow.msg(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG);
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onFinish(LetterListRequest what) {
+                        super.onFinish(what);
+                        setRefreshing(false);
+                    }
+
+                }).start();
+    }
+
+    public void markRead(final Set<Integer> ids) {
+        final LetterListRequest lreq = new LetterListRequest(LetterListRequest.Action.READ, ids.toArray(new Integer[ids.size()]));
+        setRefreshing(true);
+        RequestManager
+                .fromActivity(getActivity())
+                .manage(lreq)
+                .setCallback(new RequestManager.SimpleRequestCallback<LetterListRequest>() {
+                    @Override
+                    public void onSuccess(LetterListRequest what) {
+                        super.onSuccess(what);
+                        Meow.msg(getActivity(),
+                                ids.size()
+                                + " "
+                                + getResources().getQuantityString(R.plurals.letter_num, ids.size())
+                                + " "
+                                + getResources().getString(R.string.markedRead)
+                                , Toast.LENGTH_LONG);
+                        onRefresh();
+                    }
+
+                    @Override
+                    public void onError(LetterListRequest what, Exception e) {
+                        super.onError(what, e);
+                        Meow.msg(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG);
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onFinish(LetterListRequest what) {
+                        super.onFinish(what);
+                        setRefreshing(false);
+                    }
+
+                }).start();
+    }
 }

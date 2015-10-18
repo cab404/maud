@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.statics.Providers;

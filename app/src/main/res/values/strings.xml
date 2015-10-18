@@ -53,6 +53,11 @@
     <string name="interval_65536_ms">Every 1000000000000000₂ milliseconds</string>
     <string name="interval_9000_ms">Every 9000 milliseconds</string>
     <string name="show_delimiters">Show comment delimiters</string>
+    <string name="markread">Mark as read</string>
+    <string name="delete">Delete</string>
+    <string name="force_russian">Force Russian language</string>
+    <string name="deleted">sent to the Moon</string>
+    <string name="markedRead">marked as read</string>
 
     <string-array name="exit">
         <item>Yes</item>
@@ -83,6 +88,15 @@
         <item quantity="few">comments</item>
         <item quantity="many">comments</item>
         <item quantity="other">comments</item>
+    </plurals>
+
+    <plurals name="letter_num">
+        <item quantity="zero">letters</item>
+        <item quantity="one">letter</item>
+        <item quantity="two">letters</item>
+        <item quantity="few">letters</item>
+        <item quantity="many">letters</item>
+        <item quantity="other">letters</item>
     </plurals>
 
 </resources>

@@ -50,12 +50,18 @@
     </string-array>
 
     <plurals name="comment_num" tools:ignore="ImpliedQuantity">
-        <item quantity="zero">комментариев</item>
         <item quantity="one">комментарий</item>
-        <item quantity="two">комментария</item>
         <item quantity="few">комментария</item>
         <item quantity="many">комментариев</item>
         <item quantity="other">комментариев</item>
+    </plurals>
+
+
+    <plurals name="letter_num" tools:ignore="ImpliedQuantity">
+        <item quantity="one">письмо</item>
+        <item quantity="few">письма</item>
+        <item quantity="many">писем</item>
+        <item quantity="other">писем</item>
     </plurals>
 
 
@@ -90,5 +96,11 @@
     <string name="interval_65536_ms">Каждые 1000000000000000₂ миллисекунд</string>
     <string name="interval_9000_ms">Каждые 9000 секунд</string>
     <string name="show_delimiters">Разделять комментарии</string>
+    <string name="delete">Удалить</string>
+    <string name="markread">Пометить как прочитанное</string>
+
+    <string name="force_russian">Русский язык</string>
+    <string name="deleted">отправлено на Луну</string>
+    <string name="markedRead">отложено подальше</string>
 
 </resources>

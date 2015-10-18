@@ -150,12 +150,6 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
                         }
                     }
                 });
-        try {
-            final boolean success = Providers.Profile.get().login(username, password);
-
-        } catch (Exception e) {
-            msg("failure: " + e.getLocalizedMessage());
-        }
 
     }
 
@@ -226,11 +220,25 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
             @Override
             public void run() {
                 synchronized (messages) {
+                    float count = 0;
+                    int i = 0;
+                    int ni;
+
+                    float[] width = new float[1];
+                    status.getPaint().getTextWidths(" ", width);
+
+                    float lineWidth = status.getWidth();
+                    if (lineWidth != 0) {
+                        while ((ni = messages.indexOf("\n", i + 1)) != -1) {
+                            count += Math.ceil(width[0] / lineWidth * (ni - i));
+                            i = ni;
+                        }
+                        final float limit = status.getHeight() / status.getLineHeight() * 0.9f;
+                        while (count-- > limit)
+                            messages.delete(0, messages.indexOf("\n") + 1);
+                    }
+
                     status.setText(messages);
-//                    while (status.getHeight() / status.getLineHeight() * 0.7 <= status.getLineCount()) {
-//                        messages.replace(0, messages.indexOf("\n"), "");
-//                        status.setText(messages);
-//                    }
                 }
             }
         });
