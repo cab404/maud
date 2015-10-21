@@ -37,6 +37,7 @@
         android:layout_below="@+id/target"
         android:layout_toLeftOf="@+id/send"
         android:gravity="top|left"
+        android:textSize="14sp"
         android:inputType="textLongMessage"
         android:nestedScrollingEnabled="true"
         android:singleLine="true" />

@@ -1,9 +1,11 @@
 package ru.ponyhawks.android.activity;
 
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,13 +27,23 @@ public class BaseActivity extends AppCompatActivity {
 
     private void setupTheme() {
         final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        final String theme = sp.getString("theme", "AppThemeDark");
+        final String themeName = sp.getString("theme", "AppThemeDark");
 
-        int id = getResources().getIdentifier(theme, "style", getPackageName());
+        int id = getResources().getIdentifier(themeName, "style", getPackageName());
         if (id == 0) id = R.style.AppThemeDark;
 
         setTheme(id);
 
+    }
+
+    private void setupLang(){
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("forceRussian", false)) {
+            getResources().getConfiguration().locale = new Locale("ru");
+            getResources().updateConfiguration(
+                    getResources().getConfiguration(),
+                    getResources().getDisplayMetrics()
+            );
+        }
     }
 
     public RequestManager getRequestManager() {
@@ -62,6 +74,18 @@ public class BaseActivity extends AppCompatActivity {
         if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("removeShadow", false))
             if (getSupportActionBar() != null)
                 getSupportActionBar().setElevation(0);
+    }
+
+    @Override
+    public void setContentView(View view) {
+        setupLang();
+        super.setContentView(view);
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        setupLang();
+        super.setContentView(layoutResID);
     }
 
 }

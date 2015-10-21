@@ -58,6 +58,8 @@
     <string name="force_russian">Force Russian language</string>
     <string name="deleted">sent to the Moon</string>
     <string name="markedRead">marked as read</string>
+    <string name="link">Link</string>
+    <string name="spoiler_title">Spoiler title</string>
 
     <string-array name="exit">
         <item>Yes</item>
@@ -74,6 +76,7 @@
         <item>Dark</item>
         <item>Green</item>
         <item>Marshmallow</item>
+        <item>Celestia</item>
     </string-array>
 
     <string-array name="pub_pager_titles">

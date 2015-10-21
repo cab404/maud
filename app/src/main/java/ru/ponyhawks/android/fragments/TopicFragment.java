@@ -78,6 +78,7 @@ public class TopicFragment extends PublicationFragment {
                 Meow.inMain(new Runnable() {
                     @Override
                     public void run() {
+                        if (isDetached()) return;
                         getActivity().setTitle(((Topic) object).title);
                         if (Build.VERSION.SDK_INT >= 21)
                             getActivity().setTaskDescription(new ActivityManager.TaskDescription(((Topic) object).title));

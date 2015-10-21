@@ -13,7 +13,6 @@ import ru.ponyhawks.android.R;
 public final class SimpleChangers {
     private SimpleChangers() {
     }
-
     public static final TextChanger SPAN_LEFT =
             new WrapTextChanger(R.drawable.ic_format_align_left, "<left>", "</left>");
     public static final TextChanger SPAN_RIGHT =
@@ -33,7 +32,9 @@ public final class SimpleChangers {
     public static final TextChanger LITESPOILER =
             new WrapTextChanger(R.drawable.ic_litespoiler, "<ls>", "</ls>");
     public static final TextChanger SPOILER =
-            new WrapTextChanger(R.drawable.ic_spoiler, "<spoiler>Спойлер<end-title/>", "</spoiler>", 9, 16);
-
-
+            new ParamWrapTextChanger("<spoiler>%<end-title/>$</spoiler>", R.drawable.ic_spoiler, R.string.spoiler_title);
+    public static final TextChanger LINK =
+            new ParamWrapTextChanger("<a href='%'>$</a>", R.drawable.ic_link, R.string.link);
+    public static final TextChanger VIDEO =
+            new ParamWrapTextChanger("<video>%</video>", R.drawable.ic_video, R.string.link);
 }

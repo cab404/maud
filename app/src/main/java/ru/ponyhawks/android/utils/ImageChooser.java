@@ -1,5 +1,6 @@
 package ru.ponyhawks.android.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -66,6 +67,7 @@ public class ImageChooser {
     /**
      * Will finish given activity on cancel, if urgent.
      */
+    @SuppressLint("NewApi")
     public void requestImageSelection(final boolean urgent) {
 
         new AlertDialog.Builder(ctx)

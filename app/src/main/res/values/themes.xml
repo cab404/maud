@@ -52,6 +52,15 @@
         <item name="colorAccent">#4c4589</item>
     </style>
 
+
+    <style name="AppThemeLight.Celestia">
+        <item name="colorPrimary">#df97f1</item>
+        <item name="colorPrimaryDark">#cb8adc</item>
+        <item name="best_pony">@drawable/anim_rarity</item>
+        <item name="colorAccent">#f9b76d</item>
+        <item name="inverse_bg_color">#44abca</item>
+    </style>
+
     <style name="Theme.AppCompat.Dialog.Alert.NoBG">
         <item name="android:colorBackgroundCacheHint">@null</item>
 
@@ -82,6 +91,7 @@
         <item>AppThemeDark</item>
         <item>AppThemeDark.Green</item>
         <item>AppThemeLight.Rariteh</item>
+        <item>AppThemeLight.Celestia</item>
     </string-array>
 
     <style name="SettingsThemeDark" parent="android:Theme" />

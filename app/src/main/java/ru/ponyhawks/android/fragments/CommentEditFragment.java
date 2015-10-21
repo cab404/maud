@@ -29,6 +29,7 @@ import butterknife.OnFocusChange;
 import butterknife.OnTextChanged;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.text.changers.ImportImageTextChanger;
+import ru.ponyhawks.android.text.changers.ParamWrapTextChanger;
 import ru.ponyhawks.android.text.changers.ShrunkFormattingPrism;
 import ru.ponyhawks.android.text.changers.SimpleChangers;
 import ru.ponyhawks.android.text.changers.TextChanger;
@@ -62,10 +63,12 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
 
     {
         instruments = new ArrayList<>();
-        instruments.add(new ImportImageTextChanger());
         instruments.add(SimpleChangers.SPOILER);
-        instruments.add(SimpleChangers.LITESPOILER);
+        instruments.add(SimpleChangers.LINK);
         instruments.add(SimpleChangers.QUOTE);
+        instruments.add(SimpleChangers.LITESPOILER);
+        instruments.add(new ImportImageTextChanger());
+        instruments.add(SimpleChangers.VIDEO);
         instruments.add(SimpleChangers.BOLD);
         instruments.add(SimpleChangers.ITALIC);
         instruments.add(SimpleChangers.UNDERLINE);
@@ -219,7 +222,7 @@ public class CommentEditFragment extends Fragment implements HideablePartBehavio
                 root.invalidate();
                 text.setVerticalScrollBarEnabled(true);
                 text.setSingleLine(false);
-                text.setMaxLines(5);
+                text.setMaxLines(9);
 
                 showKeyboard();
                 break;

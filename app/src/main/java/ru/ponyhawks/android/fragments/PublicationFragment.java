@@ -147,12 +147,12 @@ public abstract class PublicationFragment extends ListFragment implements
                     @Override
                     public void onError(Page what, final Exception e) {
                         super.onError(what, e);
-                        if (getActivity() == null) return;
-                        getActivity().finish();
                         final Runnable runnable = new Runnable() {
                             @Override
                             public void run() {
+                                if (getActivity() == null) return;
                                 Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                                getActivity().finish();
                             }
                         };
                         Meow.inMain(runnable);

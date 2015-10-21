@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.AbstractMap;
@@ -43,7 +44,7 @@ public class Meow {
             handler.post(runnable);
     }
 
-    public static void msg(final Context ctx, final CharSequence what, final int duration){
+    public static void msg(final Context ctx, final CharSequence what, final int duration) {
         inMain(new Runnable() {
             @Override
             public void run() {
@@ -163,7 +164,7 @@ public class Meow {
 
         }
 
-        if (p_state == P_ST_IN_TAG){
+        if (p_state == P_ST_IN_TAG) {
             editable.setSpan(
                     new TagColoring(tagColor),
                     startTag,

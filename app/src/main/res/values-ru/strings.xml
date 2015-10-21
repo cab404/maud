@@ -70,6 +70,7 @@
         <item>Тёмная</item>
         <item>Зелёная</item>
         <item>Зефирка</item>
+        <item>Селестия</item>
     </string-array>
 
     <string-array name="pub_pager_titles">
@@ -102,5 +103,7 @@
     <string name="force_russian">Русский язык</string>
     <string name="deleted">отправлено на Луну</string>
     <string name="markedRead">отложено подальше</string>
+    <string name="link">Ссылка</string>
+    <string name="spoiler_title">Заголовок спойлера</string>
 
 </resources>
