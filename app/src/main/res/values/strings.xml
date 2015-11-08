@@ -60,9 +60,10 @@
     <string name="markedRead">marked as read</string>
     <string name="link">Link</string>
     <string name="spoiler_title">Spoiler title</string>
-    <string name="wrong_credentials">Неправильная пара логин/пароль</string>
-    <string name="username_empty">Имя пользователя не может быть пустым</string>
-    <string name="password_empty">Пароль не может быть пустым</string>
+    <string name="wrong_credentials">Invalid credentials</string>
+    <string name="username_empty">Username cannot be empty</string>
+    <string name="password_empty">Password cannot be empty</string>
+    <string name="search">Search</string>
 
     <string-array name="exit">
         <item>Yes</item>

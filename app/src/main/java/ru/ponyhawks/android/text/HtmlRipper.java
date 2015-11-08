@@ -503,12 +503,12 @@ public class HtmlRipper {
 
                             int width, height;
                             if (tag.get("width").isEmpty())
-                                width = 400;
+                                width = (int) (layout.getWidth() * 0.9f);
                             else
                                 width = Integer.parseInt(tag.get("width"));
 
                             if (tag.get("height").isEmpty())
-                                height = 200;
+                                height = -1;//(int) (layout.getWidth() * 0.6f);
                             else
                                 height = Integer.parseInt(tag.get("height"));
 

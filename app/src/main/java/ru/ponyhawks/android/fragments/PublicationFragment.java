@@ -1,9 +1,11 @@
 package ru.ponyhawks.android.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -16,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.cab404.chumroll.ChumrollAdapter;
@@ -334,6 +337,24 @@ public abstract class PublicationFragment extends ListFragment implements
                         list.setSelection(adapter.getCount() - 1);
                     }
                 });
+                return true;
+            case R.id.search:
+                final EditText search = new EditText(getActivity());
+                search.setHint(android.R.string.search_go);
+                new AlertDialog.Builder(getActivity())
+                        .setView(search)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                newCommentsStack.clear();
+                                for (Comment comment : commentPart.getComments())
+                                    if (comment.text != null && comment.text.contains(search.getText()))
+                                        newCommentsStack.add(comment.id);
+                                nextNew();
+                            }
+                        }).show();
+                return true;
+
         }
         return super.onOptionsItemSelected(item);
     }

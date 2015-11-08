@@ -105,5 +105,9 @@
     <string name="markedRead">отложено подальше</string>
     <string name="link">Ссылка</string>
     <string name="spoiler_title">Заголовок спойлера</string>
+    <string name="username_empty">Имя пользователя не может быть пустым</string>
+    <string name="wrong_credentials">Неправильная пара логин/пароль</string>
+    <string name="password_empty">Пароль не может быть пустым</string>
+    <string name="search">Поиск</string>
 
 </resources>

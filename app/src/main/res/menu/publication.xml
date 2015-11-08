@@ -19,4 +19,8 @@
         android:id="@+id/continuous_refresh"
         android:title="@string/continuous_refresh"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/search"
+        android:title="@string/search"
+        app:showAsAction="never" />
 </menu>
