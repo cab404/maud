@@ -104,7 +104,6 @@ public abstract class PublicationFragment extends ListFragment implements
         commentPart = new CommentPart();
         commentPart.setCallback(this);
         commentPart.saveState = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("saveCommentState", true);
-
         final SpacePart spacePart = new SpacePart();
 
         final CommentNumPart commentNumPart = new CommentNumPart();

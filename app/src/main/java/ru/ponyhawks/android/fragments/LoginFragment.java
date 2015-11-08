@@ -58,9 +58,9 @@ public class LoginFragment extends Fragment {
 
         String err = null;
         if (TextUtils.isEmpty(password))
-            err = "Пароль не может быть пустым";
+            err = getActivity().getString(R.string.password_empty);
         if (TextUtils.isEmpty(usermane))
-            err = "Имя пользователя не может быть пустым";
+            err = getActivity().getString(R.string.username_empty);
 
         if (err != null) {
             toast(err);
@@ -88,7 +88,7 @@ public class LoginFragment extends Fragment {
                         if (loginCallback != null)
                             loginCallback.onLogin(LoginFragment.this);
                     } else {
-                        toast("Неправильная пара логин/пароль");
+                        toast(getActivity().getString(R.string.wrong_credentials));
                     }
                 } catch (Exception e) {
                     // Errors

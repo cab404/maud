@@ -55,7 +55,7 @@ public class PublicationsListFragment extends RefreshableListFragment {
     public static PublicationsListFragment getInstance(String pageUrl) {
         final PublicationsListFragment fragment = new PublicationsListFragment();
         Bundle args = new Bundle();
-
+        System.out.println("NEW INSTANCE " + pageUrl);
         args.putString(KEY_URL, pageUrl);
         fragment.setArguments(args);
         return fragment;

@@ -46,9 +46,8 @@ public class PublicationsFragment extends Fragment {
         final String login = Providers.UserInfo.getInstance().getInfo().username;
         topicsUrl = "/profile/" + login + "/created/topics";
         commentsUrl = "/profile/" + login + "/created/comments";
-        view.setBackgroundColor(getClass().hashCode());
 
-        pager.setAdapter(new FragmentPagerAdapter(getFragmentManager()) {
+        pager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager()) {
 
             private Fragment comments;
             private Fragment topics;
@@ -58,11 +57,11 @@ public class PublicationsFragment extends Fragment {
                 switch (position) {
                     case 0:
                         if (topics == null)
-                            topics = new RefreshableListFragment();
+                            topics = PublicationsListFragment.getInstance(topicsUrl);
                         return topics;
                     case 1:
                         if (comments == null)
-                            comments = new RefreshableListFragment();
+                            comments = PublicationsListFragment.getInstance(commentsUrl);
                         return comments;
                     default:
                         return null;
