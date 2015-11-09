@@ -6,16 +6,25 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Locale;
+
+import ru.ponyhawks.android.R;
 
 /**
  * Well, sorry for no comments here!
@@ -76,7 +85,7 @@ public class App extends Application {
                 email.putExtra(Intent.EXTRA_EMAIL, new String[]{"me@cab404.ru"});
                 email.putExtra(Intent.EXTRA_SUBJECT,
                         "phclient v" + appv + " crash on "
-                        + Build.PRODUCT +
+                                + Build.PRODUCT +
                                 ", API " + Build.VERSION.SDK_INT);
 
                 email.putExtra(Intent.EXTRA_TEXT, "well, we've crashed. i'm not even sorry.\n" + ex.getLocalizedMessage());
@@ -88,7 +97,6 @@ public class App extends Application {
             }
 
         });
-
 
     }
 

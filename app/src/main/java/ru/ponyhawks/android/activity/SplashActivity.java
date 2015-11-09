@@ -1,8 +1,11 @@
 package ru.ponyhawks.android.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,12 +18,19 @@ import com.cab404.libph.requests.LSRequest;
 import com.cab404.libph.requests.LoginRequest;
 import com.cab404.moonlight.framework.Request;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
 import ru.ponyhawks.android.fragments.LoginFragment;
 import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
 import ru.ponyhawks.android.statics.Providers;
+import ru.ponyhawks.android.utils.Meow;
 import ru.ponyhawks.android.utils.RequestManager;
 
 public class SplashActivity extends BaseActivity implements LoginFragment.LoginCallback {
@@ -74,11 +84,65 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
         new Thread() {
             @Override
             public void run() {
+                // App update thread
+                String appv;
                 try {
-                    loginSeq();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException("WHAT", e);
+                    appv = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    throw new RuntimeException("", e);
                 }
+
+                String server_version = null;
+                try {
+                    final URLConnection connection = new URL("http://cab404.ru/all/bin/ph/version.txt").openConnection();
+
+                    final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    server_version = reader.readLine();
+
+                } catch (IOException e) {
+                    System.out.println("do not know newest version");
+                }
+
+                if (server_version == null) {
+                    System.out.println("okay, no data on new versions");
+                } else if (appv.equals(server_version)) {
+                    System.out.println("our version is okay");
+                } else {
+                    // now updating.
+                    System.out.println("okay, update");
+
+                    Meow.inMain(new Runnable() {
+                        @Override
+                        public void run() {
+                            new AlertDialog.Builder(SplashActivity.this)
+                                    .setMessage(R.string.wehavegotanupdate)
+                                    .setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent view = new Intent(Intent.ACTION_VIEW, Uri.parse("http://cab404.ru/all/bin/ph/client.apk"));
+                                            view.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(view);
+                                            dialog.dismiss();
+                                            finish();
+                                        }
+                                    })
+                                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            threadLoginSeq();
+                                        }
+                                    })
+                                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialog) {
+                                            threadLoginSeq();
+                                        }
+                                    }).show();
+                        }
+                    });
+                    return;
+                }
+                threadLoginSeq();
             }
         }.start();
     }
@@ -90,6 +154,19 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
                 login();
             }
         });
+    }
+
+    void threadLoginSeq() {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    loginSeq();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException("WHAT", e);
+                }
+            }
+        }.start();
     }
 
     void loginSeq() throws InterruptedException {

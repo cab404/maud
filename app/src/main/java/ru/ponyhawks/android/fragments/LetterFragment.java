@@ -81,6 +81,7 @@ public class LetterFragment extends PublicationFragment {
                 Meow.inMain(new Runnable() {
                     @Override
                     public void run() {
+                        if (getActivity() == null) return;
                         getActivity().setTitle(((Letter) object).title);
                         if (Build.VERSION.SDK_INT >= 21)
                             getActivity().setTaskDescription(new ActivityManager.TaskDescription(((Letter) object).title));

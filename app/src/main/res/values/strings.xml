@@ -64,6 +64,8 @@
     <string name="username_empty">Username cannot be empty</string>
     <string name="password_empty">Password cannot be empty</string>
     <string name="search">Search</string>
+    <string name="wehavegotanupdate">We\'ve got an update for ya.</string>
+    <string name="update">Update</string>
 
     <string-array name="exit">
         <item>Yes</item>
