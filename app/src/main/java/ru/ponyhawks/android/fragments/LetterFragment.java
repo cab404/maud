@@ -8,19 +8,16 @@ import android.text.Editable;
 
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Letter;
-import com.cab404.libph.data.Topic;
 import com.cab404.libph.data.Type;
 import com.cab404.libph.pages.BasePage;
 import com.cab404.libph.pages.LetterPage;
 import com.cab404.libph.pages.MainPage;
-import com.cab404.libph.pages.TopicPage;
 import com.cab404.libph.requests.CommentAddRequest;
 import com.cab404.libph.requests.CommentEditRequest;
 import com.cab404.libph.requests.RefreshCommentsRequest;
 import com.cab404.moonlight.framework.Page;
 
 import ru.ponyhawks.android.parts.LetterPart;
-import ru.ponyhawks.android.parts.TopicPart;
 import ru.ponyhawks.android.utils.Meow;
 import ru.ponyhawks.android.utils.MidnightSync;
 
@@ -93,10 +90,10 @@ public class LetterFragment extends PublicationFragment {
 
 
     @Override
-    protected RefreshCommentsRequest getRefreshRequest() {
+    protected RefreshCommentsRequest getRefreshRequest(int lastCommentId) {
         int id = getArguments().getInt(KEY_ID);
         return new RefreshCommentsRequest(
-                Type.TALK, id, getCommentPart().getLastCommentId()
+                Type.TALK, id, lastCommentId
         );
     }
 

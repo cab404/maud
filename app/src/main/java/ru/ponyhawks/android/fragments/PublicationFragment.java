@@ -47,7 +47,6 @@ import ru.ponyhawks.android.activity.RefreshRatePickerDialog;
 import ru.ponyhawks.android.parts.CommentNumPart;
 import ru.ponyhawks.android.parts.CommentPart;
 import ru.ponyhawks.android.parts.LoadingPart;
-import ru.ponyhawks.android.parts.SpacePart;
 import ru.ponyhawks.android.parts.UpdateCommonInfoTask;
 import ru.ponyhawks.android.utils.HideablePartBehavior;
 import ru.ponyhawks.android.utils.Meow;
@@ -77,6 +76,8 @@ public abstract class PublicationFragment extends ListFragment implements
     private boolean editing = false;
 
     private CommentEditFragment commentFragment;
+    private boolean atLeastSomethingIsHere;
+    private boolean broken;
 
     public void setCommentFragment(CommentEditFragment commentFragment) {
         this.commentFragment = commentFragment;
@@ -107,11 +108,9 @@ public abstract class PublicationFragment extends ListFragment implements
         commentPart = new CommentPart();
         commentPart.setCallback(this);
         commentPart.saveState = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("saveCommentState", true);
-        final SpacePart spacePart = new SpacePart();
 
         final CommentNumPart commentNumPart = new CommentNumPart();
-        adapter.prepareFor(commentPart, spacePart, new LoadingPart(), commentNumPart);
-        final int loadingPartId = adapter.add(LoadingPart.class, null);
+        adapter.prepareFor(commentPart, new LoadingPart(), commentNumPart);
         prepareAdapter(adapter);
         setAdapter(adapter);
 
@@ -121,65 +120,10 @@ public abstract class PublicationFragment extends ListFragment implements
         updateButton.setImageDrawable(spinningWheel);
 
         bindModules(sync);
-        RequestManager.fromActivity(getActivity())
-                .manage(getPageRequest())
-                .setHandlers(
-                        sync
-                                .bind(MainPage.BLOCK_COMMENT, commentPart)
-                                .bind(MainPage.BLOCK_COMMENT_NUM, commentNumPart),
-                        new UpdateCommonInfoTask(),
-                        new ModularBlockParser.ParsedObjectHandler() {
-                            @Override
-                            public void handle(final Object object, int key) {
-                                handleInitialLoad(object, key);
-                                switch (key) {
-                                    case MainPage.BLOCK_COMMENT:
-                                        final Comment cm = (Comment) object;
-                                        commentPart.register(cm);
-                                        if (cm.is_new)
-                                            newCommentsStack.add(cm.id);
-                                        break;
-                                    case MainPage.BLOCK_COMMENTS_ENABLED:
-                                        break;
-                                }
-                            }
-                        })
-                .setCallback(new RequestManager.SimpleRequestCallback<Page>() {
-
-                    @Override
-                    public void onError(Page what, final Exception e) {
-                        super.onError(what, e);
-                        final Runnable runnable = new Runnable() {
-                            @Override
-                            public void run() {
-                                if (getActivity() == null) return;
-                                Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                                getActivity().finish();
-                            }
-                        };
-                        Meow.inMain(runnable);
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onSuccess(Page what) {
-                        final float dp = view.getResources().getDisplayMetrics().density;
-                        sync.inject((int) (68 * dp), spacePart);
-                    }
-
-                    @Override
-                    public void onFinish(Page what) {
-                        sync.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.removeById(loadingPartId);
-                                spinningWheel.setNum(newCommentsStack.size());
-                            }
-                        });
-                    }
-                })
-                .start();
-
+        sync
+                .bind(MainPage.BLOCK_COMMENT, commentPart)
+                .bind(MainPage.BLOCK_COMMENT_NUM, commentNumPart);
+        fullReload();
         if (commentFragment != null)
             commentFragment.setTarget(getActivity().getString(R.string.replying_topic));
 
@@ -247,7 +191,12 @@ public abstract class PublicationFragment extends ListFragment implements
             }
         });
 
-        final RefreshCommentsRequest request = getRefreshRequest();
+        if (broken) {
+            fullReload();
+            return;
+        }
+
+        final RefreshCommentsRequest request = getRefreshRequest(getCommentPart().getLastCommentId());
         request.setSelfIdComment(selfCommentId);
 
         RequestManager.fromActivity(getActivity())
@@ -304,6 +253,70 @@ public abstract class PublicationFragment extends ListFragment implements
         commentPart.destroy();
     }
 
+    public void fullReload() {
+        updating = true;
+        setUpdating(true);
+
+        final int loadingPartId = adapter.add(LoadingPart.class, null);
+        adapter.clear();
+        RequestManager.fromActivity(getActivity())
+                .manage(getPageRequest())
+                .setHandlers(
+                        sync,
+                        new UpdateCommonInfoTask(),
+                        new ModularBlockParser.ParsedObjectHandler() {
+                            @Override
+                            public void handle(final Object object, int key) {
+                                handleInitialLoad(object, key);
+                                atLeastSomethingIsHere = true;
+                                switch (key) {
+                                    case MainPage.BLOCK_COMMENT:
+                                        final Comment cm = (Comment) object;
+                                        commentPart.register(cm);
+                                        if (cm.is_new)
+                                            newCommentsStack.add(cm.id);
+                                        break;
+                                    case MainPage.BLOCK_COMMENTS_ENABLED:
+                                        break;
+                                }
+                            }
+                        })
+                .setCallback(new RequestManager.SimpleRequestCallback<Page>() {
+
+                    @Override
+                    public void onError(Page what, final Exception e) {
+                        super.onError(what, e);
+                        final Runnable runnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                if (getActivity() == null) return;
+                                Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                                broken = true;
+                                if (!atLeastSomethingIsHere) {
+                                    getActivity().finish();
+                                }
+                            }
+                        };
+                        Meow.inMain(runnable);
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onFinish(Page what) {
+                        sync.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.removeById(loadingPartId);
+                                spinningWheel.setNum(newCommentsStack.size());
+                            }
+                        });
+                        updating = false;
+                        setUpdating(false);
+                    }
+                })
+                .start();
+    }
+
     public CommentPart getCommentPart() {
         return commentPart;
     }
@@ -354,7 +367,10 @@ public abstract class PublicationFragment extends ListFragment implements
                             }
                         }).show();
                 return true;
-
+            case R.id.reload:
+                if (!updating)
+                    fullReload();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -581,7 +597,7 @@ public abstract class PublicationFragment extends ListFragment implements
 
     protected abstract void handleInitialLoad(final Object object, int key);
 
-    protected abstract RefreshCommentsRequest getRefreshRequest();
+    protected abstract RefreshCommentsRequest getRefreshRequest(int lastCommentId);
 
     protected abstract String getLink();
 

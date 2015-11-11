@@ -9,7 +9,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:smoothScrollbar="false"
-        android:id="@+id/list"/>
+        android:id="@+id/list"
+        android:paddingBottom="68dp"
+        android:clipToPadding="false"/>
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"

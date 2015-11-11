@@ -109,5 +109,8 @@
     <string name="wrong_credentials">Неправильная пара логин/пароль</string>
     <string name="password_empty">Пароль не может быть пустым</string>
     <string name="search">Поиск</string>
+    <string name="wehavegotanupdate">Доступно обновление!</string>
+    <string name="update">Обновить</string>
+    <string name="reload_page">Обновить страницу</string>
 
 </resources>

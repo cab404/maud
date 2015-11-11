@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -82,7 +81,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
     int savedOffset = 0;
 
-    public Collection<Comment> getComments(){
+    public Collection<Comment> getComments() {
         return data.values();
     }
 
@@ -243,7 +242,6 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     }
 
     private final static class CommentComparator implements Comparator<Comment> {
-
         @Override
         public int compare(Comment lhs, Comment rhs) {
             return lhs.id - rhs.id;

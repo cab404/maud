@@ -23,4 +23,8 @@
         android:id="@+id/search"
         android:title="@string/search"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/reload"
+        android:title="@string/reload_page"
+        app:showAsAction="never" />
 </menu>

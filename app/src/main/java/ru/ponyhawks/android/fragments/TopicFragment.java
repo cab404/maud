@@ -90,10 +90,10 @@ public class TopicFragment extends PublicationFragment {
 
 
     @Override
-    protected RefreshCommentsRequest getRefreshRequest() {
+    protected RefreshCommentsRequest getRefreshRequest(int lastCommentId) {
         int id = getArguments().getInt(KEY_ID);
         return new RefreshCommentsRequest(
-                Type.TOPIC, id, getCommentPart().getLastCommentId()
+                Type.TOPIC, id, lastCommentId
         );
     }
 

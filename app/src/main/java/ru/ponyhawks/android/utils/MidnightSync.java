@@ -80,7 +80,15 @@ public class MidnightSync extends UniteSyncronization implements ModularBlockPar
                 target.add(converter, ((Clazz) object));
             else {
                 final int index = rule.indexFor((Clazz) object, converter, target);
-                if (index == -1) return;
+                if (index == -1)
+                    return;
+                if (index == -2) {
+                    target.add(
+                            converter,
+                            (Clazz) object
+                    );
+                    return;
+                }
                 target.add(
                         index,
                         converter,

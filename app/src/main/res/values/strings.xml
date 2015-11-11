@@ -66,6 +66,7 @@
     <string name="search">Search</string>
     <string name="wehavegotanupdate">We\'ve got an update for ya.</string>
     <string name="update">Update</string>
+    <string name="reload_page">Reload page</string>
 
     <string-array name="exit">
         <item>Yes</item>
