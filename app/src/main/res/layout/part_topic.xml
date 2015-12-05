@@ -1,66 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="8dp">
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Заголовок"
-            android:id="@+id/title" />
-
-    </LinearLayout>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingTop="2dp">
+        android:orientation="vertical"
+        android:padding="8dp">
 
-        <ImageView
-            android:id="@+id/avatar"
-            android:layout_width="@dimen/abc_text_size_medium_material"
-            android:layout_height="@dimen/abc_text_size_medium_material"
-            android:src="#fff" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Заголовок"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="2dp">
+
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="@dimen/abc_text_size_medium_material"
+                android:layout_height="@dimen/abc_text_size_medium_material"
+                android:src="#fff" />
+
+            <TextView
+                android:id="@+id/author"
+                style="@android:style/TextAppearance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:text="author"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="at 21:10"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/author"
-            style="@android:style/TextAppearance"
+            android:id="@+id/comment_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:text="author"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:text="42+4"
+            android:textAppearance="?android:textAppearanceSmall" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <ru.ponyhawks.android.text.StaticWebView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="at 21:10"
-            android:id="@+id/date"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_marginLeft="4dp" />
+            android:text="Текст" />
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="42+4"
-        android:id="@+id/comment_num"
-        android:textAppearance="?android:textAppearanceSmall" />
-
-    <ru.ponyhawks.android.text.StaticWebView
+    <View
+        android:id="@+id/delimiter"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Текст"
-        android:id="@+id/text" />
+        android:layout_height="0.5dp"
+        android:background="?colorAccent" />
 
-</LinearLayout>
+</FrameLayout>

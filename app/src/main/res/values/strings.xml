@@ -52,7 +52,7 @@
     <string name="interval_1000_years">Approx. every thousand years</string>
     <string name="interval_65536_ms">Every 1000000000000000₂ milliseconds</string>
     <string name="interval_9000_ms">Every 9000 milliseconds</string>
-    <string name="show_delimiters">Show comment delimiters</string>
+    <string name="show_delimiters">Show delimiters</string>
     <string name="markread">Mark as read</string>
     <string name="delete">Delete</string>
     <string name="force_russian">Force Russian language</string>
@@ -84,6 +84,9 @@
         <item>Green</item>
         <item>Marshmallow</item>
         <item>Celestia</item>
+        <item>Applejack</item>
+        <item>Moondancer</item>
+        <item>Darth Moondancer</item>
     </string-array>
 
     <string-array name="pub_pager_titles">

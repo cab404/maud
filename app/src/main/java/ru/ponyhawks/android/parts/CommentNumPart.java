@@ -4,6 +4,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.cab404.chumroll.ChumrollAdapter;
+
 import ru.ponyhawks.android.R;
 
 /**
@@ -17,8 +19,8 @@ import ru.ponyhawks.android.R;
 public class CommentNumPart extends MoonlitPart<Integer> {
 
     @Override
-    public void convert(View view, Integer data, int index, ViewGroup parent) {
-        super.convert(view, data, index, parent);
+    public void convert(View view, Integer data, int index, ViewGroup parent, ChumrollAdapter adapter) {
+        super.convert(view, data, index, parent, adapter);
         ((TextView) view)
                 .setText(
                         data + " " + view.getContext().getResources().getQuantityString(

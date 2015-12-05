@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.chumroll.ViewConverter;
 
 /**
@@ -37,7 +38,7 @@ public class MoonlitPart<A> implements ViewConverter<A> {
     }
 
     @Override
-    public void convert(View view, final A data, int index, ViewGroup parent) {
+    public void convert(View view, final A data, int index, ViewGroup parent, ChumrollAdapter adapter) {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,12 +49,12 @@ public class MoonlitPart<A> implements ViewConverter<A> {
     }
 
     @Override
-    public View createView(ViewGroup parent, LayoutInflater inflater) {
+    public View createView(LayoutInflater inflater, ViewGroup parent, ChumrollAdapter adapter) {
         return inflater.inflate(getLayoutId(), parent, false);
     }
 
     @Override
-    public boolean enabled(A data, int index) {
+    public boolean enabled(A data, int index, ChumrollAdapter adapter) {
         return false;
     }
 }

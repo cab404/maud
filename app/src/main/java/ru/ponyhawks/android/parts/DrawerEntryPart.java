@@ -4,6 +4,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.cab404.chumroll.ChumrollAdapter;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ru.ponyhawks.android.R;
@@ -40,8 +42,8 @@ public class DrawerEntryPart extends MoonlitPart<DrawerEntryPart.Data> {
     TextView count;
 
     @Override
-    public void convert(View view, Data data, int index, ViewGroup parent) {
-        super.convert(view, data, index, parent);
+    public void convert(View view, Data data, int index, ViewGroup parent, ChumrollAdapter adapter) {
+        super.convert(view, data, index, parent, adapter);
         ButterKnife.bind(this, view);
         count.setVisibility(data.count == 0 ? View.GONE : View.VISIBLE);
         count.setText(data.count + "");

@@ -101,8 +101,8 @@ public class LetterLabelPart extends MoonlitPart<LetterLabel> {
     }
 
     @Override
-    public void convert(View view, final LetterLabel data, int index, ViewGroup parent) {
-        super.convert(view, data, index, parent);
+    public void convert(View view, final LetterLabel data, int index, ViewGroup parent, ChumrollAdapter adapter) {
+        super.convert(view, data, index, parent, adapter);
         ButterKnife.bind(this, view);
         title.setText(data.title);
         list = (AbsListView) parent;

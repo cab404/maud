@@ -26,14 +26,14 @@ public abstract class ContinuationPart implements ViewConverter<Void> {
     }
 
     @Override
-    public void convert(View view, Void data, int index, ViewGroup parent) {
+    public void convert(View view, Void data, int index, ViewGroup parent, ChumrollAdapter adapter) {
         onEndReached();
-        adapter.remove(index);
-        adapter.notifyDataSetChanged();
+        this.adapter.remove(index);
+        this.adapter.notifyDataSetChanged();
     }
 
     @Override
-    public View createView(ViewGroup parent, LayoutInflater inflater) {
+    public View createView(LayoutInflater inflater, ViewGroup parent, ChumrollAdapter adapter) {
         final View view = new View(parent.getContext());
         view.setLayoutParams(new AbsListView.LayoutParams(1,1));
         view.setVisibility(View.GONE);
@@ -41,7 +41,7 @@ public abstract class ContinuationPart implements ViewConverter<Void> {
     }
 
     @Override
-    public boolean enabled(Void data, int index) {
+    public boolean enabled(Void data, int index, ChumrollAdapter adapter) {
         return false;
     }
 }

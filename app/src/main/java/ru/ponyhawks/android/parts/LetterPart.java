@@ -1,18 +1,15 @@
 package ru.ponyhawks.android.parts;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Letter;
 import com.cab404.libph.data.Topic;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import butterknife.Bind;
@@ -41,8 +38,8 @@ public class LetterPart extends MoonlitPart<Letter> {
     private TopicPartCallback callback;
 
     @Override
-    public void convert(View view, final Letter data, int index, ViewGroup parent) {
-        super.convert(view, data, index, parent);
+    public void convert(View view, final Letter data, int index, ViewGroup parent, ChumrollAdapter adapter) {
+        super.convert(view, data, index, parent, adapter);
         ButterKnife.bind(this, view);
         title.setText(data.title);
         text.setText(data.text);

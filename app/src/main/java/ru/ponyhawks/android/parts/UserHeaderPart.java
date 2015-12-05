@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.CommonInfo;
 import com.cab404.libph.data.Profile;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -31,8 +32,8 @@ public class UserHeaderPart extends MoonlitPart<CommonInfo> {
 
 
     @Override
-    public void convert(View view, CommonInfo data, int index, ViewGroup parent) {
-        super.convert(view, data, index, parent);
+    public void convert(View view, CommonInfo data, int index, ViewGroup parent, ChumrollAdapter adapter) {
+        super.convert(view, data, index, parent, adapter);
         ButterKnife.bind(this, view);
 
         login.setText(data.username);

@@ -256,9 +256,9 @@ public abstract class PublicationFragment extends ListFragment implements
     public void fullReload() {
         updating = true;
         setUpdating(true);
-
-        final int loadingPartId = adapter.add(LoadingPart.class, null);
         adapter.clear();
+        final int loadingPartId = adapter.add(LoadingPart.class, null);
+        commentFragment.collapse();
         RequestManager.fromActivity(getActivity())
                 .manage(getPageRequest())
                 .setHandlers(
@@ -312,6 +312,12 @@ public abstract class PublicationFragment extends ListFragment implements
                         });
                         updating = false;
                         setUpdating(false);
+                    }
+
+                    @Override
+                    public void onSuccess(Page what) {
+                        super.onSuccess(what);
+                        broken = false;
                     }
                 })
                 .start();

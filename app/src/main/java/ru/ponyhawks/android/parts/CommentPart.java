@@ -141,10 +141,10 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     View delimeter;
 
     @Override
-    public void convert(View view, final Comment cm, int index, final ViewGroup parent) {
+    public void convert(View view, final Comment cm, int index, final ViewGroup parent, ChumrollAdapter adapter) {
         register(cm);
 
-        super.convert(view, cm, index, parent);
+        super.convert(view, cm, index, parent, adapter);
         ButterKnife.bind(this, view);
 
         view.setBackgroundColor(selectedId == cm.id ? 0x80000000 : cm.is_new ? 0x40000000 : 0);

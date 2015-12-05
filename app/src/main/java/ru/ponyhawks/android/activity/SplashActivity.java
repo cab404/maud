@@ -21,6 +21,7 @@ import com.cab404.moonlight.framework.Request;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -94,14 +95,17 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
 
                 String server_version = null;
                 try {
-                    final URLConnection connection = new URL("http://cab404.ru/all/bin/ph/version.txt").openConnection();
-
+                    final HttpURLConnection connection = (HttpURLConnection) new URL("http://cab404.ru/all/bin/ph/version.txt").openConnection();
+                    connection.setInstanceFollowRedirects(false);
                     final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     server_version = reader.readLine();
 
                 } catch (IOException e) {
                     System.out.println("do not know newest version");
                 }
+
+                if (server_version != null && server_version.length() > 30)
+                    server_version = null;
 
                 if (server_version == null) {
                     System.out.println("okay, no data on new versions");

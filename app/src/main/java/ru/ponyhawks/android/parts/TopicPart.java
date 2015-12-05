@@ -2,6 +2,7 @@ package ru.ponyhawks.android.parts;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Topic;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -43,13 +45,14 @@ public class TopicPart extends MoonlitPart<Topic> {
     TextView comments;
     @Bind(R.id.date)
     TextView date;
-
+    @Bind(R.id.delimiter)
+    View delimeter;
 
     private TopicPartCallback callback;
 
     @Override
-    public void convert(View view, final Topic data, int index, ViewGroup parent) {
-        super.convert(view, data, index, parent);
+    public void convert(View view, final Topic data, int index, ViewGroup parent, ChumrollAdapter adapter) {
+        super.convert(view, data, index, parent, adapter);
         ButterKnife.bind(this, view);
         title.setText(data.title);
         text.setText(data.text);
@@ -61,6 +64,11 @@ public class TopicPart extends MoonlitPart<Topic> {
                 return true;
             }
         });
+
+        boolean showDelimeters = PreferenceManager
+                .getDefaultSharedPreferences(view.getContext())
+                .getBoolean("showDelimiters", false);
+        delimeter.setVisibility(showDelimeters ? View.VISIBLE : View.GONE);
 
         String cc = data.comments > 0 ? data.comments + " " : "";
         cc += data.comments_new > 0 ? "+" + data.comments_new + " ": "";

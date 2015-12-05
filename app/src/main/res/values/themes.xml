@@ -52,13 +52,37 @@
         <item name="colorAccent">#4c4589</item>
     </style>
 
-
     <style name="AppThemeLight.Celestia">
-        <item name="colorPrimary">#df97f1</item>
-        <item name="colorPrimaryDark">#cb8adc</item>
-        <item name="best_pony">@drawable/anim_rarity</item>
-        <item name="colorAccent">#f9b76d</item>
-        <item name="inverse_bg_color">#44abca</item>
+        <item name="colorPrimary">#ffbfe9</item>
+        <item name="colorPrimaryDark">#ffa7e1</item>
+        <item name="best_pony">@drawable/anim_celestia</item>
+        <item name="colorAccent">#f6cf82</item>
+        <item name="inverse_bg_color">#7d2e7a</item>
+    </style>
+
+
+    <style name="AppThemeLight.Applejack">
+        <item name="colorPrimary">#ed2244</item>
+        <item name="colorPrimaryDark">#b91934</item>
+        <item name="best_pony">@drawable/anim_applejack</item>
+        <item name="colorAccent">#ffc563</item>
+        <item name="inverse_bg_color">#b91934</item>
+    </style>
+
+    <style name="AppThemeLight.Moondancer">
+        <item name="colorPrimary">#ab1a54</item>
+        <item name="colorPrimaryDark">#921648</item>
+        <item name="best_pony">@drawable/anim_moondancer</item>
+        <item name="colorAccent">#744d92</item>
+        <item name="inverse_bg_color">#20172d</item>
+    </style>
+
+    <style name="AppThemeDark.Moondancer">
+        <item name="colorPrimary">#ab1a54</item>
+        <item name="colorPrimaryDark">#921648</item>
+        <item name="best_pony">@drawable/anim_moondancer</item>
+        <item name="colorAccent">#744d92</item>
+        <item name="inverse_bg_color">#744d92</item>
     </style>
 
     <style name="Theme.AppCompat.Dialog.Alert.NoBG">
@@ -92,6 +116,9 @@
         <item>AppThemeDark.Green</item>
         <item>AppThemeLight.Rariteh</item>
         <item>AppThemeLight.Celestia</item>
+        <item>AppThemeLight.Applejack</item>
+        <item>AppThemeLight.Moondancer</item>
+        <item>AppThemeDark.Moondancer</item>
     </string-array>
 
     <style name="SettingsThemeDark" parent="android:Theme" />

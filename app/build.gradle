@@ -13,8 +13,8 @@ android {
         applicationId "ru.ponyhawks.android"
         minSdkVersion 10
         targetSdkVersion 22
-        versionCode 1
-        versionName "0.9003"
+        versionCode 2
+        versionName "0.(9)"
     }
     buildTypes {
         release {

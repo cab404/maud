@@ -14,18 +14,9 @@
         android:layout_gravity="center_horizontal"
         android:clipChildren="false">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:src="?best_pony"
-            android:visibility="gone" />
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminateDrawable="?best_pony"
-            />
+        <ru.ponyhawks.android.utils.AnimatedImage
+            android:layout_width="200dp"
+            android:layout_height="60dp" />
 
     </FrameLayout>
 

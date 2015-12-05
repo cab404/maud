@@ -71,6 +71,9 @@
         <item>Зелёная</item>
         <item>Зефирка</item>
         <item>Селестия</item>
+        <item>Пони - Аллах Желтого Цвета</item>
+        <item>Мундансер</item>
+        <item>Тёмная сторона Мундансер</item>
     </string-array>
 
     <string-array name="pub_pager_titles">
@@ -96,7 +99,7 @@
     <string name="interval_5_seconds">Каждые пять секунд</string>
     <string name="interval_65536_ms">Каждые 1000000000000000₂ миллисекунд</string>
     <string name="interval_9000_ms">Каждые 9000 секунд</string>
-    <string name="show_delimiters">Разделять комментарии</string>
+    <string name="show_delimiters">Показывать разделители</string>
     <string name="delete">Удалить</string>
     <string name="markread">Пометить как прочитанное</string>
 
