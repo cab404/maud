@@ -73,11 +73,10 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
         ButterKnife.bind(this);
 
         msg(HAWK);
-
         try {
             msg("phclient v" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
-            msg("version unknown");
+            msg("version unknown (that is strange)");
         }
         msg("=======");
         msg("starting login sequence");
@@ -99,7 +98,7 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
                     connection.setInstanceFollowRedirects(false);
                     final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     server_version = reader.readLine();
-
+                    reader.close();
                 } catch (IOException e) {
                     System.out.println("do not know newest version");
                 }
@@ -331,12 +330,22 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
         @Override
         public void onError(A what, Exception e) {
             msg(retries++ + " - failure: " + e.getLocalizedMessage());
-            msg("retrying in 3 seconds");
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException ignored) {
+            if (retries > 10) {
+                msg("max retry count reached, terminating");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException ignored) {
+                }
+                finish();
             }
-            retry(what);
+            else{
+                msg("retrying in 3 seconds");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException ignored) {
+                }
+                retry(what);
+            }
         }
 
         @Override

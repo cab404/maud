@@ -272,6 +272,7 @@ public class HtmlRipper {
                             );
                             break;
                         case "em":
+                        case "i":
                             builder.setSpan(
                                     new StyleSpan(Typeface.ITALIC),
                                     off + tag.end,

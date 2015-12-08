@@ -258,7 +258,13 @@ public abstract class PublicationFragment extends ListFragment implements
         setUpdating(true);
         adapter.clear();
         final int loadingPartId = adapter.add(LoadingPart.class, null);
-        commentFragment.collapse();
+        Meow.inMain(new Runnable() {
+            @Override
+            public void run() {
+                if (commentFragment != null)
+                    commentFragment.collapse();
+            }
+        });
         RequestManager.fromActivity(getActivity())
                 .manage(getPageRequest())
                 .setHandlers(
