@@ -9,12 +9,14 @@ import android.text.Editable;
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libph.data.Topic;
 import com.cab404.libph.data.Type;
+import com.cab404.libph.modules.CommentTreeModule;
 import com.cab404.libph.pages.BasePage;
 import com.cab404.libph.pages.MainPage;
 import com.cab404.libph.pages.TopicPage;
 import com.cab404.libph.requests.CommentAddRequest;
 import com.cab404.libph.requests.CommentEditRequest;
 import com.cab404.libph.requests.RefreshCommentsRequest;
+import com.cab404.moonlight.framework.ModularBlockParser;
 import com.cab404.moonlight.framework.Page;
 
 import ru.ponyhawks.android.parts.TopicPart;
@@ -30,6 +32,9 @@ import ru.ponyhawks.android.utils.MidnightSync;
  * @author cab404
  */
 public class TopicFragment extends PublicationFragment {
+
+    private static final int MID_TREEFIXER = 98765;
+    CommentTreeModule treeFixer = new CommentTreeModule();
 
     public static TopicFragment getInstance(int id) {
         final TopicFragment pfrag = new TopicFragment();
@@ -63,7 +68,20 @@ public class TopicFragment extends PublicationFragment {
     @Override
     protected Page getPageRequest() {
         int id = getArguments().getInt(KEY_ID);
-        return new TopicPage(id);
+        return new TopicPage(id){
+            @Override
+            protected void bindParsers(ModularBlockParser base) {
+                super.bindParsers(base);
+                base.bind(treeFixer, MID_TREEFIXER);
+            }
+
+            @Override
+            public void finished() {
+                super.finished();
+                System.out.println(treeFixer.parents);
+            }
+
+        };
     }
 
     @Override
@@ -85,6 +103,8 @@ public class TopicFragment extends PublicationFragment {
                     }
                 });
                 break;
+            case MID_TREEFIXER:
+                getCommentPart().updateFrom(treeFixer);
         }
     }
 

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.chumroll.ViewConverter;
 import com.cab404.libph.data.Comment;
+import com.cab404.libph.modules.CommentTreeModule;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -56,6 +57,12 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
     public synchronized void register(Comment comment) {
         data.put(comment.id, comment);
+    }
+
+    public void updateFrom(CommentTreeModule data){
+        for (Integer id : data.parents.keySet()){
+            this.data.get(id).parent = data.parents.get(id);
+        }
     }
 
     private int levelOf(int id, int cl) {
@@ -139,12 +146,14 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     View userspace;
     @Bind(R.id.delimiter)
     View delimeter;
+    @Bind(R.id.root)
+    View root;
 
     @Override
     public void convert(View view, final Comment cm, int index, final ViewGroup parent, ChumrollAdapter adapter) {
         register(cm);
-
         super.convert(view, cm, index, parent, adapter);
+
         ButterKnife.bind(this, view);
 
         view.setBackgroundColor(selectedId == cm.id ? 0x80000000 : cm.is_new ? 0x40000000 : 0);
@@ -189,6 +198,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         avatar.setImageDrawable(null);
 
         date.setText(DateUtils.formPreciseDate(cm.date));
+        root.setBackgroundColor(cm.deleted ? 0x40000000 : 0);
 
         if (!cm.author.is_system) {
             ImageLoader.getInstance().displayImage(cm.author.small_icon, avatar, AVATARS_CFG);
