@@ -20,7 +20,7 @@ public final class SimpleChangers {
     public static final TextChanger SPAN_CENTER =
             new WrapTextChanger(R.drawable.ic_format_align_center, "<center>", "</center>");
     public static final TextChanger ITALIC =
-            new WrapTextChanger(R.drawable.ic_format_italic, "<i>", "</i>");
+            new WrapTextChanger(R.drawable.ic_format_italic, "<em>", "</em>");
     public static final TextChanger BOLD =
             new WrapTextChanger(R.drawable.ic_format_bold, "<b>", "</b>");
     public static final TextChanger UNDERLINE =

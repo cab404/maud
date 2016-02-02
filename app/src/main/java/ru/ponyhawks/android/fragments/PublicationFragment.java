@@ -373,7 +373,10 @@ public abstract class PublicationFragment extends ListFragment implements
                             public void onClick(DialogInterface dialog, int which) {
                                 newCommentsStack.clear();
                                 for (Comment comment : commentPart.getComments())
-                                    if (comment.text != null && comment.text.contains(search.getText()))
+                                    if (search.getText() != null && comment.text != null
+                                            && comment.text.toLowerCase().contains(
+                                            (search.getText() + "").toLowerCase())
+                                            )
                                         newCommentsStack.add(comment.id);
                                 nextNew();
                             }
