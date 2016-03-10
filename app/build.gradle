@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
 
+repositories { maven { url "http://dl.bintray.com/cab404/maven" } }
+
 android {
     compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    buildToolsVersion "23.0.2"
 
     packagingOptions {
         exclude 'META-INF/LICENSE'
@@ -12,9 +14,9 @@ android {
     defaultConfig {
         applicationId "ru.ponyhawks.android"
         minSdkVersion 10
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 2
-        versionName "1.11"
+        versionName "1.12"
     }
     buildTypes {
         release {
@@ -27,7 +29,6 @@ android {
 String support_v = '22.2.1'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'], exclude: ['*-sources.jar'])
-    compile project(':chumroll')
 
     compile 'com.android.support:appcompat-v7:' + support_v
     compile 'com.android.support:support-v4:' + support_v
@@ -35,4 +36,5 @@ dependencies {
 
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
     compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.cab404:chumroll:1.0'
 }

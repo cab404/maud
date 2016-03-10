@@ -60,12 +60,19 @@
         <item name="inverse_bg_color">#7d2e7a</item>
     </style>
 
-
     <style name="AppThemeLight.Applejack">
         <item name="colorPrimary">#ed2244</item>
         <item name="colorPrimaryDark">#b91934</item>
         <item name="best_pony">@drawable/anim_applejack</item>
         <item name="colorAccent">#ffc563</item>
+        <item name="inverse_bg_color">#b91934</item>
+    </style>
+
+    <style name="AppThemeDark.Applejack">
+        <item name="colorPrimary">#ed2244</item>
+        <item name="colorPrimaryDark">#b91934</item>
+        <item name="best_pony">@drawable/anim_applejack</item>
+        <item name="colorAccent">#ffb74d</item>
         <item name="inverse_bg_color">#b91934</item>
     </style>
 
@@ -117,6 +124,7 @@
         <item>AppThemeLight.Rariteh</item>
         <item>AppThemeLight.Celestia</item>
         <item>AppThemeLight.Applejack</item>
+        <item>AppThemeDark.Applejack</item>
         <item>AppThemeLight.Moondancer</item>
         <item>AppThemeDark.Moondancer</item>
     </string-array>
