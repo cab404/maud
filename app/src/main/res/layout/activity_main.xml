@@ -24,7 +24,7 @@
 
     <fragment
         android:id="@+id/navigation_drawer"
-        android:name="ru.ponyhawks.android.fragments.DrawerContentFragment"
+        android:name="ru.everypony.maud.fragments.DrawerContentFragment"
         android:layout_width="@dimen/navigation_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"

@@ -29,6 +29,7 @@
             android:background="?selectableItemBackground"
             android:clickable="true"
             android:src="@drawable/ic_create"
+            android:visibility="gone"
             android:tint="?attr/inverse_bg_color" />
 
         <ImageView

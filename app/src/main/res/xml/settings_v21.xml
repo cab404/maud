@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <SwitchPreference
+    <CheckBoxPreference
         android:defaultValue="false"
         android:key="multitasking"
         android:title="@string/open_topics_in_separate_windows" />
-    <SwitchPreference
+    <CheckBoxPreference
         android:defaultValue="false"
         android:key="removeShadow"
         android:title="@string/remove_actionbar_shadow" />

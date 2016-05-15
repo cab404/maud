@@ -14,7 +14,7 @@
         android:layout_gravity="center_horizontal"
         android:clipChildren="false">
 
-        <ru.ponyhawks.android.utils.AnimatedImage
+        <ru.everypony.maud.utils.AnimatedImage
             android:layout_width="200dp"
             android:layout_height="60dp" />
 

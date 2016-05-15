@@ -9,14 +9,13 @@
     android:layout_gravity="bottom"
     android:layout_marginBottom="-52dp"
     android:layout_marginRight="59dp"
-
     android:animateLayoutChanges="true"
     android:background="?attr/rounded_background"
     android:clickable="true"
     android:elevation="16dp"
 
     app:collapseOffset="52dp"
-    app:layout_behavior="ru.ponyhawks.android.utils.HideablePartBehavior"
+    app:layout_behavior="ru.everypony.maud.utils.HideablePartBehavior"
     tools:ignore="UnusedAttribute,RtlHardcoded,RtlSymmetry">
 
     <TextView

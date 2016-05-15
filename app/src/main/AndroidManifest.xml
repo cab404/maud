@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="ru.ponyhawks.android"
+    package="ru.everypony.maud"
     tools:ignore="UnusedAttribute">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -22,25 +22,17 @@
             android:launchMode="singleTask">
         </activity>
 
-        <activity android:name=".activity.ProfileActivity"
-            android:configChanges="keyboard|orientation|screenSize"
-            >
-            <intent-filter>
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <action android:name="android.intent.action.VIEW" />
-                <data android:scheme="http" android:host="ponyhawks.ru/profile" />
-            </intent-filter>
-        </activity>
+        <!--<activity android:name=".activity.ProfileActivity"-->
+            <!--android:configChanges="keyboard|orientation|screenSize"-->
+            <!--&gt;-->
+            <!--<intent-filter>-->
+                <!--<category android:name="android.intent.category.BROWSABLE" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <!--<action android:name="android.intent.action.VIEW" />-->
+                <!--<data android:scheme="https" android:host="tabun.everypony.ru/profile" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
 
-        <activity
-            android:name=".activity.SettingsActivity"
-            android:parentActivityName=".activity.MainActivity"
-            android:theme="?attr/settings_theme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ru.ponyhawks.android.activity.MainActivity" />
-        </activity>
 
         <activity
             android:name=".activity.TopicActivity"
@@ -48,7 +40,7 @@
             android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ru.ponyhawks.android.activity.MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
 
         <activity
@@ -57,7 +49,7 @@
             android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ru.ponyhawks.android.activity.MainActivity" />
+                android:value=".activity.MainActivity" />
         </activity>
 
         <activity
@@ -72,18 +64,15 @@
 
         <activity android:name=".activity.ResolverActivity">
 
-            <intent-filter>
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <action android:name="android.intent.action.VIEW" />
-                <data android:scheme="http" android:host="ponyhawks.ru" android:pathPrefix="/talk" />
-            </intent-filter>
 
             <intent-filter>
-                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.intent.action.VIEW" />
-                <data android:scheme="http" android:host="ponyhawks.ru" android:pathPrefix="/blog" />
+                <data
+                    android:scheme="https"
+                    android:host="tabun.everypony.ru"
+                    android:pathPattern=".*"
+                    />
             </intent-filter>
 
         </activity>

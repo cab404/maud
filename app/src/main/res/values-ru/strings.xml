@@ -3,7 +3,7 @@
     <string name="navigation_drawer_open">Открыть боковое меню</string>
     <string name="navigation_drawer_close">Закрыть боковое меню</string>
 
-    <string name="app_name">Ponyhawks</string>
+    <string name="app_name">Табун</string>
     <string name="favourites">Избранное</string>
     <string name="refresh">Обновить</string>
     <string name="write_reply">Написать комментарий</string>
@@ -42,7 +42,7 @@
     <string-array name="exit">
         <item>Я устал, я ухожу.</item>
         <item>Beam me up, Scotty!</item>
-        <item>Хоуки уже не торт.</item>
+        <item>Табун уже не торт.</item>
         <item>Да</item>
         <item>Я хочу сойти</item>
         <item>Выпустите</item>
