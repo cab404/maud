@@ -18,13 +18,12 @@
 -keep class butterknife.** { *; }
 -dontwarn butterknife.internal.**
 -keep class **$$ViewInjector { *; }
-
 -keepclasseswithmembernames class * {
     @butterknife.* <fields>;
 }
-
 -keepclasseswithmembernames class * {
     @butterknife.* <methods>;
 }
+-keepattributes *Annotation*,EnclosingMethod,Signature,InnerClasses
 
--keepattributes *Annotation*,EnclosingMethod,Signature
+-dontwarn org.apache.**
