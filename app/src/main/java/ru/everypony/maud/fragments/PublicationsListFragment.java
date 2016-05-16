@@ -1,6 +1,8 @@
 package ru.everypony.maud.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -15,10 +17,13 @@ import android.widget.Toast;
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libtabun.data.Comment;
 import com.cab404.libtabun.data.Topic;
+import com.cab404.libtabun.data.Type;
 import com.cab404.libtabun.modules.CommentModule;
 import com.cab404.libtabun.modules.TopicModule;
 import com.cab404.libtabun.pages.TabunPage;
 import com.cab404.libtabun.pages.MainPage;
+import com.cab404.libtabun.requests.FavRequest;
+import com.cab404.libtabun.requests.VoteRequest;
 import com.cab404.libtabun.util.LS;
 import com.cab404.moonlight.framework.ModularBlockParser;
 import com.cab404.moonlight.util.SU;
@@ -85,10 +90,27 @@ public class PublicationsListFragment extends RefreshableListFragment {
         TopicPart topicPart = new TopicPart();
         CommentPart commentPart = new CommentPart();
         commentPart.setMoveToPostVisible(true);
+        commentPart.setReplyVisible(false);
         commentPart.setCallback(new CommentPart.CommentPartCallback() {
             @Override
             public void onCommentActionInvoked(Action act, Comment cm, Context context) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(cm.link)));
+                switch (act) {
+                    case OPEN_POST:
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(cm.link)));
+                        break;
+                    case FAV:
+                        fav(cm, getActivity());
+                        break;
+                    case VOTE_MINUS:
+                        vote(cm, -1, context);
+                        break;
+                    case VOTE_PLUS:
+                        vote(cm, +1, context);
+                        break;
+                    case SHARE:
+                        share(cm);
+                        break;
+                }
             }
         });
 
@@ -229,4 +251,84 @@ public class PublicationsListFragment extends RefreshableListFragment {
         };
     }
 
+    public void fav(final Comment cm, final Context context) {
+        final boolean target_state = !cm.in_favs;
+        final FavRequest request = new FavRequest(Type.COMMENT, cm.id, target_state);
+        RequestManager.fromActivity(getActivity())
+                .manage(request)
+                .setCallback(new RequestManager.SimpleRequestCallback<FavRequest>() {
+
+                    @Override
+                    public void onSuccess(FavRequest what) {
+                        if (request.success())
+                            cm.in_favs = target_state;
+                        msg(request.msg);
+                    }
+
+                    @Override
+                    public void onError(FavRequest what, Exception e) {
+                        msg(e.getLocalizedMessage());
+                    }
+
+                    void msg(final String msg) {
+                        Meow.inMain(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                })
+                .start();
+
+    }
+
+    public void vote(final Comment cm, int side, final Context context) {
+        final VoteRequest request = new VoteRequest(cm.id, side, Type.COMMENT);
+        RequestManager.fromActivity(getActivity())
+                .manage(request)
+                .setCallback(new RequestManager.SimpleRequestCallback<VoteRequest>() {
+
+                    @Override
+                    public void onSuccess(VoteRequest what) {
+                        if (request.success())
+                            cm.votes = (int) what.result;
+                        msg(request.msg);
+                        Meow.inMain(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(VoteRequest what, Exception e) {
+                        msg(e.getLocalizedMessage());
+                    }
+
+                    void msg(final String msg) {
+                        Meow.inMain(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                })
+                .start();
+    }
+
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("NewApi")
+    protected void setClipboard(String to) {
+        final ClipboardManager cbman = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        cbman.setText(to);
+    }
+
+    public void share(Comment cm) {
+        setClipboard(cm.link);
+        Toast.makeText(getActivity(), R.string.comment_link_copied, Toast.LENGTH_SHORT).show();
+    }
 }

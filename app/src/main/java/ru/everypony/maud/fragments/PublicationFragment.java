@@ -30,6 +30,7 @@ import com.cab404.libtabun.requests.CommentEditRequest;
 import com.cab404.libtabun.requests.FavRequest;
 import com.cab404.libtabun.requests.LSRequest;
 import com.cab404.libtabun.requests.RefreshCommentsRequest;
+import com.cab404.libtabun.requests.VoteRequest;
 import com.cab404.moonlight.framework.ModularBlockParser;
 import com.cab404.moonlight.framework.Page;
 
@@ -465,6 +466,42 @@ public abstract class PublicationFragment extends ListFragment implements
 
     }
 
+    public void vote(final Comment cm, int side, final Context context) {
+        final VoteRequest request = new VoteRequest(cm.id, side, Type.COMMENT);
+        RequestManager.fromActivity(getActivity())
+                .manage(request)
+                .setCallback(new RequestManager.SimpleRequestCallback<VoteRequest>() {
+
+                    @Override
+                    public void onSuccess(VoteRequest what) {
+                        if (request.success())
+                            cm.votes = (int) what.result;
+                        msg(request.msg);
+                        Meow.inMain(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(VoteRequest what, Exception e) {
+                        msg(e.getLocalizedMessage());
+                    }
+
+                    void msg(final String msg) {
+                        Meow.inMain(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                })
+                .start();
+    }
+
     @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
     protected void setClipboard(String to) {
@@ -573,6 +610,12 @@ public abstract class PublicationFragment extends ListFragment implements
                 break;
             case FAV:
                 fav(cm, context);
+                break;
+            case VOTE_MINUS:
+                vote(cm, -1, context);
+                break;
+            case VOTE_PLUS:
+                vote(cm, +1, context);
                 break;
         }
     }

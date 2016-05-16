@@ -56,7 +56,8 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     private int baseIndex = 2;
     public static final DisplayImageOptions AVATARS_CFG = new DisplayImageOptions.Builder().cacheInMemory(true).build();
     private int selectedId;
-    private boolean moveToPostShown;
+    private boolean moveToPostVisible = true;
+    private boolean replyVisible = true;
 
     public synchronized void register(Comment comment) {
         data.put(comment.id, comment);
@@ -90,7 +91,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     }
 
     public void setMoveToPostVisible(boolean visible){
-        this.moveToPostShown = visible;
+        this.moveToPostVisible = visible;
     }
 
     int savedOffset = 0;
@@ -259,6 +260,14 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
         }
     }
 
+    public void setReplyVisible(boolean replyVisible) {
+        this.replyVisible = replyVisible;
+    }
+
+    public boolean isReplyVisible() {
+        return replyVisible;
+    }
+
     public interface CommentPartCallback {
         enum Action {
             EDIT, FAV, REPLY, SHARE, VOTE_PLUS, VOTE_MINUS, OPEN_POST
@@ -367,8 +376,11 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
                         R.drawable.ic_star :
                         R.drawable.ic_star_outline
         );
-        if (!moveToPostShown){
+        if (!moveToPostVisible){
             controls.findViewById(R.id.open_post).setVisibility(View.GONE);
+        }
+        if (!replyVisible){
+            controls.findViewById(R.id.reply).setVisibility(View.GONE);
         }
 
         final View.OnClickListener acl = new View.OnClickListener() {
