@@ -116,5 +116,6 @@
     <string name="wehavegotanupdate">Доступно обновление!</string>
     <string name="update">Обновить</string>
     <string name="reload_page">Обновить страницу</string>
+    <string name="allow_mobile_images">Картинки в мобильной сети</string>
 
 </resources>

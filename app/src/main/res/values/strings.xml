@@ -112,5 +112,6 @@
         <item quantity="many">letters</item>
         <item quantity="other">letters</item>
     </plurals>
+    <string name="allow_mobile_images">Images on cell network</string>
 
 </resources>

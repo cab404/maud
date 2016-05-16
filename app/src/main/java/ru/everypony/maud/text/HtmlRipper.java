@@ -8,8 +8,11 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Layout;
@@ -24,7 +27,6 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -50,6 +52,8 @@ import java.util.Collection;
 import java.util.List;
 
 import ru.everypony.maud.R;
+import ru.everypony.maud.statics.ConnectivityChangeBL;
+import ru.everypony.maud.statics.Providers;
 import ru.everypony.maud.text.spans.BaselineJumpSpan;
 import ru.everypony.maud.text.spans.DoubleClickableSpan;
 import ru.everypony.maud.text.spans.LitespoilerSpan;
@@ -62,38 +66,33 @@ import ru.everypony.maud.utils.Meow;
  */
 public class HtmlRipper {
 
-    private ViewGroup layout;
-    private Collection<Runnable> onDestroy;
-    private Collection<Runnable> onLayout;
-    private List<View> cached_contents;
-    private Context ctx;
-
-    public String hostname = "tabun.everypony.ru";
-    public String scheme = "https";
-
+    /* ... */
+    private final static String header_end = "</header>\r\n\n\t\n\t\t\t";
     public final int replacerImage = android.R.drawable.ic_menu_gallery;
     public final int errorImage = android.R.drawable.ic_dialog_alert;
-
+    public final Rect imageReplacerSize;
+    public String hostname = "tabun.everypony.ru";
+    public String scheme = "https";
     public int spoilerLabelColor = 0xffffffff;
     public int codeColor = 0xffffffff;
     public int green = 0xff00c155;
     public int blue = 0xff009ad1;
     public int red = 0xffd30035;
-
     public boolean textIsSelectable;
     public boolean loadVideos;
     public boolean loadImages;
-
     public int cutBackground = R.drawable.quote_background;
     public int codeBackground = R.drawable.quote_background;
     public int quoteBackground = R.drawable.quote_background;
-
     public int spoilerBodyLayout = R.layout.ripper_part_spoiler;
     public int spoilerHeaderId = R.id.header;
     public int spoilerBodyId = R.id.body;
-
-    public final Rect imageReplacerSize;
     public int internalMargins;
+    private ViewGroup layout;
+    private Collection<Runnable> onDestroy;
+    private Collection<Runnable> onLayout;
+    private List<View> cached_contents;
+    private Context ctx;
 
 
     public HtmlRipper(ViewGroup layout) {
@@ -105,51 +104,6 @@ public class HtmlRipper {
         float dp = ctx.getResources().getDisplayMetrics().density;
         imageReplacerSize = new Rect(0, 0, (int) (30 * dp), (int) (30 * dp));
         internalMargins = (int) (8 * dp);
-    }
-
-
-    /**
-     * Запускайте перед уничтожением этого объекта - эта штука выключает видео.
-     */
-    public void destroy() {
-        for (Runnable runnable : onDestroy)
-            Meow.inMain(runnable);
-    }
-
-    /**
-     * Просит всяческие куски разметки перерасчитать себя. Работает пока только для iframe-ов.
-     */
-    public void layout() {
-        for (Runnable runnable : onLayout)
-            runnable.run();
-    }
-
-    /**
-     * Перемещает view-шки из предыдущего layout-а (если он ещё жив) в данный.
-     */
-    public void changeLayout(ViewGroup group) {
-        layout = group;
-        layout.removeAllViews();
-
-        for (View view : cached_contents) {
-            if (view.getParent() != null)
-                ((ViewGroup) view.getParent()).removeView(view);
-            layout.addView(view);
-        }
-
-        layout.invalidate();
-        layout.requestLayout();
-    }
-
-    public void escape(final String text) {
-        destroy();
-        onDestroy.clear();
-        cached_contents.clear();
-
-        escape(text, layout);
-        for (int i = 0; i < layout.getChildCount(); i++) {
-            cached_contents.add(layout.getChildAt(i));
-        }
     }
 
     private static int indexOf(CharSequence toProcess, int start, char ch) {
@@ -232,14 +186,54 @@ public class HtmlRipper {
 
     }
 
-    /* ... */
-    private final static String header_end = "</header>\r\n\n\t\n\t\t\t";
+    /**
+     * Запускайте перед уничтожением этого объекта - эта штука выключает видео.
+     */
+    public void destroy() {
+        for (Runnable runnable : onDestroy)
+            Meow.inMain(runnable);
+    }
+
+    /**
+     * Просит всяческие куски разметки перерасчитать себя. Работает пока только для iframe-ов.
+     */
+    public void layout() {
+        for (Runnable runnable : onLayout)
+            runnable.run();
+    }
+
+    /**
+     * Перемещает view-шки из предыдущего layout-а (если он ещё жив) в данный.
+     */
+    public void changeLayout(ViewGroup group) {
+        layout = group;
+        layout.removeAllViews();
+
+        for (View view : cached_contents) {
+            if (view.getParent() != null)
+                ((ViewGroup) view.getParent()).removeView(view);
+            layout.addView(view);
+        }
+
+        layout.invalidate();
+        layout.requestLayout();
+    }
+
+    public void escape(final String text) {
+        destroy();
+        onDestroy.clear();
+        cached_contents.clear();
+
+        escape(text, layout);
+        for (int i = 0; i < layout.getChildCount(); i++) {
+            cached_contents.add(layout.getChildAt(i));
+        }
+    }
 
     /**
      * Превращает HTML в понятный Android-у CharSequence и пихает его в данный ему TextView.
      */
     private void simpleEscape(final TextView target, final String text, final Context context) {
-
 		/*
          * Исправляем проблему с header-ом.
 		 * Даже не знаю, какой умный пегас умудрился панель действий отправить в текст.
@@ -521,17 +515,15 @@ public class HtmlRipper {
                                     .cacheInMemory(true)
                                     .cacheOnDisk(true)
                                     .imageScaleType(ImageScaleType.EXACTLY).build();
-
                             if (loadImages && ImageLoader.getInstance().getDiskCache().get(src) == null)
                                 ImageLoader.getInstance().loadImage(src, size, opt, imageAware);
-                            else
+                            if (ImageLoader.getInstance().getDiskCache().get(src) != null)
                                 ImageLoader.getInstance().displayImage(
                                         src,
                                         new NonViewAware(src, size, ViewScaleType.FIT_INSIDE),
                                         opt,
                                         imageAware
                                 );
-
                             off += repl.length();
                             break;
                     }
@@ -582,6 +574,8 @@ public class HtmlRipper {
      */
     @SuppressWarnings("deprecation")
     private void escape(String text, final ViewGroup group) {
+        boolean videosDenied = ConnectivityChangeBL.isNetDenied(group.getContext());
+
         final Context context = group.getContext();
         group.removeViews(0, group.getChildCount());
         HTMLTree tree = new HTMLTree(text);
@@ -618,7 +612,7 @@ public class HtmlRipper {
 
                 final String src = (tag.get("src").startsWith("//")
                         ? (scheme + ":") : "") + tag.get("src");
-                if (loadVideos) {
+                if (loadVideos && !videosDenied) {
 
                     final WebView iframe = new WebView(context);
 

@@ -12,6 +12,9 @@
     <CheckBoxPreference
         android:key="textSelectable"
         android:title="@string/select_text" />
+    <CheckBoxPreference
+        android:key="allowMobileNetworkDownloads"
+        android:title="@string/allow_mobile_images" />
 
     <PreferenceCategory android:title="@string/app" />
     <CheckBoxPreference

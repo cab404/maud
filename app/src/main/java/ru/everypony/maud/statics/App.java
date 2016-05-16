@@ -47,6 +47,7 @@ public class App extends Application {
                 new ImageLoaderConfiguration.Builder(this)
                         .build();
         ImageLoader.getInstance().init(config);
+        ConnectivityChangeBL.updateUILDownloadStats(this);
 
         Providers.ImgurGateway.init(this);
 
