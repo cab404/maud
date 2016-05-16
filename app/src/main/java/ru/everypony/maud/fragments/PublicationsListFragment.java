@@ -1,7 +1,9 @@
 package ru.everypony.maud.fragments;
 
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,12 +13,15 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.cab404.chumroll.ChumrollAdapter;
+import com.cab404.libtabun.data.Comment;
 import com.cab404.libtabun.data.Topic;
 import com.cab404.libtabun.modules.CommentModule;
 import com.cab404.libtabun.modules.TopicModule;
 import com.cab404.libtabun.pages.TabunPage;
 import com.cab404.libtabun.pages.MainPage;
+import com.cab404.libtabun.util.LS;
 import com.cab404.moonlight.framework.ModularBlockParser;
+import com.cab404.moonlight.util.SU;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -79,6 +84,13 @@ public class PublicationsListFragment extends RefreshableListFragment {
         sync = new MidnightSync(adapter);
         TopicPart topicPart = new TopicPart();
         CommentPart commentPart = new CommentPart();
+        commentPart.setMoveToPostVisible(true);
+        commentPart.setCallback(new CommentPart.CommentPartCallback() {
+            @Override
+            public void onCommentActionInvoked(Action act, Comment cm, Context context) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(cm.link)));
+            }
+        });
 
         continuationPart = new ContinuationPart(adapter) {
             @Override
@@ -105,7 +117,7 @@ public class PublicationsListFragment extends RefreshableListFragment {
     private void switchToPage(Topic data) {
         Intent startTopicActivity = new Intent(getActivity(), TopicActivity.class);
         startTopicActivity.putExtra(TopicActivity.KEY_ID, data.id);
-        startTopicActivity.putExtra("title", data.title);
+        startTopicActivity.putExtra("title", SU.deEntity(data.title));
         boolean useMultitasking =
                 PreferenceManager.getDefaultSharedPreferences(getActivity())
                         .getBoolean("multitasking", false);

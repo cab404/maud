@@ -104,7 +104,7 @@
     <string name="delete">Удалить</string>
     <string name="markread">Пометить как прочитанное</string>
 
-    <string name="force_russian">Русский язык</string>
+    <string name="force_russian">Русский язык интерфейса</string>
     <string name="deleted">отправлено на Луну</string>
     <string name="markedRead">отложено подальше</string>
     <string name="link">Ссылка</string>

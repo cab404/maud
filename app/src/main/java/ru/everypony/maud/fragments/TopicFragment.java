@@ -18,6 +18,7 @@ import com.cab404.libtabun.requests.CommentEditRequest;
 import com.cab404.libtabun.requests.RefreshCommentsRequest;
 import com.cab404.moonlight.framework.ModularBlockParser;
 import com.cab404.moonlight.framework.Page;
+import com.cab404.moonlight.util.SU;
 
 import ru.everypony.maud.parts.TopicPart;
 import ru.everypony.maud.utils.Meow;
@@ -101,7 +102,7 @@ public class TopicFragment extends PublicationFragment {
                     @Override
                     public void run() {
                         if (getActivity() == null) return;
-                        getActivity().setTitle(((Topic) object).title);
+                        getActivity().setTitle(SU.deEntity(((Topic) object).title));
                         if (Build.VERSION.SDK_INT >= 21)
                             getActivity().setTaskDescription(new ActivityManager.TaskDescription(((Topic) object).title));
                     }

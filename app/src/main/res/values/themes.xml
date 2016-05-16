@@ -3,7 +3,8 @@
 
     <declare-styleable name="AppTheme">
         <attr name="inverse_bg_color" format="color" />
-        <attr name="font_color" format="color" />
+        <attr name="plus_color" format="color" />
+        <attr name="minus_color" format="color" />
         <attr name="new_background" format="reference" />
         <attr name="settings_theme" format="reference" />
         <attr name="main_background_color" format="color" />
@@ -14,22 +15,29 @@
         <attr name="best_pony" format="reference" />
     </declare-styleable>
 
+    <style name="PreferenceThemeOverlay.Shrinked">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="AppThemeDark" parent="Theme.AppCompat">
         <item name="android:statusBarColor" tools:targetApi="lollipop">?attr/colorPrimaryDark</item>
         <item name="inverse_bg_color">#fff</item>
-        <!--<item name="android:textColor">#fff000</item>-->
+        <item name="minus_color">#b71c1c</item>
+        <item name="plus_color">#43a047</item>
         <item name="inverse_action_bar_color">@color/abc_primary_text_material_dark</item>
         <item name="main_foreground_color">@color/primary_material_dark</item>
         <item name="main_background_color">@color/background_material_dark</item>
         <item name="new_background">@drawable/new_background_dark</item>
         <item name="rounded_background">@drawable/rounded_background_dark</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.Shrinked</item>
         <item name="alert_dialog_nobg_theme">@style/Theme.AppCompat.Dialog.Alert.NoBG</item>
         <item name="best_pony">@drawable/anim_luna</item>
     </style>
 
     <style name="AppThemeLight" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:statusBarColor" tools:targetApi="lollipop">?attr/colorPrimaryDark</item>
+        <item name="minus_color">#b71c1c</item>
+        <item name="plus_color">#43a047</item>
         <item name="android:textColor">#111</item>
         <item name="android:textColorPrimary">#333</item>
         <item name="android:textColorSecondary">#333</item>
@@ -39,7 +47,7 @@
         <item name="main_background_color">@color/background_material_light</item>
         <item name="new_background">@drawable/new_background_light</item>
         <item name="rounded_background">@drawable/rounded_background_light</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.Shrinked</item>
         <item name="alert_dialog_nobg_theme">@style/Theme.AppCompat.Light.Dialog.Alert.NoBG</item>
         <item name="best_pony">@drawable/anim_luna</item>
     </style>
@@ -133,9 +141,5 @@
         <item>AppThemeLight.Moondancer</item>
         <item>AppThemeDark.Moondancer</item>
     </string-array>
-
-    <style name="SettingsThemeDark" parent="android:Theme" />
-
-    <style name="SettingsThemeLight" parent="android:Theme.Light" />
 
 </resources>

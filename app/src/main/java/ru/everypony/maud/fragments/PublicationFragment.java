@@ -79,6 +79,8 @@ public abstract class PublicationFragment extends ListFragment implements
     private boolean atLeastSomethingIsHere;
     private boolean broken;
 
+    private int selectedCommentId = -1;
+
     public void setCommentFragment(CommentEditFragment commentFragment) {
         this.commentFragment = commentFragment;
         commentFragment.setSendCallback(this);
@@ -108,6 +110,7 @@ public abstract class PublicationFragment extends ListFragment implements
 
         commentPart = new CommentPart();
         commentPart.setCallback(this);
+        commentPart.setMoveToPostVisible(false);
         commentPart.setBaseIndex(getCommentBaseIndex());
         commentPart.saveState = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("saveCommentState", true);
 
@@ -159,7 +162,6 @@ public abstract class PublicationFragment extends ListFragment implements
                         list.setSelection(index);
                     }
                 });
-
 
                 spinningWheel.setNum(newCommentsStack.size());
                 commentPart.setSelectedId(next);
@@ -280,7 +282,6 @@ public abstract class PublicationFragment extends ListFragment implements
                             public void handle(final Object object, int key) {
                                 handleInitialLoad(object, key);
                                 atLeastSomethingIsHere = true;
-                                System.out.println(key);
                                 switch (key) {
                                     case MainPage.BLOCK_COMMENT:
                                         final Comment cm = (Comment) object;
@@ -320,8 +321,15 @@ public abstract class PublicationFragment extends ListFragment implements
                             public void run() {
                                 adapter.removeById(loadingPartId);
                                 spinningWheel.setNum(newCommentsStack.size());
+                                System.out.println("SelectPhase");
+
+                                int index = commentPart.getIndex(selectedCommentId, adapter);
+                                System.out.println("index " + index);
+                                if (index > 0)
+                                    moveToComment(selectedCommentId);
                             }
                         });
+
                         updating = false;
                         setUpdating(false);
                     }
@@ -589,10 +597,17 @@ public abstract class PublicationFragment extends ListFragment implements
         commentFragment.expand();
     }
 
-    public void moveToComment(int value) {
+    public void moveToComment(final int value) {
         commentPart.setSelectedId(value);
         adapter.notifyDataSetChanged();
-        list.setSelection(commentPart.getIndex(value, adapter));
+        final int index = commentPart.getIndex(value, adapter);
+        list.post(new Runnable() {
+            @Override
+            public void run() {
+                commentPart.offsetToId(list, value);
+                list.setSelection(index);
+            }
+        });
     }
 
 
@@ -627,4 +642,7 @@ public abstract class PublicationFragment extends ListFragment implements
     protected abstract CommentEditRequest getCommentEditRequest(Editable message, int reply);
 
 
+    public void setSelectedCommentId(int selectedCommentId) {
+        this.selectedCommentId = selectedCommentId;
+    }
 }

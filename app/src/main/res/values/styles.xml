@@ -5,6 +5,10 @@
     <style name="EditIconPadded">
         <item name="android:padding">4dp</item>
         <item name="android:tint">?attr/inverse_bg_color</item>
+        <item name="android:textColor">?attr/inverse_bg_color</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:gravity">center_vertical</item>
     </style>
 
     <drawable name="quote_background">#5445</drawable>

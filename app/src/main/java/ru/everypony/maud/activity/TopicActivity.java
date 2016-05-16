@@ -106,6 +106,8 @@ public class TopicActivity extends LoginDependentActivity {
 
         ced = (CommentEditFragment) getSupportFragmentManager().findFragmentById(R.id.comment_editor);
         topic.setCommentFragment(ced);
+        if (uri != null && path.getValue() != null)
+            topic.setSelectedCommentId(path.getValue());
         ced.collapse();
 
     }

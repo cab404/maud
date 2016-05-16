@@ -18,6 +18,7 @@ import com.cab404.libtabun.requests.CommentAddRequest;
 import com.cab404.libtabun.requests.CommentEditRequest;
 import com.cab404.libtabun.requests.RefreshCommentsRequest;
 import com.cab404.moonlight.framework.Page;
+import com.cab404.moonlight.util.SU;
 
 import ru.everypony.maud.parts.LetterPart;
 import ru.everypony.maud.utils.Meow;
@@ -85,7 +86,7 @@ public class LetterFragment extends PublicationFragment {
                     @Override
                     public void run() {
                         if (getActivity() == null) return;
-                        getActivity().setTitle(((Letter) object).title);
+                        getActivity().setTitle(SU.deEntity(((Letter) object).title));
                         if (Build.VERSION.SDK_INT >= 21)
                             getActivity().setTaskDescription(new ActivityManager.TaskDescription(((Letter) object).title));
                     }

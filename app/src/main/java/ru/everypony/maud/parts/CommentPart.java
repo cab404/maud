@@ -2,6 +2,8 @@ package ru.everypony.maud.parts;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -54,6 +56,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     private int baseIndex = 2;
     public static final DisplayImageOptions AVATARS_CFG = new DisplayImageOptions.Builder().cacheInMemory(true).build();
     private int selectedId;
+    private boolean moveToPostShown;
 
     public synchronized void register(Comment comment) {
         data.put(comment.id, comment);
@@ -84,6 +87,10 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
      */
     public void setBaseIndex(int index) {
         baseIndex = index;
+    }
+
+    public void setMoveToPostVisible(boolean visible){
+        this.moveToPostShown = visible;
     }
 
     int savedOffset = 0;
@@ -140,6 +147,8 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
     TextView author;
     @Bind(R.id.date)
     TextView date;
+    @Bind(R.id.votes)
+    TextView votes;
     @Bind(R.id.avatar)
     ImageView avatar;
     @Bind(R.id.userspace)
@@ -203,7 +212,25 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
         author.setText(cm.author.login);
         avatar.setImageDrawable(null);
-
+        if (cm.votes == 0){
+            votes.setText(null);
+        } else {
+            votes.setText((cm.votes > 0 ? "+" + cm.votes : cm.votes) + "");
+            TypedArray array = votes.getContext().getTheme().obtainStyledAttributes(
+                    new int[]{
+                            R.attr.plus_color,
+                            R.attr.minus_color
+                    }
+            );
+            //noinspection ResourceType
+            votes.setTextColor(cm.votes > 0
+                    ?
+                    array.getColor(0, Color.BLACK)
+                    :
+                    array.getColor(1, Color.BLACK)
+            );
+            array.recycle();
+        }
         date.setText(DateUtils.formPreciseDate(cm.date));
         root.setBackgroundColor(cm.deleted ? 0x40000000 : 0);
 
@@ -234,7 +261,7 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
 
     public interface CommentPartCallback {
         enum Action {
-            EDIT, FAV, REPLY, SHARE
+            EDIT, FAV, REPLY, SHARE, VOTE_PLUS, VOTE_MINUS, OPEN_POST
         }
 
         void onCommentActionInvoked(Action act, Comment cm, Context context);
@@ -335,15 +362,14 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
                 .show();
 
         final ImageView fav = (ImageView) controls.findViewById(R.id.fav);
-        final ImageView edit = (ImageView) controls.findViewById(R.id.edit);
-        final ImageView reply = (ImageView) controls.findViewById(R.id.reply);
-        final ImageView share = (ImageView) controls.findViewById(R.id.copy_link);
-
         fav.setImageResource(
                 cm.in_favs ?
                         R.drawable.ic_star :
                         R.drawable.ic_star_outline
         );
+        if (!moveToPostShown){
+            controls.findViewById(R.id.open_post).setVisibility(View.GONE);
+        }
 
         final View.OnClickListener acl = new View.OnClickListener() {
             @Override
@@ -362,6 +388,15 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
                     case R.id.copy_link:
                         act = CommentPartCallback.Action.SHARE;
                         break;
+                    case R.id.open_post:
+                        act = CommentPartCallback.Action.OPEN_POST;
+                        break;
+                    case R.id.vote_plus:
+                        act = CommentPartCallback.Action.VOTE_PLUS;
+                        break;
+                    case R.id.vote_minus:
+                        act = CommentPartCallback.Action.VOTE_MINUS;
+                        break;
                     default:
                         act = null;
                 }
@@ -371,10 +406,9 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
                 dialog.dismiss();
             }
         };
-        fav.setOnClickListener(acl);
-        edit.setOnClickListener(acl);
-        share.setOnClickListener(acl);
-        reply.setOnClickListener(acl);
+        ViewGroup parent = (ViewGroup) controls.findViewById(R.id.root);
+        for (int i = 0; i < parent.getChildCount(); i++)
+            parent.getChildAt(i).setOnClickListener(acl);
     }
 
 }

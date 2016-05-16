@@ -47,6 +47,15 @@
                 android:id="@+id/date"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:paddingLeft="4sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+1"
+                android:id="@+id/votes"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:paddingLeft="4sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <ru.everypony.maud.text.StaticWebView
