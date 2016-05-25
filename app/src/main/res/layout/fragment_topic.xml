@@ -5,21 +5,27 @@
     tools:context="ru.everypony.maud.fragments.ListFragment">
 
     <ListView
-        android:nestedScrollingEnabled="true"
+        android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:smoothScrollbar="false"
-        android:id="@+id/list"
+        android:clipToPadding="false"
+        android:nestedScrollingEnabled="true"
         android:paddingBottom="68dp"
-        android:clipToPadding="false"/>
+        android:smoothScrollbar="false"
+        tools:targetApi="lollipop" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:gravity="center"
-        android:layout_margin="3dp"
+    <ImageView
         android:id="@+id/colorful_button"
-        />
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="3dp"
+        android:background="@drawable/circly_circle"
+        android:gravity="center"
+        android:src="@drawable/ic_refresh"
+        android:elevation="4dp"
+        android:backgroundTint="?colorPrimary"
+        tools:targetApi="lollipop"
+        android:contentDescription="@string/update"/>
 
 </FrameLayout>

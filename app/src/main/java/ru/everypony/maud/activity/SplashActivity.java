@@ -27,7 +27,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.everypony.maud.R;
 import ru.everypony.maud.fragments.LoginFragment;
@@ -66,7 +66,7 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
             " ,,                       \n";
     final StringBuilder messages = new StringBuilder();
     private final Handler handler = new Handler(Looper.getMainLooper());
-    @Bind(R.id.status)
+    @BindView(R.id.status)
     TextView status;
 
     @Override

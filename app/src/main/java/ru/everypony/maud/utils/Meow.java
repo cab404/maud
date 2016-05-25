@@ -94,7 +94,7 @@ public class Meow {
                     target = Integer.parseInt(uri.getFragment().replace("comment", ""));
 
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            System.out.println("no topic number in " + uri);
             return null;
         }
 

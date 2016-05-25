@@ -12,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.everypony.maud.R;
 import ru.everypony.maud.statics.Providers;
@@ -27,7 +27,7 @@ import ru.everypony.maud.statics.Providers;
  */
 public class PublicationsFragment extends Fragment {
 
-    @Bind(R.id.viewPager)
+    @BindView(R.id.viewPager)
     ViewPager pager;
     private float elevation;
     protected String topicsUrl;
@@ -83,16 +83,16 @@ public class PublicationsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         final ActionBar sab = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (sab == null) throw new RuntimeException("We can't live without actionbar :(");
 
         elevation = sab.getElevation();
         sab.setElevation(0);
-
     }
+
 
     @Override
     public void onDetach() {

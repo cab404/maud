@@ -8,11 +8,8 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.Layout;
@@ -53,7 +50,6 @@ import java.util.List;
 
 import ru.everypony.maud.R;
 import ru.everypony.maud.statics.ConnectivityChangeBL;
-import ru.everypony.maud.statics.Providers;
 import ru.everypony.maud.text.spans.BaselineJumpSpan;
 import ru.everypony.maud.text.spans.DoubleClickableSpan;
 import ru.everypony.maud.text.spans.LitespoilerSpan;
@@ -234,7 +230,7 @@ public class HtmlRipper {
      * Превращает HTML в понятный Android-у CharSequence и пихает его в данный ему TextView.
      */
     private void simpleEscape(final TextView target, final String text, final Context context) {
-		/*
+        /*
          * Исправляем проблему с header-ом.
 		 * Даже не знаю, какой умный пегас умудрился панель действий отправить в текст.
 		 */
@@ -345,46 +341,52 @@ public class HtmlRipper {
                             break;
                         case "span":
                             if (!tag.get("align").isEmpty())
-                                switch (tag.get("align")) {
-                                    case "right":
-                                        builder.setSpan(
-                                                new AlignmentSpan() {
-                                                    @Override
-                                                    public Layout.Alignment getAlignment() {
-                                                        return Layout.Alignment.ALIGN_OPPOSITE;
-                                                    }
-                                                },
-                                                off + tag.end,
-                                                off + tree.get(tree.getClosingTag(tag)).start,
-                                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                                        );
-                                        break;
-                                    case "center":
-                                        builder.setSpan(
-                                                new AlignmentSpan() {
-                                                    @Override
-                                                    public Layout.Alignment getAlignment() {
-                                                        return Layout.Alignment.ALIGN_CENTER;
-                                                    }
-                                                },
-                                                off + tag.end,
-                                                off + tree.get(tree.getClosingTag(tag)).start,
-                                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                                        );
-                                        break;
-                                    case "left":
-                                        builder.setSpan(
-                                                new AlignmentSpan() {
-                                                    @Override
-                                                    public Layout.Alignment getAlignment() {
-                                                        return Layout.Alignment.ALIGN_NORMAL;
-                                                    }
-                                                },
-                                                off + tag.end,
-                                                off + tree.get(tree.getClosingTag(tag)).start,
-                                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                                        );
-                                        break;
+                                try {
+                                    switch (tag.get("align")) {
+                                        case "right":
+                                            builder.setSpan(
+                                                    new AlignmentSpan() {
+                                                        @Override
+                                                        public Layout.Alignment getAlignment() {
+                                                            return Layout.Alignment.ALIGN_OPPOSITE;
+                                                        }
+                                                    },
+                                                    off + tag.end,
+                                                    off + tree.get(tree.getClosingTag(tag)).start,
+                                                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                                            );
+                                            break;
+                                        case "center":
+                                            builder.setSpan(
+                                                    new AlignmentSpan() {
+                                                        @Override
+                                                        public Layout.Alignment getAlignment() {
+                                                            return Layout.Alignment.ALIGN_CENTER;
+                                                        }
+                                                    },
+                                                    off + tag.end,
+                                                    off + tree.get(tree.getClosingTag(tag)).start,
+                                                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                                            );
+                                            break;
+                                        case "left":
+                                            builder.setSpan(
+                                                    new AlignmentSpan() {
+                                                        @Override
+                                                        public Layout.Alignment getAlignment() {
+                                                            return Layout.Alignment.ALIGN_NORMAL;
+                                                        }
+                                                    },
+                                                    off + tag.end,
+                                                    off + tree.get(tree.getClosingTag(tag)).start,
+                                                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                                            );
+                                            break;
+                                    }
+                                } catch (IndexOutOfBoundsException e) {
+                                    Log.e("Things", "IOOBE when parsing spans");
+                                    System.out.println(tree);
+                                    System.out.println(tag);
                                 }
                             switch (tag.get("class")) {
                                 case "red":
@@ -468,11 +470,13 @@ public class HtmlRipper {
 //							builder.insert(off++ + tag.end, "\n");       // Используем расставление из html, ибо pre.
                             break;
                         case "img":
-                            if (tag.get("src").isEmpty()) continue;
+                            String unmoddedSrc = tag.get("src");
+                            if (unmoddedSrc.isEmpty()) continue;
                             final String repl = "I";
                             builder.insert(off + tag.start, repl);
 
-                            final String src = tag.get("src");
+                            final String src = unmoddedSrc.startsWith("//")
+                                    ? scheme + ":" + unmoddedSrc : unmoddedSrc;
 
                             Drawable dr = context.getResources().getDrawable(replacerImage);
                             if (dr != null)

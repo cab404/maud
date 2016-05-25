@@ -22,7 +22,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
@@ -42,17 +42,17 @@ import ru.everypony.maud.utils.Meow;
  */
 public class CommentEditFragment extends Fragment implements HideablePartBehavior.ChangeCallback {
 
-    @Bind(R.id.text)
+    @BindView(R.id.text)
     EditText text;
-    @Bind(R.id.target)
+    @BindView(R.id.target)
     TextView target;
-    @Bind(R.id.send)
+    @BindView(R.id.send)
     ImageView send;
-    @Bind(R.id.commentFrame)
+    @BindView(R.id.commentFrame)
     RelativeLayout commentFrame;
-    @Bind(R.id.root)
+    @BindView(R.id.root)
     IgnorantCoordinatorLayout root;
-    @Bind(R.id.instruments)
+    @BindView(R.id.instruments)
     LinearLayout instrumentsLayout;
 
     private HideablePartBehavior behavior;

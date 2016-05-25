@@ -13,7 +13,7 @@ import android.widget.AbsListView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.everypony.maud.R;
 
@@ -27,7 +27,7 @@ import ru.everypony.maud.R;
  */
 public class ListFragment extends Fragment {
 
-    @Bind(R.id.list)
+    @BindView(R.id.list)
     AbsListView list;
 
     @Override

@@ -13,8 +13,8 @@ android {
         applicationId "ru.everypony.maud"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 4
+        versionName "1.0.3"
     }
     buildTypes {
         release {
@@ -25,6 +25,9 @@ android {
 }
 
 String support_v = '22.2.1'
+
+apply plugin: 'com.neenbedankt.android-apt'
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'], exclude: ['*-sources.jar'])
 
@@ -34,6 +37,7 @@ dependencies {
     compile 'com.android.support:design:' + support_v
 
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
-    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.jakewharton:butterknife:8.0.1'
+    apt 'com.jakewharton:butterknife-compiler:8.0.1'
     compile 'com.cab404:chumroll:1.0'
 }

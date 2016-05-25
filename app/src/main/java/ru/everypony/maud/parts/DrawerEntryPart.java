@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import com.cab404.chumroll.ChumrollAdapter;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.everypony.maud.R;
 
@@ -36,9 +36,9 @@ public class DrawerEntryPart extends MoonlitPart<DrawerEntryPart.Data> {
         public String title;
     }
 
-    @Bind(R.id.title)
+    @BindView(R.id.title)
     TextView title;
-    @Bind(R.id.count)
+    @BindView(R.id.count)
     TextView count;
 
     @Override

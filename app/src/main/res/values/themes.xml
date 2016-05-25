@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto">
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <declare-styleable name="AppTheme">
         <attr name="inverse_bg_color" format="color" />
@@ -14,6 +14,8 @@
         <attr name="alert_dialog_nobg_theme" format="reference" />
         <attr name="best_pony" format="reference" />
     </declare-styleable>
+
+    <color name="colorPrimary">?colorPrimary</color>
 
     <style name="PreferenceThemeOverlay.Shrinked">
         <item name="android:textSize">16sp</item>

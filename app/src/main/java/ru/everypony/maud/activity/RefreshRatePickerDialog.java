@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.everypony.maud.R;
@@ -41,16 +41,16 @@ public class RefreshRatePickerDialog extends Dialog implements SeekBar.OnSeekBar
     }
 
     static {
-        times.put(5000l, R.string.interval_5_seconds);
-        times.put(9000l, R.string.interval_9000_ms);
-        times.put(10000l, R.string.interval_10_seconds);
-        times.put(13000l, R.string.interval_13_seconds);
-        times.put(13000l, R.string.interval_15_seconds);
-        times.put(30000l, R.string.interval_30_seconds);
-        times.put(42000l, R.string.interval_42_seconds);
-        times.put(60000l, R.string.interval_1_minute);
-        times.put(65536l, R.string.interval_65536_ms);
-        times.put(413000l, R.string.interval_413_seconds);
+        times.put(5000L, R.string.interval_5_seconds);
+        times.put(9000L, R.string.interval_9000_ms);
+        times.put(10000L, R.string.interval_10_seconds);
+        times.put(13000L, R.string.interval_13_seconds);
+        times.put(13000L, R.string.interval_15_seconds);
+        times.put(30000L, R.string.interval_30_seconds);
+        times.put(42000L, R.string.interval_42_seconds);
+        times.put(60000L, R.string.interval_1_minute);
+        times.put(65536L, R.string.interval_65536_ms);
+        times.put(413000L, R.string.interval_413_seconds);
         times.put(TimeUnit.DAYS.toMillis(1), R.string.interval_1_day);
         times.put(TimeUnit.DAYS.toMillis(365 * 1000 + 250), R.string.interval_1000_years);
 
@@ -61,13 +61,13 @@ public class RefreshRatePickerDialog extends Dialog implements SeekBar.OnSeekBar
         super(context);
     }
 
-    @Bind(R.id.value)
+    @BindView(R.id.value)
     SeekBar value;
 
-    @Bind(R.id.refresh_enabled)
+    @BindView(R.id.refresh_enabled)
     CheckBox enabled;
 
-    @Bind(R.id.indicator)
+    @BindView(R.id.indicator)
     TextView indicator;
 
     @Override

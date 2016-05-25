@@ -23,18 +23,6 @@
             android:launchMode="singleTask">
         </activity>
 
-        <!--<activity android:name=".activity.ProfileActivity"-->
-            <!--android:configChanges="keyboard|orientation|screenSize"-->
-            <!--&gt;-->
-            <!--<intent-filter>-->
-                <!--<category android:name="android.intent.category.BROWSABLE" />-->
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-                <!--<action android:name="android.intent.action.VIEW" />-->
-                <!--<data android:scheme="https" android:host="tabun.everypony.ru/profile" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-
-
         <activity
             android:name=".activity.TopicActivity"
             android:configChanges="keyboard|orientation|screenSize"
@@ -65,14 +53,15 @@
 
         <activity android:name=".activity.ResolverActivity">
 
-
             <intent-filter>
+                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.intent.action.VIEW" />
                 <data
                     android:scheme="https"
                     android:host="tabun.everypony.ru"
                     android:pathPattern=".*"
+                    android:sspPattern=".*"
                     />
             </intent-filter>
 

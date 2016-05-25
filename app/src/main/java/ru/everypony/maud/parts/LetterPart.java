@@ -12,7 +12,7 @@ import com.cab404.libtabun.data.Letter;
 import com.cab404.libtabun.data.Topic;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.everypony.maud.R;
 import ru.everypony.maud.text.StaticWebView;
@@ -27,13 +27,13 @@ import ru.everypony.maud.text.StaticWebView;
  */
 public class LetterPart extends MoonlitPart<Letter> {
 
-    @Bind(R.id.title)
+    @BindView(R.id.title)
     TextView title;
-    @Bind(R.id.text)
+    @BindView(R.id.text)
     StaticWebView text;
-    @Bind(R.id.author)
+    @BindView(R.id.author)
     TextView author;
-    @Bind(R.id.avatar)
+    @BindView(R.id.avatar)
     ImageView avatar;
     private TopicPartCallback callback;
 

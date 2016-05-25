@@ -10,7 +10,7 @@ import com.cab404.libtabun.data.CommonInfo;
 import com.cab404.libtabun.data.Profile;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.everypony.maud.R;
 
@@ -24,10 +24,10 @@ import ru.everypony.maud.R;
  */
 public class UserHeaderPart extends MoonlitPart<CommonInfo> {
 
-    @Bind(R.id.login)
+    @BindView(R.id.login)
     TextView login;
 
-    @Bind(R.id.avatar)
+    @BindView(R.id.avatar)
     ImageView avatar;
 
 

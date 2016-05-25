@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.everypony.maud.R;
 import ru.everypony.maud.text.DateUtils;
@@ -142,21 +142,21 @@ public class CommentPart extends MoonlitPart<Comment> implements MidnightSync.In
             }
     }
 
-    @Bind(R.id.text)
+    @BindView(R.id.text)
     StaticWebView text;
-    @Bind(R.id.author)
+    @BindView(R.id.author)
     TextView author;
-    @Bind(R.id.date)
+    @BindView(R.id.date)
     TextView date;
-    @Bind(R.id.votes)
+    @BindView(R.id.votes)
     TextView votes;
-    @Bind(R.id.avatar)
+    @BindView(R.id.avatar)
     ImageView avatar;
-    @Bind(R.id.userspace)
+    @BindView(R.id.userspace)
     View userspace;
-    @Bind(R.id.delimiter)
+    @BindView(R.id.delimiter)
     View delimeter;
-    @Bind(R.id.root)
+    @BindView(R.id.root)
     View root;
 
     @Override

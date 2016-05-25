@@ -6,19 +6,21 @@ import android.app.ProgressDialog;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.TypedArray;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.text.Editable;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.cab404.chumroll.ChumrollAdapter;
@@ -39,7 +41,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindColor;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
@@ -67,20 +70,42 @@ public abstract class PublicationFragment extends ListFragment implements
         CommentEditFragment.SendCallback,
         CommentPart.CommentPartCallback,
         RefreshRatePickerDialog.RefreshPickedListener {
-    public static final String KEY_ID = "id";
 
+    public static final String KEY_ID = "id";
+    volatile boolean updating = false;
+
+    List<Integer> newCommentsStack = new ArrayList<>();
+    RefreshRatePickerDialog.SavedRefreshState refreshState = new RefreshRatePickerDialog.SavedRefreshState();
+
+    @BindView(R.id.colorful_button)
+    ImageView updateButton;
+
+    UpdateDrawable spinningWheel;
+
+    long refreshRateMs = 0;
     private ChumrollAdapter adapter;
     private MidnightSync sync;
     private CommentPart commentPart;
-
+    Comparator<Integer> levelIDs = new Comparator<Integer>() {
+        @Override
+        public int compare(Integer lhs, Integer rhs) {
+            return commentPart.getIndex(lhs, adapter) - commentPart.getIndex(rhs, adapter);
+        }
+    };
     private Comment replyingTo = null;
     private boolean editing = false;
-
     private CommentEditFragment commentFragment;
     private boolean atLeastSomethingIsHere;
     private boolean broken;
-
     private int selectedCommentId = -1;
+    Runnable updateCycle = new Runnable() {
+        @Override
+        public void run() {
+            if (isDetached()) return;
+            update(false);
+            list.postDelayed(this, refreshRateMs);
+        }
+    };
 
     public void setCommentFragment(CommentEditFragment commentFragment) {
         this.commentFragment = commentFragment;
@@ -92,21 +117,52 @@ public abstract class PublicationFragment extends ListFragment implements
         return R.layout.fragment_topic;
     }
 
+    abstract void prepareAdapter(ChumrollAdapter adapter);
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        final View view = super.onCreateView(inflater, container, savedInstanceState);
-        ButterKnife.bind(this, view);
-        return view;
+        System.out.println("ON CREATE");
     }
 
-    abstract void prepareAdapter(ChumrollAdapter adapter);
+    void rootPrint(View view, int offset) {
+        StringBuilder line = new StringBuilder();
+        for (int i = 0; i < offset; i++) {
+            line.append("  ");
+        }
+        line.append(view);
+        System.out.println(line);
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                rootPrint(((ViewGroup) view).getChildAt(i), offset + 1);
+            }
+        }
+    }
 
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (list == null)
-            return;
+        System.out.println("ON VIEW CREATED");
+        if (list == null) {
+            System.err.println("*** NULL RECREATE ***");
+            rootPrint(view, 0);
+            if (view != null && view.findViewById(R.id.list) != null) {
+                System.err.println("possible recreation?");
+                list = (AbsListView) view.findViewById(R.id.list);
+                updateButton = (ImageView) view.findViewById(R.id.colorful_button);
+            }
+        }
+        onFinishedCreating();
+    }
+
+    void onFinishedCreating() {
+
+        TypedArray attributes = getView().getContext().obtainStyledAttributes(new int[]{R.attr.colorPrimary});
+        int primaryColor = attributes.getColor(0, 0);
+        attributes.recycle();
+        updateButton.getBackground().setColorFilter(primaryColor, PorterDuff.Mode.SRC_ATOP);
+
         adapter = new ChumrollAdapter();
 
         commentPart = new CommentPart();
@@ -134,16 +190,6 @@ public abstract class PublicationFragment extends ListFragment implements
             commentFragment.setTarget(getActivity().getString(R.string.replying_topic));
 
     }
-
-    volatile boolean updating = false;
-
-    List<Integer> newCommentsStack = new ArrayList<>();
-    Comparator<Integer> levelIDs = new Comparator<Integer>() {
-        @Override
-        public int compare(Integer lhs, Integer rhs) {
-            return commentPart.getIndex(lhs, adapter) - commentPart.getIndex(rhs, adapter);
-        }
-    };
 
     public void nextNew() {
         Meow.inMain(new Runnable() {
@@ -206,52 +252,52 @@ public abstract class PublicationFragment extends ListFragment implements
         final RefreshCommentsRequest request = getRefreshRequest(getCommentPart().getLastCommentId());
         request.setSelfIdComment(selfCommentId);
         if (getActivity() != null)
-        RequestManager.fromActivity(getActivity())
-                .manage(request)
-                .setCallback(new RequestManager.SimpleRequestCallback<RefreshCommentsRequest>() {
-                    @Override
-                    public void onStart(RefreshCommentsRequest what) {
-                        super.onStart(what);
-                    }
+            RequestManager.fromActivity(getActivity())
+                    .manage(request)
+                    .setCallback(new RequestManager.SimpleRequestCallback<RefreshCommentsRequest>() {
+                        @Override
+                        public void onStart(RefreshCommentsRequest what) {
+                            super.onStart(what);
+                        }
 
-                    @Override
-                    public void onSuccess(final RefreshCommentsRequest what) {
-                        list.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (clearNew) {
-                                    clearNew();
+                        @Override
+                        public void onSuccess(final RefreshCommentsRequest what) {
+                            list.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (clearNew) {
+                                        clearNew();
+                                    }
+                                    for (Comment cm : what.comments) {
+                                        sync.inject(cm, commentPart, commentPart);
+                                        commentPart.register(cm);
+                                        if (cm.is_new)
+                                            newCommentsStack.add(cm.id);
+                                    }
+                                    spinningWheel.setNum(newCommentsStack.size());
                                 }
-                                for (Comment cm : what.comments) {
-                                    sync.inject(cm, commentPart, commentPart);
-                                    commentPart.register(cm);
-                                    if (cm.is_new)
-                                        newCommentsStack.add(cm.id);
+                            });
+                        }
+
+                        @Override
+                        public void onError(RefreshCommentsRequest what, final Exception e) {
+                            super.onError(what, e);
+                            e.printStackTrace();
+                            Meow.inMain(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                                 }
-                                spinningWheel.setNum(newCommentsStack.size());
-                            }
-                        });
-                    }
+                            });
+                        }
 
-                    @Override
-                    public void onError(RefreshCommentsRequest what, final Exception e) {
-                        super.onError(what, e);
-                        e.printStackTrace();
-                        Meow.inMain(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getActivity(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFinish(RefreshCommentsRequest what) {
-                        updating = false;
-                        setUpdating(false);
-                    }
-                })
-                .start();
+                        @Override
+                        public void onFinish(RefreshCommentsRequest what) {
+                            updating = false;
+                            setUpdating(false);
+                        }
+                    })
+                    .start();
     }
 
     @Override
@@ -348,8 +394,6 @@ public abstract class PublicationFragment extends ListFragment implements
         return commentPart;
     }
 
-    RefreshRatePickerDialog.SavedRefreshState refreshState = new RefreshRatePickerDialog.SavedRefreshState();
-
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         final int id = item.getItemId();
@@ -418,11 +462,6 @@ public abstract class PublicationFragment extends ListFragment implements
         update(true);
         return true;
     }
-
-    @Bind(R.id.colorful_button)
-    FloatingActionButton updateButton;
-
-    UpdateDrawable spinningWheel;
 
     void setUpdating(boolean updating) {
         spinningWheel.setSpinning(updating);
@@ -652,17 +691,6 @@ public abstract class PublicationFragment extends ListFragment implements
             }
         });
     }
-
-
-    long refreshRateMs = 0;
-    Runnable updateCycle = new Runnable() {
-        @Override
-        public void run() {
-            if (isDetached()) return;
-            update(false);
-            list.postDelayed(this, refreshRateMs);
-        }
-    };
 
     @Override
     public void onRefreshRatePicked(boolean enabled, long rate_ms) {

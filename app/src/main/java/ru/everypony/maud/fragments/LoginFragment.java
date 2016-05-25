@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ru.everypony.maud.R;
@@ -28,14 +28,14 @@ public class LoginFragment extends Fragment {
     public static final String KEY_USERNAME = "login.username";
     private LoginCallback loginCallback;
 
-    @Bind(R.id.username)
+    @BindView(R.id.username)
     EditText fUsername;
-    @Bind(R.id.password)
+    @BindView(R.id.password)
     EditText fPassword;
-    @Bind(R.id.save_pwd)
+    @BindView(R.id.save_pwd)
     CheckBox fRemember;
 
-    @Bind(R.id.loading)
+    @BindView(R.id.loading)
     ProgressBar loading;
 
     @Override

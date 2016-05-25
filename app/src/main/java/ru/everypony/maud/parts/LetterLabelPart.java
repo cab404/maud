@@ -20,7 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
-import butterknife.Bind;
+import butterknife.BindView;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.everypony.maud.R;
 import ru.everypony.maud.fragments.LetterListFragment;
@@ -38,17 +39,17 @@ public class LetterLabelPart extends MoonlitPart<LetterLabel> {
     private final LetterListFragment act;
     private AbsListView list;
 
-    @Bind(R.id.title)
+    @BindView(R.id.title)
     TextView title;
-    @Bind(R.id.recipients)
+    @BindView(R.id.recipients)
     TextView recipients;
-    @Bind(R.id.date)
+    @BindView(R.id.date)
     TextView date;
-    @Bind(R.id.comment_num)
+    @BindView(R.id.comment_num)
     TextView commentNum;
-    @Bind(R.id.new_comments)
+    @BindView(R.id.new_comments)
     TextView newComments;
-    @Bind(R.id.selected)
+    @BindView(R.id.selected)
     CheckBox selected;
     private ActionMode actionMode;
 
