@@ -2,6 +2,7 @@ package ru.everypony.maud.fragments;
 
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,27 +12,25 @@ import android.view.ViewGroup;
 
 import com.cab404.chumroll.ChumrollAdapter;
 import com.cab404.libtabun.data.CommonInfo;
-import com.cab404.libtabun.data.Profile;
-import com.cab404.moonlight.parser.HTMLTree;
-import com.cab404.moonlight.parser.Tag;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
 import ru.everypony.maud.R;
 import ru.everypony.maud.parts.DrawerEntryPart;
 import ru.everypony.maud.parts.MoonlitPart;
+import ru.everypony.maud.parts.SimpleButtonItem;
 import ru.everypony.maud.parts.UserHeaderPart;
 import ru.everypony.maud.statics.Providers;
+import ru.everypony.maud.utils.DrawerItemData;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DrawerContentFragment extends ListFragment implements Observer {
+public class DrawerContentFragment extends ListFragment implements Observer, SharedPreferences.OnSharedPreferenceChangeListener {
 
     DrawerClickCallback callback;
     ChumrollAdapter adapter;
@@ -43,7 +42,8 @@ public class DrawerContentFragment extends ListFragment implements Observer {
             ID_PUBLICATIONS = 3,
             ID_EXIT = 4,
             ID_MAIN = 5,
-            ID_START_BLOGS = 300;
+            ID_EDIT_LIST = 6,
+            ID_BLOG = 300;
 
     public DrawerContentFragment() {
         adapter = new ChumrollAdapter();
@@ -53,7 +53,7 @@ public class DrawerContentFragment extends ListFragment implements Observer {
             @Override
             public void onClick(DrawerEntryPart.Data data, View view) {
                 if (callback != null)
-                    callback.onDrawerItemSelected(data.id);
+                    callback.onDrawerItemSelected(data);
             }
         });
     }
@@ -86,11 +86,11 @@ public class DrawerContentFragment extends ListFragment implements Observer {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        update(Providers.UserInfo.getInstance().getInfo());
+        update();
     }
 
-    Map<Integer, String> blogs = new HashMap<>();
-    void update(CommonInfo info) {
+    void update() {
+        CommonInfo info = Providers.UserInfo.getInstance().getInfo();
         if (info == null) {
             return;
         }
@@ -99,26 +99,42 @@ public class DrawerContentFragment extends ListFragment implements Observer {
 
         adapter.add(UserHeaderPart.class, info);
         List<DrawerEntryPart.Data> points = new ArrayList<>();
-        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.main_page_label), ID_MAIN));
-        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.messages_label), ID_MESSAGES, info.new_messages));
-        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.publications_label), ID_PUBLICATIONS));
-        points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.favourites), ID_FAVOURITES));
+        points.add(new DrawerEntryPart.Data(getString(R.string.main_page_label), ID_MAIN));
+        points.add(new DrawerEntryPart.Data(getString(R.string.messages_label), ID_MESSAGES, info.new_messages));
+        points.add(new DrawerEntryPart.Data(getString(R.string.publications_label), ID_PUBLICATIONS));
+        points.add(new DrawerEntryPart.Data(getString(R.string.favourites), ID_FAVOURITES));
 
-        Profile profile = Providers.UserProfile.getInstance().getProfile();
-        if (profile != null && profile.get(Profile.UserInfoType.BELONGS) != null){
-            HTMLTree tags = new HTMLTree(
-                    profile.get(Profile.UserInfoType.BELONGS)
+
+        Providers.Preferences.getInstance().get().registerOnSharedPreferenceChangeListener(this);
+        ConfigureDrawerFragment.DrawerItemContainer container = new Gson().fromJson(
+                Providers.Preferences.getInstance().get().getString("drawerItems", "{}"),
+                ConfigureDrawerFragment.DrawerItemContainer.class
+        );
+
+        for (DrawerItemData saved : container.data) {
+            DrawerEntryPart.Data data = new DrawerEntryPart.Data(
+                    saved.name,
+                    DrawerContentFragment.ID_BLOG
             );
-            int blog_ids = ID_START_BLOGS;
-            for (Tag a : tags.xPath("a")) {
-                blogs.put(blog_ids++, a.get("href"));
-                points.add(new DrawerEntryPart.Data(tags.getContents(a), blog_ids));
-            }
+            data.data = saved.data;
+            points.add(data);
         }
 
         points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.settings_label), ID_SETTINGS));
         points.add(new DrawerEntryPart.Data(getActivity().getString(R.string.logout_label), ID_EXIT));
         adapter.addAll(DrawerEntryPart.class, points);
+        adapter.add(
+                SimpleButtonItem.class,
+                new SimpleButtonItem.ButtonData(
+                        getString(R.string.edit_list),
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                callback.onDrawerItemSelected(new DrawerEntryPart.Data(null, ID_EDIT_LIST));
+                            }
+                        }
+                )
+        );
 
         setAdapter(adapter);
     }
@@ -134,13 +150,20 @@ public class DrawerContentFragment extends ListFragment implements Observer {
             getView().post(new Runnable() {
                 @Override
                 public void run() {
-                    update((CommonInfo) data);
+                    update();
                 }
             });
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if ("drawerItems".equals(key)) {
+            update();
+        }
+    }
+
     public interface DrawerClickCallback {
-        void onDrawerItemSelected(int id);
+        void onDrawerItemSelected(DrawerEntryPart.Data data);
     }
 
 }

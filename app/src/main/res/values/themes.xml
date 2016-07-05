@@ -22,7 +22,7 @@
     </style>
 
     <style name="AppThemeDark" parent="Theme.AppCompat">
-        <item name="android:statusBarColor" tools:targetApi="lollipop">?attr/colorPrimaryDark</item>
+        <item name="android:statusBarColor" tools:targetApi="lollipop">?attr/colorPrimary</item>
         <item name="inverse_bg_color">#fff</item>
         <item name="minus_color">#b71c1c</item>
         <item name="plus_color">#43a047</item>

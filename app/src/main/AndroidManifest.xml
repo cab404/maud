@@ -61,7 +61,6 @@
                     android:scheme="https"
                     android:host="tabun.everypony.ru"
                     android:pathPattern=".*"
-                    android:sspPattern=".*"
                     />
             </intent-filter>
 

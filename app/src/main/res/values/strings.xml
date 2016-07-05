@@ -113,5 +113,9 @@
         <item quantity="other">letters</item>
     </plurals>
     <string name="allow_mobile_images">Images on cell network</string>
+    <string name="load_from_profile">Load from profile</string>
+    <string name="add_blog">Add blog</string>
+    <string name="edit_list">Edit drawer...</string>
+    <string name="loading_user_data">Loading user data</string>
 
 </resources>

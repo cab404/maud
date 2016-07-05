@@ -10,22 +10,28 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.MenuItem;
 
+import com.cab404.libtabun.data.Blog;
 import com.cab404.libtabun.data.CommonInfo;
 import com.cab404.libtabun.data.Profile;
+import com.cab404.libtabun.util.Tabun;
+import com.cab404.libtabun.util.TabunAccessProfile;
 import com.cab404.moonlight.parser.HTMLTree;
 import com.cab404.moonlight.parser.Tag;
 import com.cab404.moonlight.util.SU;
+import com.google.gson.Gson;
 
 import java.util.List;
 
 import ru.everypony.maud.R;
+import ru.everypony.maud.fragments.ConfigureDrawerFragment;
 import ru.everypony.maud.fragments.DrawerContentFragment;
 import ru.everypony.maud.fragments.FavouritesFragment;
 import ru.everypony.maud.fragments.LetterListFragment;
 import ru.everypony.maud.fragments.LoginFragment;
-import ru.everypony.maud.fragments.SettingsFragment;
 import ru.everypony.maud.fragments.PublicationsFragment;
 import ru.everypony.maud.fragments.PublicationsListFragment;
+import ru.everypony.maud.fragments.SettingsFragment;
+import ru.everypony.maud.parts.DrawerEntryPart;
 import ru.everypony.maud.statics.Providers;
 import ru.everypony.maud.utils.Meow;
 
@@ -59,7 +65,7 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
         drawerToggle.getToolbarNavigationClickListener();
         drawerLayout.setDrawerListener(drawerToggle);
 
-        onDrawerItemSelected(DrawerContentFragment.ID_MAIN);
+        onDrawerItemSelected(new DrawerEntryPart.Data(null, DrawerContentFragment.ID_MAIN));
     }
 
     @Override
@@ -74,12 +80,14 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
         return super.onOptionsItemSelected(item);
     }
 
-    int currentSection = -1;
+    DrawerEntryPart.Data currentSection = null;
 
     @Override
-    public void onDrawerItemSelected(int id) {
+    public void onDrawerItemSelected(DrawerEntryPart.Data data) {
         Fragment use = null;
-        if (currentSection == id)
+        int id = data.id;
+
+        if (data.equals(currentSection))
             return;
 
         final CommonInfo info = Providers.UserInfo.getInstance().getInfo();
@@ -88,11 +96,13 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
             finish();
             return;
         }
-        String login = info.username;
 
         switch (id) {
             case DrawerContentFragment.ID_MAIN:
                 use = PublicationsListFragment.getInstance("/blog/good");
+                break;
+            case DrawerContentFragment.ID_EDIT_LIST:
+                use = new ConfigureDrawerFragment();
                 break;
             case DrawerContentFragment.ID_SETTINGS:
                 use = new SettingsFragment();
@@ -124,15 +134,9 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
                             }
                         }).show();
                 break;
-            default:
-                HTMLTree tags = new HTMLTree(
-                        Providers.UserProfile.getInstance().getProfile().get(Profile.UserInfoType.BELONGS)
-                );
-                List<Tag> blogs = tags.xPath("a");
-                Tag tag = blogs.get(id - DrawerContentFragment.ID_START_BLOGS - 1);
-                use = PublicationsListFragment.getInstance(
-                        SU.bsub(tag.get("href"), "tabun.everypony.ru", "")
-                );
+            case DrawerContentFragment.ID_BLOG:
+                Blog blog = Tabun.resolveURL(data.data);
+                use = PublicationsListFragment.getInstance(blog.resolveURL());
                 break;
         }
 
@@ -143,20 +147,28 @@ public class MainActivity extends LoginDependentActivity implements DrawerConten
                     .replace(R.id.content_frame, use, "content")
                     .commit();
             drawerLayout.closeDrawer(GravityCompat.START);
-            currentSection = id;
+            currentSection = data;
         }
     }
 
+    private Gson gson = new Gson();
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        onDrawerItemSelected(savedInstanceState.getInt("selected"));
+        onDrawerItemSelected(
+                gson.fromJson(
+                        savedInstanceState.getString("selected"),
+                        DrawerEntryPart.Data.class
+                )
+        );
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("selected", currentSection);
+        outState.putString("selected", gson.toJson(
+                currentSection
+        ));
     }
 
     protected void logout() {

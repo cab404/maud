@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 
 import java.util.ArrayList;
 
@@ -52,6 +53,15 @@ public class IgnorantCoordinatorLayout extends CoordinatorLayout {
         if (resizeCallback != null)
             resizeCallback.onSizeChanged(w, h, oldw, oldh);
 
+    }
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        for (int i = 0; i < getChildCount(); i++)
+            if (getChildAt(i).onTouchEvent(ev))
+                return super.onTouchEvent(ev);
+        return false;
     }
 
     ResizeCallback resizeCallback;

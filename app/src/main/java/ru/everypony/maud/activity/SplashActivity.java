@@ -276,18 +276,6 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
             );
             getRequestManager().manage(basePage).setCallback(new RetryCallback<TabunPage>()).run();
         }
-        msg("loading navigation data");
-        String username = Providers.UserInfo.getInstance().getInfo().username;
-        getRequestManager().manage(new ProfilePage(username)).setHandlers(
-                new ModularBlockParser.ParsedObjectHandler() {
-                    @Override
-                    public void handle(Object object, int key) {
-                        if (key == TabunPage.BLOCK_USER_INFO) {
-                            Providers.UserProfile.getInstance().setProfile((Profile) object);
-                        }
-                    }
-                }
-        ).run();
     }
 
     void onSuccess() {
@@ -305,7 +293,7 @@ public class SplashActivity extends BaseActivity implements LoginFragment.LoginC
                 startActivity(returnTo);
                 finish();
             }
-        }, 1500);
+        }, 500);
     }
 
     void msg(final String message) {

@@ -180,27 +180,4 @@ public class Providers {
         }
     }
 
-    public static class UserProfile extends Observable {
-
-        private static UserProfile ourInstance = new UserProfile();
-
-        public static UserProfile getInstance() {
-            return ourInstance;
-        }
-
-        com.cab404.libtabun.data.Profile profile;
-
-        public com.cab404.libtabun.data.Profile getProfile() {
-            return profile;
-        }
-
-        public void setProfile(com.cab404.libtabun.data.Profile profile) {
-            if (profile == null)
-                return;
-            setChanged();
-            this.profile = profile;
-            notifyObservers(profile);
-        }
-
-    }
 }

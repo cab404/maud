@@ -117,5 +117,9 @@
     <string name="update">Обновить</string>
     <string name="reload_page">Обновить страницу</string>
     <string name="allow_mobile_images">Картинки в мобильной сети</string>
+    <string name="add_blog">Добавить блог</string>
+    <string name="load_from_profile">Загрузить из профиля</string>
+    <string name="edit_list">Редактировать список...</string>
+    <string name="loading_user_data">Загрузка данных пользователя</string>
 
 </resources>

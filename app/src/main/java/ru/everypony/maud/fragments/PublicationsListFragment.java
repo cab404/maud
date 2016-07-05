@@ -81,12 +81,17 @@ public class PublicationsListFragment extends RefreshableListFragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        adapter = new ChumrollAdapter();
+        sync = new MidnightSync(adapter);
+    }
+
+    @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         url = getArguments().getString(KEY_URL);
 
-        adapter = new ChumrollAdapter();
-        sync = new MidnightSync(adapter);
         TopicPart topicPart = new TopicPart();
         CommentPart commentPart = new CommentPart();
         commentPart.setMoveToPostVisible(true);

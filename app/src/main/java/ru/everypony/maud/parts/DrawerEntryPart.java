@@ -34,6 +34,7 @@ public class DrawerEntryPart extends MoonlitPart<DrawerEntryPart.Data> {
 
         public int count, id;
         public String title;
+        public String data;
     }
 
     @BindView(R.id.title)
