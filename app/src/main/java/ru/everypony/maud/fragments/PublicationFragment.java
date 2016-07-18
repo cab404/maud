@@ -195,7 +195,7 @@ public abstract class PublicationFragment extends ListFragment implements
         Meow.inMain(new Runnable() {
             @Override
             public void run() {
-                if (newCommentsStack.isEmpty()) return;
+                if (newCommentsStack.isEmpty() || adapter == null) return;
 
                 Collections.sort(newCommentsStack, levelIDs);
 

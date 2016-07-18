@@ -90,6 +90,8 @@ public class DrawerContentFragment extends ListFragment implements Observer, Sha
     }
 
     void update() {
+        if (getView() == null) return;
+
         CommonInfo info = Providers.UserInfo.getInstance().getInfo();
         if (info == null) {
             return;
