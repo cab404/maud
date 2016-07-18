@@ -42,6 +42,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.nostra13.universalimageloader.core.assist.ViewScaleType;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.NonViewAware;
 
 import java.util.ArrayList;
@@ -504,30 +505,30 @@ public class HtmlRipper {
 
                             int width, height;
                             if (tag.get("width").isEmpty())
-                                width = (int) (layout.getWidth() * 0.9f);
+                                width = -1;
                             else
                                 width = Integer.parseInt(tag.get("width"));
 
                             if (tag.get("height").isEmpty())
-                                height = -1;//(int) (layout.getWidth() * 0.6f);
+                                height = -1;
                             else
                                 height = Integer.parseInt(tag.get("height"));
 
-                            final SpanImageListener imageAware = new SpanImageListener(target, replacer, builder);
-                            ImageSize size = new ImageSize(width, height);
+                            final SpanImageListener imageAware = new SpanImageListener(
+                                    target,
+                                    replacer,
+                                    builder,
+                                    new ImageSize(width, height)
+                            );
                             DisplayImageOptions opt = new DisplayImageOptions.Builder()
                                     .cacheInMemory(true)
                                     .cacheOnDisk(true)
-                                    .imageScaleType(ImageScaleType.EXACTLY).build();
+                                    .build();
+
                             if (loadImages && ImageLoader.getInstance().getDiskCache().get(src) == null)
-                                ImageLoader.getInstance().loadImage(src, size, opt, imageAware);
+                                ImageLoader.getInstance().loadImage(src, opt, imageAware);
                             if (ImageLoader.getInstance().getDiskCache().get(src) != null)
-                                ImageLoader.getInstance().displayImage(
-                                        src,
-                                        new NonViewAware(src, size, ViewScaleType.FIT_INSIDE),
-                                        opt,
-                                        imageAware
-                                );
+                                ImageLoader.getInstance().loadImage(src, opt, imageAware);
                             off += repl.length();
                             break;
                     }
