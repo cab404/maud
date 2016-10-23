@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 
+
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
@@ -13,8 +14,8 @@ android {
         applicationId "ru.everypony.maud"
         minSdkVersion 10
         targetSdkVersion 24
-        versionCode 6
-        versionName "1.1.1"
+        versionCode 7
+        versionName "1.1.2"
     }
     buildTypes {
         release {
